@@ -9,7 +9,7 @@ class SalonOwner(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 class Salon(models.Model):
     salon_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
@@ -26,6 +26,16 @@ class Salon(models.Model):
     def __str__(self):
         return self.name
 
+class SalonMaintainer(models.Model):
+    maintainer_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=13)
+    password = models.CharField(max_length=100)
+    salon = models.ForeignKey(Salon,on_delete=models.DO_NOTHING,related_name="Maintains")
+    def __str__(self):
+        return self.name
+    
 class UserManager(models.Manager):
     def create_user(self, name, email, phone, otp, is_phone_verified=False, **extra_fields):
         if not phone:

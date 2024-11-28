@@ -48,3 +48,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+SalonaBackend/db.sqlite3
+SalonaBackend/Salon/__pycache__/
+SalonaBackend/hnb/__pycache__/
+SalonaBackend/migrations/
+SalonaBackend/rest_views/__pycache__/

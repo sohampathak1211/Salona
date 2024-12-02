@@ -75,7 +75,7 @@ const CreateBill = ({ view }) => {
     >
       {/* Vendor Dropdown */}
       <div>
-        <label className="block text-sm font-medium">Vendor</label>
+        <label className="block text-sm font-medium">Customer</label>
         <select
           value={vendorId}
           onChange={(e) => setVendorId(e.target.value)}
@@ -83,25 +83,9 @@ const CreateBill = ({ view }) => {
           required
         >
           <option value="" disabled>
-            Select Vendor
+            Select Customer
           </option>
           <option value="1">Hello Travels</option>
-        </select>
-      </div>
-
-      {/* Vehicle Dropdown */}
-      <div>
-        <label className="block text-sm font-medium">Vehicle</label>
-        <select
-          value={vehicleId}
-          onChange={(e) => setVehicleId(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2"
-          required
-        >
-          <option value="" disabled>
-            Select Vehicle
-          </option>
-          <option value="7">MH 20 HG 4563</option>
         </select>
       </div>
 

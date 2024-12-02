@@ -6,6 +6,7 @@ import { RiColorFilterFill } from 'react-icons/ri'
 import { IoMdBookmarks } from 'react-icons/io'
 import { MdAutoGraph } from 'react-icons/md'
 import { PiScissorsFill } from "react-icons/pi";
+import { MdCleaningServices } from "react-icons/md";
 
 const useAssets = () => {
   const categories = [
@@ -24,23 +25,29 @@ const useAssets = () => {
     {
       id: 2,
       name: 'Services',
-      icon: <RiColorFilterFill className="transition-all duration-500" size={25} />,
+      icon: <MdCleaningServices className="transition-all duration-500" size={25} />,
       link: '/service'
     },
     {
       id: 3,
-      name: 'Users',
-      icon: <FaUsers className="transition-all duration-500" size={25} />,
-      link: '/user'
+      name: 'Combos',
+      icon: <RiColorFilterFill className="transition-all duration-500" size={25} />,
+      link: '/combos'
     },
     {
-      id: 4,
+      id: 3,
+      name: 'Customers',
+      icon: <FaUsers className="transition-all duration-500" size={25} />,
+      link: '/customer'
+    },
+    {
+      id: 5,
       name: 'Music',
       icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
       link: '/music'
     },
     {
-      id: 5,
+      id: 6,
       name: 'Salons',
       icon: <PiScissorsFill className="transition-all duration-500" size={25} />,
       link: '/salon'
@@ -63,7 +70,7 @@ const useAssets = () => {
       id: 0,
       name: 'Settings',
       icon: <GrSettingsOption className="transition-all duration-500" size={25} />,
-      link:"/"
+      link:"settings"
     },
   ]
   return { categories, options }

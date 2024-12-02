@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Modal from 'react-modal'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import '../../../index.css'
+import '../../../../index.css'
 import SalonCard from './SalonCard'
 import AddSalon from './AddSalon'
 
@@ -51,28 +51,29 @@ const Salon = () => {
 
   const cleanLocalStorage = async () => {
     const response = await window.electron.ipcRenderer
-      .invoke('setAppData', {})
+      .invoke('setAppData', { key: 'data', value: {} })
       .then((d) => setTemp(d))
       .catch((e) => console.log(e))
   }
 
-  const createData = async() => {
+  const createData = async () => {
     const response = await window.electron.ipcRenderer
-      .invoke('setAppData', {name:"Soham Pathak"})
+      .invoke('setAppData', { key: 'data', value: { name: 'Soham Pathak' } })
       .then((d) => console.log(d))
       .catch((e) => console.log(e))
   }
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <ToastContainer />
+    <div className="p-8 bg-gray-100">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-yellow-600" onClick={createData}>Salon Dashboard</h1>
+        <h1 className="text-2xl font-bold text-yellow-600" onClick={createData}>
+          Salon Dashboard
+        </h1>
         <button
           className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
           onClick={() => {
             //  setIsModalOpen(true);
-             cleanLocalStorage();
-            }}
+            cleanLocalStorage()
+          }}
         >
           Add Salon
         </button>

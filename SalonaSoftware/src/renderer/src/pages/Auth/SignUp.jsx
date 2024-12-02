@@ -59,7 +59,7 @@ export default function SignUp() {
 
       {/* Right side - Form */}
       <div className="flex flex-col justify-center w-full lg:w-1/2 p-8 sm:p-16 lg:p-24 bg-white">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Create an account</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Register as a Salon Owner</h1>
 
         <form>
           <div className="mb-4">

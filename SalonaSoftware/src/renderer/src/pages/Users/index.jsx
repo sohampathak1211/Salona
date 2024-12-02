@@ -2,18 +2,18 @@ import React, { useEffect, useState } from 'react'
 import CreateUser from './CreateUser'
 import EditUser from './EditUser'
 import Modal from 'react-modal'
+import useAuth from '../../services/useAuth'
 
-const Users = () => {
+const Customer = () => {
   const [VendorDetails, setVendorDetails] = useState([])
-
+  const { getUsers } = useAuth()
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
 
-  const fetchUser = () => {
-    window.electron.ipcRenderer.invoke('getUsers').then((data) => {
-      setVendorDetails(data)
-    })
+  const fetchUser = async () => {
+    const data = await getUsers();
+    setVendorDetails(data)
   }
 
   useEffect(() => {
@@ -41,24 +41,24 @@ const Users = () => {
       <div className="w-full p-10">
         <div className="flex justify-between">
           <div>
-            <h2 className="text-sm font-bold text-subheading">User</h2>
-            <h2 className="text-3xl font-bold">User</h2>
+            <h2 className="text-sm font-bold text-subheading">Customer</h2>
+            <h2 className="text-3xl font-bold">Customers</h2>
           </div>
           <button
             onClick={() => setCreate(true)}
             className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500 transition-colors"
           >
-            Add a new User
+            Add a new Customer
           </button>
         </div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">
-          <h2 className="w-full bg-white p-5 text-xl font-bold">User Details</h2>
+          <h2 className="w-full bg-white p-5 text-xl font-bold">Customer Details</h2>
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-subheading bg-white border-b">
               <tr>
                 <th scope="col" className="px-6 py-3">
-                  User Name
+                  Name
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Email
@@ -123,4 +123,4 @@ const Users = () => {
   )
 }
 
-export default Users
+export default Customer

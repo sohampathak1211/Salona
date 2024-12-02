@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SalonOwner, Salon, User, Service, Appointment
+from .models import SalonOwner, Salon, User, Service, Appointment,SalonMaintainer
 
 class SalonOwnerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,12 +15,22 @@ class SalonOwnerSignUp(serializers.ModelSerializer):
     class Meta:
         model = SalonOwner
         fields = ['name', 'email','phone','password']
+        
+class SalonMaintainer(serializers.ModelSerializer):
+    class Meta:
+        model = SalonMaintainer
+        fields = '__all__'
 
 
 class SalonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Salon
         fields = '__all__'
+class SearchSalonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Salon
+        fields = ['name','address']
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,4 +1,4 @@
-import Both from '../../assets/hairfemale3.jpg?react'
+import Both from '../../../assets/hairfemale3.jpg?react'
 
 const SalonCard = ({ salon, onClick }) => {
   return (

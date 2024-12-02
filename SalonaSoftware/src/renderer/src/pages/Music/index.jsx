@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import WebView from './WebView'
 
 const Music = () => {
+  
   return (
-    <div>Music</div>
+    <div className={`w-full min-h-screen`}>
+      
+    </div>
   )
 }
 

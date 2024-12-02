@@ -2,22 +2,45 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from hnb.models import Salon
-from hnb.serializer import SalonSerializer
+from hnb.serializer import SalonSerializer,SearchSalonSerializer
+from django.db.models import Q, F, Max, Min, ExpressionWrapper, DecimalField
 
 class SalonRest(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            salon_id=request.query_params.get('salon_id') 
+            # Fetch search query from query parameters
+            search_query = request.query_params.get('search', '').strip()
+            salon_id = request.query_params.get('salon_id')
+            only_names_and_locations = request.GET.get('names_and_locations', 'false').lower() == 'true'
+            
+            # Fetch by salon_id if provided
             if salon_id:
-                salon = Salon.objects.filter(id==salon_id)
-                seri = SalonSerializer(salon,many=False)
-                print("HIT",salon)
-                return Response(seri.data,status=status.HTTP_200_OK)
-            data = Salon.objects.all()
-            serializer = SalonSerializer(data, many=True)
+                salon = Salon.objects.filter(id=salon_id).first()
+                if not salon:
+                    return Response({"error": "Salon not found"}, status=status.HTTP_404_NOT_FOUND)
+                serializer = SalonSerializer(salon)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            # Apply search filter if search_query exists
+            if search_query:
+                salons = Salon.objects.filter(
+                    Q(name=search_query) | 
+                    Q(location__icontains=search_query)  # Replace `location` with any other field you want to include
+                )
+            elif only_names_and_locations:
+                salons = Salon.objects.values('name', 'location')
+                print(salons)
+                serializer = SearchSalonSerializer(salons,many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                salons = Salon.objects.all()
+
+            serializer = SalonSerializer(salons, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     def post(self, request, *args, **kwargs):
         serializer = SalonSerializer(data=request.data)

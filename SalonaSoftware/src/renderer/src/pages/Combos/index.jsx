@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import CreateVendor from './CreateVendor'
 import Modal from 'react-modal'
-import EditService from './EditService'
+import EditVendor from './EditVendor'
 
-const Services = () => {
+const Combos = () => {
   const [VendorDetails, setVendorDetails] = useState([])
 
   const [create, setCreate] = useState(false)
@@ -18,7 +18,7 @@ const Services = () => {
   }
 
   useEffect(() => {
-    fetchVendor()
+    fetchVendor();
   }, [])
 
   const handleEditVendor = (vendor) => {
@@ -42,34 +42,24 @@ const Services = () => {
       <div className="w-full p-10">
         <div className="flex justify-between">
           <div>
-            <h2
-              className="text-sm font-bold text-subheading"
-              onClick={() =>
-                window.electron.ipcRenderer
-                  .invoke('createServices', { key: 'data', value: {} })
-                  .then((d) => console.log('Success'))
-                  .catch((e) => console.log(e))
-              }
-            >
-              Services
-            </h2>
-            <h2 className="text-3xl font-bold">Services</h2>
+            <h2 className="text-sm font-bold text-subheading">Combos</h2>
+            <h2 className="text-3xl font-bold">Combos</h2>
           </div>
           <button
             onClick={() => setCreate(true)}
             className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
           >
-            Add a new Services
+            Add a new Combo
           </button>
         </div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">
-          <h2 className="w-full bg-white p-5 text-xl font-bold">Services Details</h2>
+          <h2 className="w-full bg-white p-5 text-xl font-bold">Combo Details</h2>
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-subheading bg-white border-b">
               <tr>
                 <th scope="col" className="px-6 py-3">
-                  Service Name
+                Combo Name
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Category
@@ -81,7 +71,7 @@ const Services = () => {
                   Price
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Duration
+                  Services
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Actions
@@ -104,7 +94,7 @@ const Services = () => {
                     {item.price}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.duration}
+                    {item.services}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     <button
@@ -128,7 +118,7 @@ const Services = () => {
       </div>
       {create && <CreateVendor fetchVendor={fetchVendor} setCreate={setCreate} create={create} />}
       {edit && (
-        <EditService
+        <EditVendor
           setEdit={setEdit}
           edit={edit}
           vendorToEdit={vendorToEdit}
@@ -140,4 +130,4 @@ const Services = () => {
   )
 }
 
-export default Services
+export default Combos

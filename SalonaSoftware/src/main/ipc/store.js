@@ -1,10 +1,10 @@
 let Store
 let store
-(async () => {
+;(async () => {
   Store = (await import('electron-store')).default
   store = new Store()
   console.log('Here I am the store', store)
-})();
+})()
 
 export function registerStoreHandlers(ipcMain) {
   ipcMain.handle('setAppData', (event, { key, value }) => {
@@ -25,4 +25,22 @@ export function registerStoreHandlers(ipcMain) {
       return {}
     }
   })
+}
+
+export const getAllStoreData = () => {
+  try {
+    return store.store
+  } catch (error) {
+    console.error('Failed to get all store data:', error)
+    return {}
+  }
+}
+
+export const getData = (key) => {
+  try {
+    return store.get(key)
+  } catch (e) {
+    console.error('Failed to get app data:', e)
+    return {}
+  }
 }

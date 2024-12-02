@@ -1,8 +1,13 @@
 import React from 'react'
+import Salon from './Salon'
+import Maintainer from './Maintainer'
 
 const Settings = () => {
   return (
-    <div>Settings</div>
+    <div>
+      <Salon />
+      <Maintainer/>
+    </div>
   )
 }
 

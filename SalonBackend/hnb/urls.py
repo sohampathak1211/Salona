@@ -3,6 +3,7 @@ from django.contrib import admin
 from hnb.rest_views.Appointment import AppointmentRest
 from hnb.rest_views.Salon import SalonRest
 from hnb.rest_views.SalonOwner import SalonOwnerRest
+from hnb.rest_views.Maintainer import MaintainerRest
 from hnb.rest_views.Services import ServicesRest
 from hnb.rest_views.User import UserRest
 from hnb.views import SignupView, SigninView, OtpVerificationView, OtpResendView
@@ -11,6 +12,7 @@ urlpatterns = [
     path("Appointment/", AppointmentRest.as_view()),
     path("salon/", SalonRest.as_view()),
     path("salon_owner/", SalonOwnerRest.as_view()),
+    path("salon_maintainer/", MaintainerRest.as_view()),
     path("services/", ServicesRest.as_view()),
     path("users/", UserRest.as_view()),
     path("salon_owner/signup/", SignupView.as_view(), name="signup"),

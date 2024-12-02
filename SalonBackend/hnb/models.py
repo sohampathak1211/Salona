@@ -26,13 +26,22 @@ class Salon(models.Model):
     def __str__(self):
         return self.name
 
+class Branch(models.Model):
+    branch_id = models.AutoField(primary_key=True)
+    address = models.TextField()
+    phone = models.CharField(max_length=15)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    salon = models.ForeignKey(Salon, on_delete=models.DO_NOTHING, related_name='branches')
+    
+
 class SalonMaintainer(models.Model):
     maintainer_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=13)
     password = models.CharField(max_length=100)
-    salon = models.ForeignKey(Salon,on_delete=models.DO_NOTHING,related_name="Maintains")
+    brnach = models.ForeignKey(Branch,on_delete=models.DO_NOTHING,related_name="Maintains")
     def __str__(self):
         return self.name
     
@@ -71,6 +80,7 @@ class Service(models.Model):
     service_id = models.AutoField(primary_key=True)
     salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name='services')
     name = models.CharField(max_length=100)
+    category = models.CharField(max_length=50)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     duration = models.DurationField()

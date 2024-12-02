@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Logo from '../../assets/logo.png?react'
+import useAuth from '../../services/useAuth'
 
 const SplashScreen = () => {
   const navigate = useNavigate()
+  const { salonSignIn } = useAuth()
+  const [authenticated, setAuthenticated] = useState(false)
+
+  const redirect = () => {
+    navigate('/auth')
+  }
 
   useEffect(() => {
     // window.electron.ipcRenderer.send('splash-loaded')
     setTimeout(() => {
-      navigate('/auth')
+      redirect()
     }, 3000)
   }, [])
 

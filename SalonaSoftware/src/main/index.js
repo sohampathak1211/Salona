@@ -5,19 +5,17 @@ import icon from '../../resources/icon.png?asset'
 import axios from 'axios'
 import path from 'path'
 import fs from 'fs'
+import { registerSalonOwnerHandlers } from './ipc/auth'
 import { registerSalonHandlers } from './ipc/salon'
 import { registerAppointmentHandlers } from './ipc/appointment'
 import { registerStoreHandlers } from './ipc/store'
+import { ServiceApi } from './ipc/services'
 // const __dirname = dirname(fileURLToPath(import.meta.url))
 // console.log(__dirname)
 // const store = new Store()
-let Store;
-let store;
-(async () => {
-  Store = (await import('electron-store')).default;
-  store = new Store();
-  console.log("Here I am the store",store)
-})();
+
+console.log("Enviroment",process.env.SALONA_BACKEND_URL) 
+
 
 const SERVER_IP = 'http://127.0.0.1:8000/'
 const gs = globalShortcut
@@ -37,14 +35,18 @@ function createWindow() {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      webviewTag: true
     }
   })
   ipcMain.on('react-loaded', () => {
     mainWindow.maximize()
-    mainWindow.setTitle('Salona') // Set the title when React is fully loaded
-    mainWindow.show() // Show the window
+    mainWindow.setTitle('Salona')
+    mainWindow.show()
   })
 
   mainWindow.on('ready-to-show', () => {
@@ -57,8 +59,6 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -66,30 +66,9 @@ function createWindow() {
   }
 }
 
-// ipcMain.handle('registerOwner', async (e, data) => {
-//   const re = await axios.post(`${SERVER_IP}hnb/salon_owner/`, data)
-//   console.log(re.data)
-// })
-
-ipcMain.handle('signinOwner', async (e, data) => {
-  const re = await axios.post(`${SERVER_IP}hnb/salon_owner/`, data)
-  console.log(re.data)
-})
-
-// ipcMain.handle('getSalon', async () => {
-//   try {
-//     const response = await axios.get(`${SERVER_IP}hnb/salon?salon_id=3`)
-//     return response.data
-//   } catch (error) {
-//     console.error('Failed to fetch company data:', error)
-//     return { error: 'Failed to fetch data' }
-//   }
-// })
-
 ipcMain.handle('getUsers', async (event) => {
   try {
     const response = await axios.get(`${SERVER_IP}hnb/users/`)
-    console.log('Response', response)
     return response.data
   } catch (error) {
     console.error('Failed to fetch company data:', error)
@@ -97,96 +76,14 @@ ipcMain.handle('getUsers', async (event) => {
   }
 })
 
-// ipcMain.handle('createTruck', async (event, someArguments) => {
-//   try {
-//     console.log(someArguments)
-//     const response = await axios.post(`${SERVER_IP}chand/Vehicle/`, someArguments)
-//     return response.data
-//   } catch (error) {
-//     console.error('Failed to fetch company data:')
-//     return { error: 'Failed to fetch data' }
-//   }
-// })
-
-// ipcMain.handle('getVehicle', async () => {
-//   try {
-//     const response = await axios.get(`${SERVER_IP}chand/Vehicle/`)
-//     return response.data
-//   } catch (error) {
-//     console.error('Failed to fetch company data:', error)
-//     return { error: 'Failed to fetch data' }
-//   }
-// })
-
-// ipcMain.handle('updateTruck', async (e, args) => {
-//   try {
-//     const response = await axios.patch(`${SERVER_IP}chand/Vehicle/`, args)
-//     return response
-//   } catch (err) {
-//     console.log('SOme error occured', err)
-//     return { error: 'Failed to update' }
-//   }
-// })
-
-// ipcMain.handle('deleteTruck', async (e, args) => {
-//   try {
-//     console.log(args)
-//     const response = await axios.delete(`${SERVER_IP}chand/Vehicle/?number=${args}`)
-//     return response
-//   } catch (err) {
-//     console.log('SOme error occured', err)
-//     return { error: 'Failed to update' }
-//   }
-// })
-
-// ipcMain.handle('getVendors', async () => {
-//   try {
-//     const response = await axios.get(`${SERVER_IP}chand/Vendor/`)
-//     return response.data
-//   } catch (error) {
-//     console.error('Failed to fetch company data:', error)
-//     return { error: 'Failed to fetch data' }
-//   }
-// })
-
-// ipcMain.handle('createVendor', async (event, someArguments) => {
-//   try {
-//     const response = await axios.post(`${SERVER_IP}chand/Vendor/`, someArguments)
-//     return response.data
-//   } catch (error) {
-//     console.error('Failed to fetch company data:')
-//     return { error: 'Failed to fetch data' }
-//   }
-// })
-
-// ipcMain.handle('updateVendor', async (e, args) => {
-//   try {
-//     const response = await axios.patch(`${SERVER_IP}chand/Vendor/`, args)
-//     return response
-//   } catch (err) {
-//     console.log('SOme error occured', err)
-//     return { error: 'Failed to update' }
-//   }
-// })
-
-// ipcMain.handle('getBills', async () => {
-//   try {
-//     const response = await axios.get(`${SERVER_IP}chand/Bill/`)
-//     return response.data
-//   } catch (error) {
-//     console.error('Failed to fetch company data:', error)
-//     return { error: 'Failed to fetch data' }
-//   }
-// })
-
-
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
-
-  registerSalonHandlers(ipcMain);
-  registerAppointmentHandlers(ipcMain);
-  registerStoreHandlers(ipcMain);
+  registerSalonOwnerHandlers(ipcMain)
+  registerSalonHandlers(ipcMain)
+  registerAppointmentHandlers(ipcMain)
+  registerStoreHandlers(ipcMain)
+  ServiceApi(ipcMain)
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

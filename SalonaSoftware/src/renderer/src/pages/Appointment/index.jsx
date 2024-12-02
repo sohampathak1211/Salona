@@ -48,12 +48,12 @@ const Appointment = () => {
             onClick={() => setView((prev) => !prev)}
             className="m-3 mr-10 bg-yellow-400 px-5 py-2 rounded-xl text-black font-bold hover:bg-yellow-500 transition-colors duration-300"
           >
-            Add an Appointment
+            Add a Bill
           </button>
         </div>
 
         <div className={`relative rounded-2xl overflow-x-auto mt-5 ${view ? 'hidden' : 'block'}`}>
-          <h2 className="w-full bg-white p-5 text-xl font-bold">Appointment Details</h2>
+          <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-subheading bg-white border-b">
               <tr>
@@ -64,13 +64,10 @@ const Appointment = () => {
                   Date
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Vendor Name
+                  Customer Name
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  From
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  To
+                  Customer Phone
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Vehicle Number
@@ -78,9 +75,6 @@ const Appointment = () => {
                 {/* Added Vehicle Number */}
                 <th scope="col" className="px-6 py-3">
                   Total Amount
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Pending Amount
                 </th>
                 {/* <th scope="col" className="px-6 py-3">
                   Actions
@@ -104,22 +98,16 @@ const Appointment = () => {
                     {item.date.split('-').reverse().join('-')}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item?.ven_id?.name}
+                    {item?.customer_id?.name}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.from_add}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.to_add}
+                    {item?.customer_id?.phone}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {item.veh_id ? item.veh_id.number : 'Vehicle was deleted'}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     ₹{item.total_amt}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    ₹{item.pending}
                   </td>
                   {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     <button

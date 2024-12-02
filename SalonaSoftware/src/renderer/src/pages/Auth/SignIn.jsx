@@ -87,12 +87,12 @@ export default function SignIn() {
       const res = await salonSignIn({ email, password, salon: selectedSalon, action: 'signin' })
       console.log('data from the backend for user', res)
       if (res.error) {
-        toast.info(res.error)
+        toast.info(res)
         return;
       }
       toast.success(res.message)
     } catch (err) {
-      toast.error(err.error)
+      toast.error(err)
       setError('An error occurred. Please try again later.')
     } finally {
       setLoading(false)

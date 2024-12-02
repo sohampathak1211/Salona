@@ -10,14 +10,14 @@ import { registerSalonHandlers } from './ipc/salon'
 import { registerAppointmentHandlers } from './ipc/appointment'
 import { registerStoreHandlers } from './ipc/store'
 import { ServiceApi } from './ipc/services'
+import "../main/middleware/auth";
+import { customerHandler } from './ipc/customer'
 // const __dirname = dirname(fileURLToPath(import.meta.url))
 // console.log(__dirname)
 // const store = new Store()
 
-console.log("Enviroment",process.env.SALONA_BACKEND_URL) 
+export const SERVER_URL = process.env.SALONA_BACKEND_URL &&  'http://127.0.0.1:8000/'
 
-
-const SERVER_IP = 'http://127.0.0.1:8000/'
 const gs = globalShortcut
 function createWindow() {
   gs.register('f5', function () {
@@ -66,24 +66,16 @@ function createWindow() {
   }
 }
 
-ipcMain.handle('getUsers', async (event) => {
-  try {
-    const response = await axios.get(`${SERVER_IP}hnb/users/`)
-    return response.data
-  } catch (error) {
-    console.error('Failed to fetch company data:', error)
-    return { error: 'Failed to fetch data' }
-  }
-})
-
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+  // ALL THE API REGISTERED
   registerSalonOwnerHandlers(ipcMain)
   registerSalonHandlers(ipcMain)
   registerAppointmentHandlers(ipcMain)
   registerStoreHandlers(ipcMain)
   ServiceApi(ipcMain)
+  customerHandler(ipcMain)
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

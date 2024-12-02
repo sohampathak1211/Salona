@@ -11,9 +11,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+LOGS_DIR = os.path.join(STATIC_DIR, 'logs')
+if not os.path.exists(STATIC_DIR):
+    os.makedirs(STATIC_DIR)
+
+# Check if the logs directory exists inside the static folder, and create it if it doesn't
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
 
 
 # Quick-start development settings - unsuitable for production
@@ -51,9 +60,45 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'hnb.middlewares.ChatUserEnabledMiddleware',
 ]
 
 ROOT_URLCONF = 'Salon.urls'
+
+LOGGING = {
+    'version': 1,  # Required key specifying the schema version
+    'disable_existing_loggers': False,  # Ensures existing loggers are not disabled
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',  # Set the logging level to INFO
+            'class': 'logging.FileHandler',
+            'filename': f"{LOGS_DIR}/general.log",
+            'formatter': 'verbose',  # Use the verbose formatter
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'INFO', 
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
 
 TEMPLATES = [
     {

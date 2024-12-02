@@ -1,17 +1,18 @@
 from django.db import models
 
 class SalonOwner(models.Model):
-    owner_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=13)
     password = models.CharField(max_length=100)
+    is_enabled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
     
 class Salon(models.Model):
-    salon_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     address = models.TextField()
     phone = models.CharField(max_length=15)
@@ -27,7 +28,7 @@ class Salon(models.Model):
         return self.name
 
 class Branch(models.Model):
-    branch_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     address = models.TextField()
     phone = models.CharField(max_length=15)
     description = models.TextField()
@@ -36,12 +37,12 @@ class Branch(models.Model):
     
 
 class SalonMaintainer(models.Model):
-    maintainer_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=13)
     password = models.CharField(max_length=100)
-    brnach = models.ForeignKey(Branch,on_delete=models.DO_NOTHING,related_name="Maintains")
+    branch = models.ForeignKey(Branch,on_delete=models.DO_NOTHING,related_name="Maintains")
     def __str__(self):
         return self.name
     
@@ -58,7 +59,7 @@ class UserManager(models.Manager):
         return self.create_user(name, email, phone, otp, **extra_fields)
 
 class User(models.Model):
-    user_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15)
@@ -77,7 +78,7 @@ class User(models.Model):
         return self.name
 
 class Service(models.Model):
-    service_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name='services')
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=50)
@@ -89,7 +90,7 @@ class Service(models.Model):
         return self.name
 
 class Appointment(models.Model):
-    appointment_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='appointments')
     salon = models.ForeignKey(Salon, on_delete=models.CASCADE, related_name='appointments')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='appointments')

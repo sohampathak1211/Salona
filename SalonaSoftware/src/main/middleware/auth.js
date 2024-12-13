@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getData, setData } from '../ipc/store'
 
 const Request = axios.create({
   baseURL: process.env.SALONA_BACKEND_URL || 'http://127.0.0.1:8000/'
@@ -6,8 +7,7 @@ const Request = axios.create({
 
 Request.interceptors.request.use(
   async (config) => {
-    const token = 'hello'
-    console.log('Request Hook: Adding Authorization Header', token)
+    const token = getData('token')
     config.headers.Authorization = `Bearer ${token}`
 
     if (config.data instanceof FormData) {
@@ -21,10 +21,11 @@ Request.interceptors.request.use(
 )
 
 Request.interceptors.response.use(
-  (response) => response,
+  (response) => response.data,
   async (error) => {
     if (error.response) {
       if (error.response.status === 401) {
+        setData('token', '')
         console.log('Unauthorized: Handle Logout or Refresh Token')
       } else if (error.response.status === 403) {
         return Promise.reject({ data: error.response.data, status: 403 })

@@ -1,6 +1,6 @@
 import React from 'react'
 
-// data 
+// data
 // userInfo
 // salons
 // currentSalonIndex

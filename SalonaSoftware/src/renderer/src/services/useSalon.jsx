@@ -34,7 +34,20 @@ const useSalon = () => {
         return e
       })
   }
-  return { searchSalon, getNamesAndLocation, getBranchNamesAndLocation }
+
+  const createSalon = async (details) => {
+    return await window.electron.ipcRenderer
+      .invoke('createSalon', {
+        names_and_locations: true
+      })
+      .then((data) => {
+        return data
+      })
+      .catch((e) => {
+        return e
+      })
+  }
+  return { searchSalon, getNamesAndLocation, getBranchNamesAndLocation, createSalon }
 }
 
 export default useSalon

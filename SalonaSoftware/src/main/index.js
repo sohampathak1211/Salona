@@ -8,15 +8,18 @@ import fs from 'fs'
 import { registerSalonOwnerHandlers } from './ipc/auth'
 import { registerSalonHandlers } from './ipc/salon'
 import { registerAppointmentHandlers } from './ipc/appointment'
-import { registerStoreHandlers } from './ipc/store'
+import { loadEnv, registerStoreHandlers } from './ipc/store'
 import { ServiceApi } from './ipc/services'
-import "../main/middleware/auth";
+import '../main/middleware/auth'
 import { customerHandler } from './ipc/customer'
+import { registerEnv } from './ipc/configEnv'
 // const __dirname = dirname(fileURLToPath(import.meta.url))
 // console.log(__dirname)
 // const store = new Store()
 
-export const SERVER_URL = process.env.SALONA_BACKEND_URL &&  'http://127.0.0.1:8000/'
+export const SERVER_URL = process.env.SALONA_BACKEND_URL && 'http://127.0.0.1:8000/'
+export const SALON_ID = process.env.SALON_ID
+export const BRANCH_ID = process.env.BRANCH_ID
 
 const gs = globalShortcut
 function createWindow() {
@@ -36,13 +39,14 @@ function createWindow() {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false,
+      // contextIsolation: false,
       enableRemoteModule: true,
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       webviewTag: true
     }
   })
+
   ipcMain.on('react-loaded', () => {
     mainWindow.maximize()
     mainWindow.setTitle('Salona')
@@ -54,10 +58,10 @@ function createWindow() {
     mainWindow.show()
   })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+  // mainWindow.webContents.setWindowOpenHandler((details) => {
+  //   shell.openExternal(details.url)
+  //   return { action: 'deny' }
+  // })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -76,6 +80,8 @@ app.whenReady().then(() => {
   registerStoreHandlers(ipcMain)
   ServiceApi(ipcMain)
   customerHandler(ipcMain)
+  registerEnv(ipcMain)
+  // loadEnv({ SERVER_URL, SALON_ID, BRANCH_ID })
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -95,6 +101,17 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+// Expense ease reference 
+// ipcMain.handle('updateTruck', async (e, args) => {
+//   try {
+//     const response = await axios.patch('http://127.0.0.1:8000/chand/Vehicle/', args)
+//     return response
+//   } catch (err) {
+//     console.log('SOme error occured', err)
+//     return { error: 'Failed to update' }
+//   }
+// })
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

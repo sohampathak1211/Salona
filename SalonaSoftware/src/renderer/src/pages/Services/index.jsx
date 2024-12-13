@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import CreateVendor from './CreateVendor'
+import CreateService from './CreateService'
 import Modal from 'react-modal'
 import EditService from './EditService'
+import useService from '../../services/useService'
 
 const Services = () => {
   const [VendorDetails, setVendorDetails] = useState([])
+  const { getBranchServices } = useService()
 
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
 
-  const fetchVendor = () => {
-    // window.electron.ipcRenderer
-    // .invoke('getVendors')
-    // .then((data) => setVendorDetails(data))
-    // .catch((e) => console.log(e))
+  const fetchVendor = async () => {
+    const data = await getBranchServices({}, { branch_id: 2 })
+    console.log('Data For services', data)
+    setVendorDetails(() => data)
   }
 
   useEffect(() => {
@@ -89,7 +90,7 @@ const Services = () => {
               </tr>
             </thead>
             <tbody>
-              {VendorDetails.map((item) => (
+              { VendorDetails.length > 0 && VendorDetails.map((item) => (
                 <tr key={item.service_id} className="bg-white text-large">
                   <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {item.name}
@@ -126,7 +127,7 @@ const Services = () => {
           </table>
         </div>
       </div>
-      {create && <CreateVendor fetchVendor={fetchVendor} setCreate={setCreate} create={create} />}
+      {create && <CreateService fetchVendor={fetchVendor} setCreate={setCreate} create={create} />}
       {edit && (
         <EditService
           setEdit={setEdit}

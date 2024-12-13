@@ -2,15 +2,25 @@ import React, { useState } from 'react'
 import { validateVendor } from '../../../utils/validators'
 import { toast } from 'react-toastify'
 
-const CreateVendor = ({ setCreate, create , fetchVendor}) => {
+const CreateService = ({ setCreate, create, fetchVendor }) => {
   const [vendor, setVendor] = useState({
+    branch_id: -1,
+    branch_name: "",
     name: '',
-    email: '',
-    domain: '',
-    address: '',
-    phone: '',
-    gst_no: ''
+    category: '',
+    description: '',
+    price: '',
+    duration: ''
   })
+
+  //   {
+  //     "branch":2,
+  //     "name": "Facial",
+  //     "category": "MALE",
+  //     "description": "A standard men's haircut.",
+  //     "price": 20.00,
+  //     "duration": "1 Hour"
+  // }
 
   const handleClose = () => {
     setCreate(false)
@@ -23,14 +33,14 @@ const CreateVendor = ({ setCreate, create , fetchVendor}) => {
 
   const handleSubmit = () => {
     // Basic input validation can go here
-    if (!vendor.name || !vendor.email || !vendor.phone) {
+    if (!vendor.name || !vendor.description || !vendor.price) {
       toast.warn('Please fill out all required fields')
       return
     }
 
     // Handle vendor creation logic here
     console.log('Vendor details:', vendor)
-    window.electron.ipcRenderer.invoke('createVendor', vendor).then((data) => {
+    window.electron.ipcRenderer.invoke('CreateService', vendor).then((data) => {
       setVendor(data)
       fetchVendor()
       toast.success('Vendor created successfully')
@@ -51,7 +61,7 @@ const CreateVendor = ({ setCreate, create , fetchVendor}) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
-          <h3 className="text-xl font-semibold text-gray-900">Create Vendor</h3>
+          <h3 className="text-xl font-semibold text-gray-900">Create Service</h3>
           <button
             type="button"
             className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
@@ -85,66 +95,66 @@ const CreateVendor = ({ setCreate, create , fetchVendor}) => {
                   name="name"
                   value={vendor.name}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-900">Email</label>
+                <label className="block text-sm font-medium text-gray-900">Category</label>
                 <input
-                  type="email"
-                  name="email"
-                  value={vendor.email}
+                  type="text"
+                  name="category"
+                  value={vendor.category}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  required
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-900">Domain</label>
+                <label className="block text-sm font-medium text-gray-900">Branch</label>
                 <input
-                  type="text"
-                  name="domain"
-                  value={vendor.domain}
+                  type="branch_name"
+                  name="branch_name"
+                  value={vendor.branch_name}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-900">GST Number</label>
-                <input
-                  type="text"
-                  name="gst_no"
-                  value={vendor.gst_no}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-900">Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={vendor.phone}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
                   required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-900">Price</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={vendor.price}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-900">Duration {"(Hours)"}</label>
+                <input
+                  type="text"
+                  name="duration"
+                  value={vendor.duration}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
                 />
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-900">Address</label>
+                <label className="block text-sm font-medium text-gray-900">Description</label>
                 <input
                   type="text"
-                  name="address"
-                  value={vendor.address}
+                  name="description"
+                  value={vendor.description}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
                   required
                 />
               </div>
@@ -160,7 +170,7 @@ const CreateVendor = ({ setCreate, create , fetchVendor}) => {
               </button>
               <button
                 onClick={handleSubmit}
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="text-black font-semibold bg-gold hover:bg-gold/90 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-5 py-2.5 text-center"
               >
                 Create
               </button>
@@ -172,4 +182,4 @@ const CreateVendor = ({ setCreate, create , fetchVendor}) => {
   )
 }
 
-export default CreateVendor
+export default CreateService

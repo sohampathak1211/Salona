@@ -36,9 +36,33 @@ export const getAllStoreData = () => {
   }
 }
 
+export const setData = (key,value) => {
+  try {
+    store.set(key, value)
+    return { success: true }
+  } catch (error) {
+    console.error('Failed to set app data:', error)
+    return { success: false }
+  }
+}
+
 export const getData = (key) => {
   try {
     return store.get(key)
+  } catch (e) {
+    console.error('Failed to get app data:', e)
+    return {}
+  }
+}
+
+export const loadEnv = (allEnvs) => {
+  try {
+    Object.keys(allEnvs).forEach((key) => {
+      console.log(`${key}: ${allEnvs[key]}`)
+      store.set(key, allEnvs[key])
+    })
+    console.log('Env loaded successfully')
+    return 'Success'
   } catch (e) {
     console.error('Failed to get app data:', e)
     return {}

@@ -32,4 +32,14 @@ export function registerSalonHandlers(ipcMain) {
       return { error: 'Failed to search salon' }
     }
   })
+
+  ipcMain.handle('createSalon', async ({ params, data }) => {
+    try {
+      const response = await axios.post(`${SERVER_URL}hnb/salon/`, data)
+      return response.data;
+    } catch (e) {
+      console.error('Failed to search salon:', e)
+      return { error: 'Failed to search salon' }
+    }
+  })
 }

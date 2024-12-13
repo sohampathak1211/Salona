@@ -43,6 +43,8 @@ export default function SignUp() {
       .then((data) => {
         console.log(data)
         navigate("/auth")
+      }).then(nav=>{
+        
       })
       .catch((e) => console.log(e))
   }

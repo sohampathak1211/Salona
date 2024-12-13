@@ -5,4 +5,4 @@ export const API_URL = `${SERVER_IP}hnb/`;
 
 export const salonOwner = `${API_URL}salon_owner/`;
 export const salon = `${API_URL}salon/`;
-export const services = `${API_URL}services/`;
+export const services = `${API_URL}service/`;

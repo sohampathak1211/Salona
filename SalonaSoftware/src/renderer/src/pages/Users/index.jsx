@@ -3,17 +3,20 @@ import CreateUser from './CreateUser'
 import EditUser from './EditUser'
 import Modal from 'react-modal'
 import useAuth from '../../services/useAuth'
+import useCustomer from '../../services/useCustomer'
 
 const Customer = () => {
   const [VendorDetails, setVendorDetails] = useState([])
   const { getUsers } = useAuth()
+  const {getSalonCustomer} = useCustomer();
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
 
   const fetchUser = async () => {
-    const data = await getUsers();
-    setVendorDetails(data)
+    const data = await getSalonCustomer();
+    console.log("Customer data",data)
+    setVendorDetails([])
   }
 
   useEffect(() => {
@@ -75,7 +78,7 @@ const Customer = () => {
               </tr>
             </thead>
             <tbody>
-              {VendorDetails.map((item) => (
+              {VendorDetails?.map((item) => (
                 <tr key={item.id} className="bg-white text-large">
                   <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {item.name}

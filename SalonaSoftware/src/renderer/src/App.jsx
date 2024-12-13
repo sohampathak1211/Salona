@@ -13,6 +13,7 @@ import Otp from './pages/Auth/Otp'
 import { ToastContainer } from 'react-toastify'
 import Combos from './pages/Combos'
 import Customer from './pages/Users'
+import SalonCreation from './pages/Auth/SalonCreation'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<SplashScreen />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/salonCreate" element={<SalonCreation />} />
         <Route path="/otp" element={<Otp />} />
         <Route path="/auth" element={<SidebarLayout />}>
           <Route index element={<Dashboard />} />

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { SERVER_URL } from '..'
+import { deserialize, serialize } from '../utils'
+import Request from '../middleware/auth'
 
 export function registerSalonOwnerHandlers(ipcMain) {
   ipcMain.handle('registerOwner', async (e, data) => {
@@ -15,11 +17,18 @@ export function registerSalonOwnerHandlers(ipcMain) {
 
   ipcMain.handle('signinOwner', async (e, data) => {
     try {
-      const re = await axios.post(`${SERVER_URL}hnb/salon_owner/`, data)
-      return re
+      const response = await Request.post(`${SERVER_URL}hnb/salon_owner/`, data)
+      return response // Return a clean object
     } catch (error) {
-      console.error('Failed to signin owner:', error.response.data)
-      return error.response.data
+      return error // Send safe error
+    }
+  })
+  ipcMain.handle('signinMaintainer', async (e, data) => {
+    try {
+      const response = await Request.post(`${SERVER_URL}hnb/salon_maintainer/`, data)
+      return response
+    } catch (error) {
+      return error
     }
   })
 }

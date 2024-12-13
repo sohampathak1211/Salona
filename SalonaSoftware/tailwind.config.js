@@ -68,7 +68,8 @@ module.exports = {
         card: 'white',
         accent: 'rgba(33, 161, 220,1)',
         heading: 'rgba(43,54,116,1)',
-        subheading: 'rgba(163,174,208,1)'
+        subheading: 'rgba(163,174,208,1)',
+        gold:'#d4af37'
       }
     }
   },

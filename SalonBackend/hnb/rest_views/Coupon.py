@@ -1,20 +1,20 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from hnb.models import User
-from hnb.serializer import UserSerializer
+from hnb.models import Coupon
+from hnb.serializer import CouponSerializer
 
-class UserRest(APIView):
+class CouponREST(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            data = User.objects.all()
-            serializer = UserSerializer(data, many=True)
+            data = Coupon.objects.all()
+            serializer = CouponSerializer(data, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
-        serializer = UserSerializer(data=request.data)
+        serializer = CouponSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -22,21 +22,21 @@ class UserRest(APIView):
 
     def patch(self, request, *args, **kwargs):
         try:
-            user_id = request.data.get('user_id')
-            user = User.objects.get(user_id=user_id)
-            serializer = UserSerializer(user, data=request.data, partial=True)
+            coupon_id = request.data.get('coupon_id')
+            coupon = Coupon.objects.get(id=coupon_id)
+            serializer = CouponSerializer(coupon, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Coupon.DoesNotExist:
+            return Response({"error": "Coupon not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, *args, **kwargs):
         try:
-            user_id = request.data.get('user_id')
-            user = User.objects.get(user_id=user_id)
-            user.delete()
-            return Response({"message": "User successfully deleted"}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            coupon_id = request.data.get('coupon_id')
+            coupon = Coupon.objects.get(Coupon_id=coupon_id)
+            coupon.delete()
+            return Response({"message": "Coupon successfully deleted"}, status=status.HTTP_200_OK)
+        except Coupon.DoesNotExist:
+            return Response({"error": "Coupon not found"}, status=status.HTTP_404_NOT_FOUND)

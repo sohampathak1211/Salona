@@ -1,12 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from hnb.models import SalonOwner
-from hnb.serializer import SalonOwnerSerializer
+from hnb.models import SalonOwner,Salon
+from hnb.serializer import SalonOwnerSerializer,SalonSerializer
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 import jwt 
-from Salon.settings import SECRET_KEY
+from Salon.settings import SECRET_KEY,JWT_EXPIRY
 import json
 import logging
 
@@ -30,17 +30,24 @@ class SalonOwnerRest(APIView):
         try:
             logger.info('Signing up new salon owner')
             # Ensure the password is hashed before saving
-            request.data['password'] = make_password(request.data.get('password'))
             serializer = SalonOwnerSerializer(data=request.data)
+            request.data['password'] = make_password(request.data.get('password'))
             if serializer.is_valid():
                 owner = serializer.save()
                 logger.info('Salon owner signed up successfully')
                 print("Owner",owner)
                 print(serializer.data)
-                access_token = jwt.encode(serializer.data, SECRET_KEY, algorithm="HS256")
+                temp = serializer.data
+                temp['password']=""
+                payload = serializer.data
+                salon_data = Salon.objects.filter(owner=payload['id'])
+                salon_seri = SalonSerializer(salon_data,many=True)
+                payload['exp'] = int(JWT_EXPIRY)
+                payload['password'] = ''
+                access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
                 
                 return Response(
-                    {"message": "Sign-up successful", "token": access_token, "data": serializer.data},
+                    {"message": "Sign-up successful","token": access_token, "owner_data": temp, "salon_data":salon_seri.data},
                     status=status.HTTP_201_CREATED,
                 )
             logger.error('Error signing up salon owner: invalid data')
@@ -83,10 +90,19 @@ class SalonOwnerRest(APIView):
 
             # On successful login, return user details (you could also return a token)
             serializer = SalonOwnerSerializer(salon_owner)
-            access_token = jwt.encode(serializer.data, SECRET_KEY, algorithm="HS256")
+            print(serializer.data)
+            temp = serializer.data
+            temp['password']=""
+            payload = serializer.data
+            salon_data = Salon.objects.filter(owner=payload['id'])
+            salon_seri = SalonSerializer(salon_data,many=True)
+            payload['salon_data'] = salon_seri.data
+            payload['exp'] = int(JWT_EXPIRY)
+            payload['password'] = ''
+            access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
             logger.info('Salon owner signed in successfully')
             return Response(
-                {"message": "Sign-in successful","token": access_token, "data": serializer.data},
+                {"message": "Sign-in successful","token": access_token, "owner_data": temp, "salon_data":salon_seri.data},
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
@@ -95,8 +111,9 @@ class SalonOwnerRest(APIView):
         
     def post(self, request, *args, **kwargs):
         logger.info('Handling post request')
+        
         action = request.data.get('action')  # Determine whether it's sign-up or sign-in
-
+        print(action)
         if action == "signup":
             return self.signup(request)
         elif action == "signin":

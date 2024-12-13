@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import pytz
+from datetime import datetime,timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -60,44 +62,46 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'hnb.middlewares.ChatUserEnabledMiddleware',
+    # 'hnb.middlewares.ChatUserEnabledMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'Salon.urls'
 
-LOGGING = {
-    'version': 1,  # Required key specifying the schema version
-    'disable_existing_loggers': False,  # Ensures existing loggers are not disabled
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'INFO',  # Set the logging level to INFO
-            'class': 'logging.FileHandler',
-            'filename': f"{LOGS_DIR}/general.log",
-            'formatter': 'verbose',  # Use the verbose formatter
-        },
-    },
-    'root': {
-        'handlers': ['file'],
-        'level': 'INFO', 
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,  # Required key specifying the schema version
+#     'disable_existing_loggers': False,  # Ensures existing loggers are not disabled
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'file': {
+#             'level': 'INFO',  # Set the logging level to INFO
+#             'class': 'logging.FileHandler',
+#             'filename': f"{LOGS_DIR}/general.log",
+#             'formatter': 'verbose',  # Use the verbose formatter
+#         },
+#     },
+#     'root': {
+#         'handlers': ['file'],
+#         'level': 'INFO', 
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#     },
+# }
 
 
 TEMPLATES = [
@@ -176,3 +180,13 @@ EMAIL_USE_TLS=True
 EMAIL_PORT=587
 EMAIL_HOST_USER="pathaksoham2003@gmail.com"
 EMAIL_HOST_PASSWORD="mlsn.520f24ab18eeca13c6d9c985be2347e1a1a3fd1814401868238590862bade9bb"
+
+
+# settings.py
+TOKEN_EXPIRY_DAYS = 30  # Token validity in days
+JWT_SECRET_KEY = 'your_secret_key_here'  # Define your secret key here
+JWT_ALGORITHM = 'HS256'  # Algorithm for JWT
+
+kolkata_tz = pytz.timezone(TIME_ZONE)
+now_kolkata = datetime.now(kolkata_tz)
+JWT_EXPIRY = (now_kolkata + timedelta(days=TOKEN_EXPIRY_DAYS)).timestamp()

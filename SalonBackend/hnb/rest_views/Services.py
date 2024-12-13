@@ -10,8 +10,21 @@ logger = logging.getLogger(__name__)
 class ServicesRest(APIView):
     def get(self, request, *args, **kwargs):
         try:
+            print(request.query_params)
+            service_id = request.query_params.get('service_id')
+            branch_id = request.query_params.get('branch_id')
+            print("service_id",service_id)
+            print("branch_id",branch_id)
+            if service_id:
+                service = Service.objects.filter(id=service_id,branch=branch_id)
+                serializer = ServiceSerializer(service,many=False)
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            if branch_id:
+                service = Service.objects.filter(branch=branch_id)
+                serializer = ServiceSerializer(service,many=True)
+                return Response(serializer.data,status=status.HTTP_200_OK)
             logger.info('Getting all services')
-            data = Service.objects.all()
+            data = Service.objects.filter(branch=branch_id)
             serializer = ServiceSerializer(data, many=True)
             logger.info('Services retrieved successfully')
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -33,7 +46,7 @@ class ServicesRest(APIView):
         try:
             logger.info('Updating service')
             service_id = request.data.get('service_id')
-            service = Service.objects.get(service_id=service_id)
+            service = Service.objects.get(id=service_id)
             serializer = ServiceSerializer(service, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -49,7 +62,7 @@ class ServicesRest(APIView):
         try:
             logger.info('Deleting service')
             service_id = request.data.get('service_id')
-            service = Service.objects.get(service_id=service_id)
+            service = Service.objects.get(id=service_id)
             service.delete()
             logger.info('Service deleted successfully')
             return Response({"message": "Service successfully deleted"}, status=status.HTTP_200_OK)

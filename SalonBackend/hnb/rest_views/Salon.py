@@ -25,10 +25,10 @@ class SalonRest(APIView):
             if search_query:
                 salons = Salon.objects.filter(
                     Q(name=search_query) | 
-                    Q(location__icontains=search_query)  # Replace `location` with any other field you want to include
+                    Q(address__icontains=search_query)  # Replace `location` with any other field you want to include
                 )
             elif only_names_and_locations:
-                salons = Salon.objects.values('name', 'location')
+                salons = Salon.objects.values('name', 'address')
                 print(salons)
                 serializer = SearchSalonSerializer(salons,many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)

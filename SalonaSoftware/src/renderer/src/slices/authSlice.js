@@ -3,28 +3,27 @@ import { createSlice } from '@reduxjs/toolkit'
 const authSlice = createSlice({
   name: 'todos',
   initialState: {
-    id: -1,
-    name: '',
-    email: '',
-    token: '',
-    role:'',
+    id: 14,
+    name: 'SAPssfas',
+    email: 'ssafssdzazdcssa@gmail.com',
+    phone: '7887557175',
+    password: '',
+    is_enabled: true,
+    role: 'SO',
+    exp: 1736791698,
+    salon_id: 2
   },
   reducers: {
-    todoAdded(state, action) {
-      state.push({
-        id: action.payload.id,
-        text: action.payload.text,
-        completed: false,
-      })
-    },
-    todoToggled(state, action) {
-      const todo = state.find((todo) => todo.id === action.payload)
-      todo.completed = !todo.completed
-    },
-    setCurrentUser: (state,action) => {
-      state = action.payload
+    setAuth: (state, action) => {
+      state.id = action.payload.id
+      state.name = action.payload.name
+      state.phone = action.payload.phone
+      state.email = action.payload.email
+      state.token = action.payload.token
+      state.role = action.payload.role
+      state.salon_id = action.payload.salon_id
     }
-  },
+  }
 })
 
 export const { todoAdded, todoToggled } = authSlice.actions

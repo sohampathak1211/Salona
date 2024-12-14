@@ -5,7 +5,6 @@ import Services from './pages/Services'
 import Music from './pages/Music'
 import Appointment from './pages/Appointment'
 import Settings from './pages/Settings'
-import Salon from './pages/Settings/Salon'
 import SplashScreen from './pages/Auth/SplashScreen'
 import SignIn from './pages/Auth/SignIn'
 import SignUp from './pages/Auth/SignUp'
@@ -38,7 +37,6 @@ function App() {
           <Route path="customer" element={<Customer />} />
           <Route path="customer/:id" element={<Customer />} />
           <Route path="music" element={<Music />} />
-          <Route path="salon" element={<Salon />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

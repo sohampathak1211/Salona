@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Fragment } from 'react'
 import CreateService from './CreateService'
 import Modal from 'react-modal'
 import EditService from './EditService'
 import useService from '../../services/useService'
 import useBranch from '../../services/useBranch'
+import { Dialog, Transition } from '@headlessui/react'
+import { AiFillShop } from 'react-icons/ai'
 
 const Services = () => {
   const [VendorDetails, setVendorDetails] = useState([])
@@ -140,7 +142,46 @@ const Services = () => {
           </table>
         </div>
       </div>
-      {create && <CreateService fetchVendor={fetchVendor} setCreate={setCreate} create={create} />}
+      <Transition appear show={create} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={() => setCreate(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="flex text-xl pb-2 font-semibold leading-6 text-gray-900"
+                  >
+                    <AiFillShop size={25} color="gray" className="mr-2" />
+                    New Service
+                  </Dialog.Title>
+                  <CreateService fetchVendor={fetchVendor} setCreate={setCreate} create={create} />
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
       {edit && (
         <EditService
           setEdit={setEdit}

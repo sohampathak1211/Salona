@@ -1,71 +1,66 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Logo from '../../assets/logo.png?react';
-import useAuth from '../../services/useAuth';
-import useLocalStorage from '../../services/useLocalStorage';
-import useSalon from '../../services/useSalon';
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Logo from '../../assets/logo.png?react'
+import useAuth from '../../services/useAuth'
+import useLocalStorage from '../../services/useLocalStorage'
+import useSalon from '../../services/useSalon'
 
 const SplashScreen = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { getData } = useLocalStorage();
-  const { getSalonOfOwner } = useSalon();
-  const { salonSignIn } = useAuth();
+  const { getData } = useLocalStorage()
+  const { getSalonOfOwner } = useSalon()
+ 
+  const [hasSalon, setHasSalon] = useState(null) // Use `null` for unknown state
+  const [isLogin, setIsLogin] = useState(null) // Use `null` for unknown state
 
-  const [authenticated, setAuthenticated] = useState(false);
-  const [hasSalon, setHasSalon] = useState(null); // Use `null` for unknown state
-  const [isLogin, setIsLogin] = useState(null); // Use `null` for unknown state
-
-  const redirect = () => {
-    console.log(`isLogin: ${isLogin}, hasSalon: ${hasSalon}`);
-    if (isLogin === false) {
-      navigate('/signin');
-    } else if (hasSalon === false) {
-      navigate('/salonCreate');
-    } else {
-      navigate('/auth');
-    }
-  };
+  const [moveAheas, setMoveAhead] = useState(false)
 
   const checkHasSalon = async () => {
     try {
-      const data = await getData('cUser');
+      const data = await getData('cUser')
+      console.log(data)
       if (!data) {
-        setIsLogin(false);
-        return;
+        setIsLogin(false)
+        return
       }
-
-      setIsLogin(true);
-
+      setIsLogin(true)
       try {
-        const salon = await getSalonOfOwner(data.id);
-        console.log("Fetched salon data:", salon);
-        setHasSalon(!!salon); // Explicitly convert to boolean
+        const salon = await getSalonOfOwner(data.id)
+        console.log('Fetched salon data:', salon)
+        setHasSalon(!!salon) // Explicitly convert to boolean
       } catch (e) {
-        console.error("Error fetching salon:", e);
-        setHasSalon(false);
+        console.error('Error fetching salon:', e)
+        setHasSalon(false)
       }
     } catch (e) {
-      console.error("Error retrieving user data:", e);
-      setIsLogin(false);
+      console.error('Error retrieving user data:', e)
+      setIsLogin(false)
     }
-  };
+  }
 
   useEffect(() => {
-    checkHasSalon();
-  }, []);
+    checkHasSalon()
+    setTimeout(() => {
+      setMoveAhead(true)
+    }, 3000)
+  }, [])
 
   // Separate useEffect to handle redirection after state updates
   useEffect(() => {
-    if (isLogin !== null && hasSalon !== null) {
-      redirect();
+    if (moveAheas) {
+      if (!isLogin) {
+        navigate('signin')
+      } else if (!hasSalon) {
+        navigate('/salonCreate')
+      } else {
+        navigate('/auth')
+      }
     }
-  }, [isLogin, hasSalon]);
+  }, [isLogin, hasSalon, moveAheas])
 
   return (
-    <div
-      className="bg-background transition-colors bg-red-400 w-full h-full flex items-center justify-center"
-    >
+    <div className="bg-background transition-colors bg-red-400 w-full h-full flex items-center justify-center">
       <div className="overflow-hidden">
         <div className="flex justify-center items-center bg-white pr-10">
           <div className="w-[300px] h-[300px] overflow-hidden animate-customOpacity">
@@ -78,7 +73,7 @@ const SplashScreen = () => {
         <div className="h-5 bg-black"></div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SplashScreen;
+export default SplashScreen

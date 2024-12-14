@@ -36,6 +36,12 @@ const useAssets = () => {
     },
     {
       id: 3,
+      name: 'Coupons',
+      icon: <RiColorFilterFill className="transition-all duration-500" size={25} />,
+      link: '/combos'
+    },
+    {
+      id: 3,
       name: 'Customers',
       icon: <FaUsers className="transition-all duration-500" size={25} />,
       link: '/customer'
@@ -46,26 +52,20 @@ const useAssets = () => {
       icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
       link: '/music'
     },
-    {
-      id: 6,
-      name: 'Salons',
-      icon: <PiScissorsFill className="transition-all duration-500" size={25} />,
-      link: '/salon'
-    },
   ]
   const options = [
-    {
-      id: 1,
-      name: 'SignIn',
-      icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
-      link: '/signin'
-    },
-    {
-      id: 2,
-      name: 'SignUp',
-      icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
-      link: '/signup'
-    },
+    // {
+    //   id: 1,
+    //   name: 'SignIn',
+    //   icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
+    //   link: '/signin'
+    // },
+    // {
+    //   id: 2,
+    //   name: 'SignUp',
+    //   icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
+    //   link: '/signup'
+    // },
     {
       id: 0,
       name: 'Settings',

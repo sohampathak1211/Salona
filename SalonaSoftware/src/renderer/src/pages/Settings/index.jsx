@@ -1,11 +1,11 @@
 import React from 'react'
-import Salon from './Salon'
 import Maintainer from './Maintainer'
+import Branch from './Branch'
 
 const Settings = () => {
   return (
     <div>
-      <Salon />
+      <Branch/>
       <Maintainer/>
     </div>
   )

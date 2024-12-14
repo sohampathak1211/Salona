@@ -6,10 +6,26 @@ import useAssets from './categories.jsx'
 import { GiEvilEyes } from 'react-icons/gi'
 import '../assets/main.css'
 import Logo from '../assets/logo.png?react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import useLocalStorage from '../services/useLocalStorage.jsx'
+import { toast } from 'react-toastify'
+import { RiLogoutCircleRLine } from 'react-icons/ri'
 
 const Sidebar = ({ sidebar, setSidebar }) => {
   const { categories, options } = useAssets()
+  const navigate = useNavigate()
+  const { setData } = useLocalStorage()
+
+  const handleLogout = async () => {
+    try {
+      await setData('cUser', {})
+      await setData('token', {})
+      toast.success('Successfully logged out')
+      navigate('/signin')
+    } catch (e) {
+      toast.error('Error loggin out')
+    }
+  }
   return (
     <div className="flex flex-1 h-full flex-col justify-between py-4 relative">
       <div className="">
@@ -63,6 +79,20 @@ const Sidebar = ({ sidebar, setSidebar }) => {
             </h2>
           </Link>
         ))}
+        <div onClick={handleLogout} className="flex px-4 items-center mt-4 ">
+          <div className="flex-1 flex items-center rounded-lg">
+            <div className="w-8 h-8 bg-gold rounded-lg flex justify-center items-center">
+              <RiLogoutCircleRLine strokeWidth={0.8} size={20} />
+            </div>
+            <h2
+              className={`ml-1 transition-all duration-500 transform ${
+                sidebar ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'
+              } font-bold pl-2`}
+            >
+              Logout
+            </h2>
+          </div>
+        </div>
       </div>
     </div>
   )

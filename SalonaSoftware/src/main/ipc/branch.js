@@ -12,4 +12,13 @@ export const BranchApi = (ipcMain) => {
       return e
     }
   })
+
+  ipcMain.handle('createBranch', async (e, data) => {
+    try {
+      const response = await Request.post(branch, data)
+      return response
+    } catch (e) {
+      return e
+    }
+  })
 }

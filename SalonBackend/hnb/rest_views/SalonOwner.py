@@ -98,11 +98,11 @@ class SalonOwnerRest(APIView):
             # Roles are SO for the Salon Owner , STY for the Stylist , MT for the maintainer 
             serializer = SalonOwnerSerializer(salon_owner)
             salon = Salon.objects.filter(owner=serializer.data['id'])
-            seri_salo = SalonIdSerializer(salon)
+            seri_salo = SalonIdSerializer(salon,many=True)
             if id not in seri_salo.data:
                 salon_id = -1
             else:
-                salon_id = seri_salo.data['id']
+                salon_id = seri_salo.data[0]['id']
             payload = serializer.data
             payload['role'] = "SO"
             payload['exp'] = int(JWT_EXPIRY)

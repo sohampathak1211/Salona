@@ -49,6 +49,9 @@ class BranchRest(APIView):
 
 
     def post(self, request, *args, **kwargs):
+        if not request.is_owner:
+            return Response({"error": "Maintainer cannot create branches"}, status=status.HTTP_400_BAD_REQUEST)
+        request.data['salon'] = request.salon_id
         serializer = BranchSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

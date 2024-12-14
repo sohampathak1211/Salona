@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from hnb.models import Branch
-from hnb.serializer import BranchSerializer,SearchBranchSerializer
+from hnb.serializer import BranchSerializer,SearchBranchSerializer,BranchNameIdSerializer
 from django.db.models import Q, F, Max, Min, ExpressionWrapper, DecimalField
 
 class BranchRest(APIView):
@@ -13,14 +13,14 @@ class BranchRest(APIView):
             branch_id = request.query_params.get('branch_id')
             salon_id = request.query_params.get('salon_id')
             only_names_and_locations = request.GET.get('names_and_locations', 'false').lower() == 'true'
-            
+            print("Salonid   --->>>",salon_id)
             # Fetch by salon_id if provided           
+            if salon_id:
+                branches = Branch.objects.filter(salon=salon_id)
+                if not branches.exists():  # Check if the queryset is empty
+                    return Response({"error": "No branch found for the provided salon and branch ID"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(BranchNameIdSerializer(branches, many=True).data, status=status.HTTP_200_OK)
             if branch_id:
-                if salon_id:
-                    branch = Branch.objects.filter(salon=salon_id, id=branch_id)
-                    if not branch.exists():  # Check if the queryset is empty
-                        return Response({"error": "No branch found for the provided salon and branch ID"}, status=status.HTTP_404_NOT_FOUND)
-                    return Response(BranchSerializer(branches, many=False).data, status=status.HTTP_200_OK)
                 branch = Branch.objects.filter(id=branch_id).first()
                 if not branch:
                     return Response({"error": "Branch not found"}, status=status.HTTP_404_NOT_FOUND)

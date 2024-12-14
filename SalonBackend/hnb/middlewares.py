@@ -1,4 +1,4 @@
-from hnb.models import SalonOwner,SalonMaintainer,Salon
+from hnb.models import SalonOwner,SalonMaintainer,Salon,Branch
 from django.http import HttpResponse
 import jwt
 from Salon.settings import SECRET_KEY
@@ -23,33 +23,65 @@ class ChatUserEnabledMiddleware:
 
     def __call__(self, request):
         logger.info(f"Request path: {request.path}")
-        if request.path.startswith('/hnb/salon_owner') or request.path.startswith('/admin'):
+        if request.path.startswith('/hnb/salon_owner') or request.path.startswith('/admin') or request.path.startswith('/hnb/salon_maintainer'):
             logger.info("Request is for salon owner")
             return self.get_response(request)
         try:
-            auth = request.headers['Authorization']
+            auth = request.headers.get('Authorization', None)
+            if not auth:
+                logger.error("Authorization header is missing")
+                return JsonResponse({"error": "Authorization header is missing"}, status=status.HTTP_401_UNAUTHORIZED)
+            
             token = auth.split(" ")[1]
             logger.info(f"Token: {token}")
-            user = jwt.decode(token, SECRET_KEY , algorithms=["HS256"])
+            user = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             logger.info(f"Decoded user: {user}")
-            salon_data = user['salon_data']
+            
+            salon_id = user.get('salon_id', None)
+            branch_id = user.get('branch_id', None)
+            
             if user:
-                try:
-                    cUser = SalonOwner.objects.get(id=user['id'])
-                    salon = Salon.objects.get(id=salon_data['id'])
-                    logger.info(f"User {user['id']} is enabled: {cUser.is_enabled}")
-                    if not cUser.is_enabled:
-                        logger.warning("User is not enabled")
-                        return JsonResponse({"error":"You are not enabled. Contact admin of the software at 7887557175 or pathaksoham2003@gmail.com | Thanks for connecting with NEXORA CREATIONS |"}, status=status.HTTP_401_UNAUTHORIZED)
-                    request.cUser = cUser
-                    request.salon_data = salon
-                except SalonOwner.DoesNotExist:
-                    logger.error(f"User {user['id']} does not exist")
+                if user['role'] == 'SO':
+                    try:
+                        cUser = SalonOwner.objects.get(id=user['id'])
+                        logger.info(f"User {user['id']} is enabled: {cUser.is_enabled}")
+                        if not cUser.is_enabled:
+                            logger.warning("User is not enabled")
+                            return JsonResponse({"error": "You are not enabled. Contact admin of the software at 7887557175 or pathaksoham2003@gmail.com | Thanks for connecting with NEXORA CREATIONS |"}, 
+                                                status=status.HTTP_401_UNAUTHORIZED)
+                        request.cUser = cUser
+                        request.salon_data = salon_id
+                        request.branch_data = branch_id
+                        request.role = user['role']
+                        request.is_owner = user['role'] == 'SO'
+                    except SalonOwner.DoesNotExist:
+                        logger.error(f"User {user['id']} does not exist")
+                        return JsonResponse({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+                elif user['role'] == 'MT':
+                    # Handling maintainer account 
+                    try:
+                        cUser = SalonMaintainer.objects.get(id=user['id'])
+                        logger.info(f"User {user['id']} is enabled: {cUser.is_enabled}")
+                        if not cUser.is_enabled:
+                            logger.warning("User is not enabled")
+                            return JsonResponse({"error": "You are not enabled. Contact admin of the software at 7887557175 or pathaksoham2003@gmail.com | Thanks for connecting with NEXORA CREATIONS |"}, 
+                                                status=status.HTTP_401_UNAUTHORIZED)
+                        salon = Branch.objects.get(id=branch_id)
+                        request.cUser = cUser
+                        request.salon_data = salon.id
+                        request.branch_data = branch_id
+                        request.role = user['role']
+                        request.is_owner = user['role'] == 'SO'
+                    except SalonOwner.DoesNotExist:
+                        logger.error(f"User {user['id']} does not exist")
+                        return JsonResponse({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+                    pass
             else:
                 logger.error("No user found")
+                return JsonResponse({"error": "No user found"}, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
             logger.error(f"An error occurred: {e}")
-            return JsonResponse({"error":"Token Expired! Login Again"},status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({"error": "Token Expired! Login Again"}, status=status.HTTP_401_UNAUTHORIZED)
 
         response = self.get_response(request)
         logger.info("Response: {}".format(response))

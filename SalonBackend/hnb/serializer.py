@@ -26,6 +26,11 @@ class SalonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Salon
         fields = '__all__'
+
+class SalonIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Salon
+        fields = ['id']
 class SearchSalonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Salon
@@ -34,6 +39,11 @@ class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
         fields = '__all__'
+class BranchNameIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ['id','address']
+
 class SearchBranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Salon

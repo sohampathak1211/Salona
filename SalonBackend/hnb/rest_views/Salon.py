@@ -11,8 +11,14 @@ class SalonRest(APIView):
             # Fetch search query from query parameters
             search_query = request.query_params.get('search', '').strip()
             salon_id = request.query_params.get('salon_id')
+            owner_id = request.query_params.get('owner_id')
             only_names_and_locations = request.GET.get('names_and_locations', 'false').lower() == 'true'
             
+            if owner_id:
+                salon = Salon.objects.filter(owner=owner_id).first()
+                if salon:
+                    return Response(SalonSerializer(salon).data,status=status.HTTP_200_OK)
+                return Response({'error':'Salon not found'},status=status.HTTP_404_NOT_FOUND)
             # Fetch by salon_id if provided
             if salon_id:
                 salon = Salon.objects.filter(id=salon_id).first()

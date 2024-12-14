@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from hnb.models import SalonMaintainer
-from hnb.serializer import SalonMaintainerSerializer
+from hnb.models import SalonMaintainer,Branch
+from hnb.serializer import SalonMaintainerSerializer,BranchSerializer
 from django.contrib.auth.hashers import make_password, check_password
 import jwt 
 from Salon.settings import SECRET_KEY,JWT_EXPIRY
@@ -20,24 +20,30 @@ class MaintainerRest(APIView):
         try:
             email = request.data.get('email')
             password = request.data.get('password')
-            branch_id = request.data.get('branch_id')
             try:
-                user = SalonMaintainer.objects.get(email=email,branch=branch_id)
+                user = SalonMaintainer.objects.get(email=email)
+                serializer = SalonMaintainerSerializer(user,many=False)
             except SalonMaintainer.DoesNotExist:
                 return Response(
                     {"error": "Maintainer with this email does not exist"},
                     status=status.HTTP_404_NOT_FOUND,
                 )
             if user:
-                if not check_password(password,user.password):
+                if not check_password(password,serializer.data['password']):
                     return Response({"error": "Invalid Password"}, status=status.HTTP_404_NOT_FOUND)
                 else:
-                    serializer = SalonMaintainerSerializer(user)
                     payload = serializer.data
+                    payload['role'] = 'MT'
+                    branch = Branch.objects.get(id=serializer.data['branch'])
+                    seri_branch = BranchSerializer(branch,many=False)
+                    payload['role'] = "MT"
+                    payload['branch_id'] = serializer.data['branch']
+                    payload['salon_id'] = seri_branch.data['salon']
+                    payload['password'] = ''
                     payload['exp'] = int(JWT_EXPIRY)
                     access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
                     return Response(
-                    {"message": "Maintainer Sign-in successful", "token": access_token, "data": serializer.data},
+                    {"message": "Maintainer Sign-in successful", "token": access_token, "cUser": payload},
                     status=status.HTTP_201_CREATED)
             else:
                 return Response({"message": "Maintainer does not exist"}, status=status.HTTP_404_NOT_FOUND)

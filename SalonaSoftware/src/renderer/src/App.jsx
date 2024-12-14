@@ -14,6 +14,7 @@ import { ToastContainer } from 'react-toastify'
 import Combos from './pages/Combos'
 import Customer from './pages/Users'
 import SalonCreation from './pages/Auth/SalonCreation'
+import { useEffect } from 'react'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')

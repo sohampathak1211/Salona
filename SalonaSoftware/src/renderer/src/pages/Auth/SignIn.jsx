@@ -8,9 +8,9 @@ import Logo from '../../assets/logo.png?react'
 
 export default function SignIn() {
   const navigate = useNavigate()
-  const { salonSignIn , maintainerSignIn } = useAuth()
+  const { salonSignIn, maintainerSignIn } = useAuth()
   const { setData } = useLocalStorage()
-  
+
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -52,22 +52,24 @@ export default function SignIn() {
           return
         }
         toast.success(res.message)
-        setData('owner', res.owner_data)
-        setData('salon_data', res.salon_data)
+        setData('cUser', res.cUser)
         setData('token', res.token)
-        if (res.salon_data.length <= 0) {
-          navigate('/createSalon')
+        if (res.cUser.salon_id == -1) {
+          navigate('/salonCreate')
         } else {
           navigate('/auth')
         }
       } else {
         const res = await maintainerSignIn({ email, password, action: 'signin' })
-        console.log("Responsese sefefdf",res.error)
+        console.log('Responsese sefefdf', res.error)
         if (res.error) {
           toast.info(res.error)
           return
         }
         toast.success(res.message)
+        setData('cUser', res.cUser)
+        setData('token', res.token)
+        navigate('/auth')
       }
     } catch (err) {
       toast.error(err)

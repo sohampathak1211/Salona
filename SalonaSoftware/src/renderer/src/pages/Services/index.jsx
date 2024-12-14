@@ -3,14 +3,17 @@ import CreateService from './CreateService'
 import Modal from 'react-modal'
 import EditService from './EditService'
 import useService from '../../services/useService'
+import useBranch from '../../services/useBranch'
 
 const Services = () => {
   const [VendorDetails, setVendorDetails] = useState([])
   const { getBranchServices } = useService()
+  const { getSalonBranches } = useBranch()
 
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
+  const [branch, setBranch] = useState([])
 
   const fetchVendor = async () => {
     const data = await getBranchServices({}, { branch_id: 2 })
@@ -18,7 +21,13 @@ const Services = () => {
     setVendorDetails(() => data)
   }
 
+  const fetchBranches = async () => {
+    const data = await getSalonBranches({}, { salon_id: 1 })
+    console.log('Salon Data', data)
+  }
+
   useEffect(() => {
+    fetchBranches()
     fetchVendor()
   }, [])
 
@@ -90,39 +99,43 @@ const Services = () => {
               </tr>
             </thead>
             <tbody>
-              { VendorDetails.length > 0 && VendorDetails.map((item) => (
-                <tr key={item.service_id} className="bg-white text-large">
-                  <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.name}
-                  </th>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.category}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.description}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-normal max-w-xs break-words">
-                    {item.price}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.duration}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    <button
-                      onClick={() => handleEditVendor(item)}
-                      className="text-blue-500 hover:text-blue-700 mr-4"
+              {VendorDetails.length > 0 &&
+                VendorDetails.map((item) => (
+                  <tr key={item.service_id} className="bg-white text-large">
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                     >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      {item.name}
+                    </th>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {item.category}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {item.description}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-normal max-w-xs break-words">
+                      {item.price}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {item.duration}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      <button
+                        onClick={() => handleEditVendor(item)}
+                        className="text-blue-500 hover:text-blue-700 mr-4"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

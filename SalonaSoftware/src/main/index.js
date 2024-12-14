@@ -12,7 +12,8 @@ import { loadEnv, registerStoreHandlers } from './ipc/store'
 import { ServiceApi } from './ipc/services'
 import '../main/middleware/auth'
 import { customerHandler } from './ipc/customer'
-import { registerEnv } from './ipc/configEnv'
+// import { registerEnv } from './ipc/configEnv'
+import { BranchApi } from './ipc/branch'
 // const __dirname = dirname(fileURLToPath(import.meta.url))
 // console.log(__dirname)
 // const store = new Store()
@@ -79,8 +80,9 @@ app.whenReady().then(() => {
   registerAppointmentHandlers(ipcMain)
   registerStoreHandlers(ipcMain)
   ServiceApi(ipcMain)
+  BranchApi(ipcMain)
   customerHandler(ipcMain)
-  registerEnv(ipcMain)
+  // registerEnv(ipcMain)
   // loadEnv({ SERVER_URL, SALON_ID, BRANCH_ID })
 
   // Default open or close DevTools by F12 in development

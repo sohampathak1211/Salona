@@ -37,9 +37,7 @@ const useSalon = () => {
 
   const createSalon = async (details) => {
     return await window.electron.ipcRenderer
-      .invoke('createSalon', {
-        names_and_locations: true
-      })
+      .invoke('createSalon', details)
       .then((data) => {
         return data
       })
@@ -47,7 +45,24 @@ const useSalon = () => {
         return e
       })
   }
-  return { searchSalon, getNamesAndLocation, getBranchNamesAndLocation, createSalon }
+
+  const getSalonOfOwner = async (owner_id) => {
+    return await window.electron.ipcRenderer
+      .invoke('getSalonOfOwner', { owner_id: owner_id })
+      .then((data) => {
+        return data
+      })
+      .catch((e) => {
+        return e
+      })
+  }
+  return {
+    searchSalon,
+    getNamesAndLocation,
+    getSalonOfOwner,
+    getBranchNamesAndLocation,
+    createSalon
+  }
 }
 
 export default useSalon

@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 const CreateService = ({ setCreate, create, fetchVendor }) => {
   const [vendor, setVendor] = useState({
     branch_id: -1,
-    branch_name: "",
+    branch_name: '',
     name: '',
     category: '',
     description: '',

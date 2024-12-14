@@ -2,7 +2,13 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const authSlice = createSlice({
   name: 'todos',
-  initialState: [],
+  initialState: {
+    id: -1,
+    name: '',
+    email: '',
+    token: '',
+    role:'',
+  },
   reducers: {
     todoAdded(state, action) {
       state.push({
@@ -15,6 +21,9 @@ const authSlice = createSlice({
       const todo = state.find((todo) => todo.id === action.payload)
       todo.completed = !todo.completed
     },
+    setCurrentUser: (state,action) => {
+      state = action.payload
+    }
   },
 })
 

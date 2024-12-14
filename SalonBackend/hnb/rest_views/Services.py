@@ -12,7 +12,11 @@ class ServicesRest(APIView):
         try:
             print(request.query_params)
             service_id = request.query_params.get('service_id')
-            branch_id = request.query_params.get('branch_id')
+            branch_id = request.branch_id
+            
+            if request.is_owner:
+                services = Service.objects.filter(branch_id__in=branch_id)
+                return Response(ServiceSerializer(services, many=True).data, status=status.HTTP_200_OK)
             print("service_id",service_id)
             print("branch_id",branch_id)
             if service_id:

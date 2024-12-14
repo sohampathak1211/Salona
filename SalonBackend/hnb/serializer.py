@@ -43,6 +43,10 @@ class BranchNameIdSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
         fields = ['id','address']
+class BranchIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ['id']
 
 class SearchBranchSerializer(serializers.ModelSerializer):
     class Meta:

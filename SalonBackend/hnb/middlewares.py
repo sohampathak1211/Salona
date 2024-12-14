@@ -39,7 +39,6 @@ class ChatUserEnabledMiddleware:
             
             salon_id = user.get('salon_id', None)
             branch_id = user.get('branch_id', None)
-            
             if user:
                 if user['role'] == 'SO':
                     try:

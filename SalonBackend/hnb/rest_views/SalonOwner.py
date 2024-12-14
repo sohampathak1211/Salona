@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from hnb.models import SalonOwner,Salon
-from hnb.serializer import SalonOwnerSerializer,SalonSerializer,SalonIdSerializer
+from hnb.models import SalonOwner,Salon,Branch
+from hnb.serializer import SalonOwnerSerializer,SalonSerializer,SalonIdSerializer,BranchIdSerializer
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 import jwt 
@@ -99,14 +99,19 @@ class SalonOwnerRest(APIView):
             serializer = SalonOwnerSerializer(salon_owner)
             salon = Salon.objects.filter(owner=serializer.data['id'])
             seri_salo = SalonIdSerializer(salon,many=True)
-            if id not in seri_salo.data:
-                salon_id = -1
-            else:
+            salon_id = -1
+            if len(seri_salo.data)>0:
                 salon_id = seri_salo.data[0]['id']
+            print(salon_id)
+            branch_id = Branch.objects.filter(salon=salon_id)
+            seri_branch = BranchIdSerializer(branch_id,many=True)
+            branches = [branch['id'] for branch in seri_branch.data]
+            print(branches)
             payload = serializer.data
             payload['role'] = "SO"
             payload['exp'] = int(JWT_EXPIRY)
             payload['salon_id'] = salon_id
+            payload['branch_id'] = branches
             payload['password'] = ''
             access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
             logger.info('Salon owner signed in successfully')

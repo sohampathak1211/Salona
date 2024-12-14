@@ -68,7 +68,7 @@ class SalonRest(APIView):
             return Response({"error": "Salon not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, *args, **kwargs):
-        try:
+        try: 
             salon_id = request.data.get('salon_id')
             salon = Salon.objects.get(salon_id=salon_id)
             salon.delete()

@@ -48,16 +48,13 @@ class MaintainerRest(APIView):
                     access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
                     return Response(
                     {"message": "Maintainer Sign-in successful", "token": access_token, "cUser": payload},
-                    status=status.HTTP_201_CREATED)
+                    status=status.HTTP_200_OK)
             else:
                 return Response({"message": "Maintainer does not exist"}, status=status.HTTP_404_NOT_FOUND)
         except Exception:
             return Response({"error":"Error in the maintainer api"},status=status.HTTP_400_BAD_REQUEST)
             
     def post(self, request, *args, **kwargs):
-        is_owner = request.is_owner
-        if is_owner:
-            pass
         action = request.data.get('action')
         email = request.data.get('email')
         if action == 'signin':
@@ -67,14 +64,21 @@ class MaintainerRest(APIView):
             return Response({"error": "Maintainer already exists"}, status=status.HTTP_400_BAD_REQUEST)
         request.data['password'] = make_password(request.data.get('password'))
         serializer = SalonMaintainerSerializer(data=request.data)
+        
         if serializer.is_valid():
             serializer.save()
             payload = serializer.data
+            branch = Branch.objects.get(id=serializer.data['branch'])
+            seri_branch = BranchSerializer(branch,many=False)
+            payload['role'] = "MT"
+            payload['branch_id'] = serializer.data['branch']
+            payload['salon_id'] = seri_branch.data['salon']
+            payload['password'] = ''
             payload['exp'] = int(JWT_EXPIRY)
             access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
             return Response(
-                    {"message": "Maintainer Sign-up successful", "token": access_token, "data": serializer.data},
-                    status=status.HTTP_201_CREATED)
+            {"message": "Maintainer Sign-in successful", "token": access_token, "cUser": payload},
+            status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, *args, **kwargs):

@@ -7,6 +7,11 @@ from hnb.serializer import CouponSerializer
 class CouponREST(APIView):
     def get(self, request, *args, **kwargs):
         try:
+            is_owner = request.is_owner
+            branch_id = request.data.get('branch_id')
+            if is_owner:
+                coupons = Coupon.objects.filter(branch__in=branch_id)
+                
             data = Coupon.objects.all()
             serializer = CouponSerializer(data, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)

@@ -5,6 +5,7 @@ import { FaChevronUp } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 import useService from '../../../services/useService'
 import { ImCheckmark } from 'react-icons/im'
+import useCoupon from '../../../services/useCoupon'
 
 const CreateCoupon = ({ setCreate }) => {
   const [coupon, setCoupon] = useState({
@@ -28,7 +29,7 @@ const CreateCoupon = ({ setCreate }) => {
   const [enabled, setEnabled] = useState(true)
 
   console.log('dsa', selectedCombos)
-  const { createCoupon } = useService()
+  const { createCoupon } = useCoupon()
   const dispatch = useDispatch()
 
   useEffect(() => {

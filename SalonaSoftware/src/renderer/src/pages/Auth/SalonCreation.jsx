@@ -144,7 +144,7 @@ const SalonCreation = () => {
       //   backgroundRepeat: 'no-repeat',
       // }}
     >
-      <ToastContainer />
+      {/* <ToastContainer /> */}
       <Link to="/auth">
         <h1 className="text-4xl font-extrabold mb-8 text-center text-gold/90">Create a Salon</h1>
       </Link>

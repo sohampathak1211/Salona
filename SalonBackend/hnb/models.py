@@ -46,6 +46,7 @@ class SalonMaintainer(models.Model):
     phone = models.CharField(max_length=13)
     password = models.CharField(max_length=100)
     branch = models.ForeignKey(Branch,on_delete=models.DO_NOTHING,related_name="Maintains")
+    
     def __str__(self):
         return self.name
 

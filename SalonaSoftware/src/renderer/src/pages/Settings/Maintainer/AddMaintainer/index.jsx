@@ -21,6 +21,7 @@ const AddMaintainer = ({ currentMaintainer, setCurrentMaintainer, setIsModalOpen
     // Save logic here
     // Reset the modal after saving
     const data = await createMaintainer()
+    console.log("Save Maintainer call ",data)
     resetModal()
   }
 

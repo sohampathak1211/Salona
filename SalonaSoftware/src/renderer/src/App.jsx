@@ -14,6 +14,9 @@ import Combos from './pages/Combos'
 import Customer from './pages/Users'
 import SalonCreation from './pages/Auth/SalonCreation'
 import { useEffect } from 'react'
+import Coupons from './pages/Coupons'
+import Invoice from './components/Invoice'
+import ModernInvoice from './components/ModernInvoice'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
@@ -34,9 +37,13 @@ function App() {
           <Route path="service/:id" element={<Services />} />
           <Route path="combos" element={<Combos />} />
           <Route path="combos/:id" element={<Combos />} />
+          <Route path="coupons" element={<Coupons />} />
+          <Route path="coupons/:id" element={<Coupons />} />
           <Route path="customer" element={<Customer />} />
           <Route path="customer/:id" element={<Customer />} />
           <Route path="music" element={<Music />} />
+          <Route path="invoice" element={<Invoice />} />
+          <Route path="moderninvoice" element={<ModernInvoice />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

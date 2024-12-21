@@ -74,21 +74,25 @@ class AppointmentSerializer(serializers.ModelSerializer):
         model = Appointment
         fields = '__all__'
 
-
 class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = '__all__'
+class ServiceBranchIdSerilaizer(serializers.ModelSerializer):
     # salon = SalonSerializer(many=False,read_only=True)
-    # branch = BranchSerializer(many=False,read_only=True)
+    branch = BranchNameIdSerializer(many=False,read_only=True)
     class Meta:
         model = Service
         fields = ['id', 'branch', 'name', 'category', 'description', 'price', 'duration']
 
 
 class GetSalonBranchComboSerializer(serializers.ModelSerializer):
-    service_details = serializers.SerializerMethodField()
+    services = serializers.SerializerMethodField()
+    branch = BranchNameIdSerializer()
     class Meta:
         model = Combo
-        fields = ['id', 'name', 'description', 'price', 'service_details']
-    def get_service_details(self, obj):
+        fields = ['id', 'name', 'description', 'price', 'branch' , 'services']
+    def get_services(self, obj):
         return obj.services.values('id', 'name')
 
 class ComboSerializer(serializers.ModelSerializer):

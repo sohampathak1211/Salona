@@ -1,0 +1,11 @@
+// How to create a service in the windows and run the script as a service
+https://www.youtube.com/watch?v=YyrX1UXxrVQ
+https://github.com/BetaUtopia/HowToGuide/tree/main/PythonAsWindowsService
+
+// How to use the whatsapp api for free
+https://www.youtube.com/watch?v=RFerMyAUPRg
+
+// Steps to run WOHO (Sequence of API in WOHO)
+POST >  /api/sessions
+POST >  /api/sessions/{session}/start
+POST >  /api/sessions/{session}/end

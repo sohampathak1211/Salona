@@ -1,8 +1,14 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import MaintainerCard from './MaintainerCard'
 import { GoEye } from 'react-icons/go'
 import { GoEyeClosed } from 'react-icons/go'
-import { Dialog, Transition } from '@headlessui/react'
+import { FaChevronUp } from 'react-icons/fa6'
+import { Dialog, Listbox, Transition } from '@headlessui/react'
+import useMaintainer from '../../../services/useMaintainer'
+import { useSelector } from 'react-redux'
+import AddMaintainer from './AddMaintainer'
+import { AiFillShop } from 'react-icons/ai'
+import { GrUserWorker } from 'react-icons/gr'
 const Maintainer = () => {
   const [maintainers, setMaintainers] = useState([
     {
@@ -34,7 +40,9 @@ const Maintainer = () => {
       password: 'ABC@123'
     }
   ])
-  const [passVis, setPassVis] = useState(true)
+  const selectBranch = useSelector((state) => state.branch.result)
+  const [selected, setSelected] = useState(selectBranch[0])
+  const { getSalonMaintainers } = useMaintainer()
 
   const [currentMaintainer, setCurrentMaintainer] = useState({
     id: null,
@@ -45,18 +53,14 @@ const Maintainer = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const handleSave = () => {
-    if (currentMaintainer.id) {
-      setMaintainers((prev) =>
-        prev.map((maintainer) =>
-          maintainer.id === currentMaintainer.id ? currentMaintainer : maintainer
-        )
-      )
-    } else {
-      setMaintainers((prev) => [...prev, { ...currentMaintainer, id: Date.now() }])
-    }
-    resetModal()
+  const fetchMaintainers = async () => {
+    const data = await getSalonMaintainers()
+    console.log('Data for the maintainers', data)
   }
+
+  useEffect(() => {
+    fetchMaintainers()
+  }, [])
 
   const handleDelete = (id) => {
     setMaintainers((prev) => prev.filter((maintainer) => maintainer.id !== id))
@@ -81,7 +85,7 @@ const Maintainer = () => {
           Add Maintainer
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {maintainers.map((maintainer) => (
           <MaintainerCard
             key={maintainer.id}
@@ -119,93 +123,19 @@ const Maintainer = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="flex text-xl pb-2 font-semibold leading-6 text-gray-900"
+                    className="flex text-xl pb-4 font-semibold leading-6 text-gray-900"
                   >
-                    {/* <AiFillShop size={25} color="gray" className="mr-2" /> */}
-                    {currentMaintainer.id ? 'Edit Maintainer' : 'Add Maintainer'}
+                    <GrUserWorker size={25} color="gray" className="mr-2" />
+                    Add Maintainer
                   </Dialog.Title>
-                  <div className="bg-white rounded-lg w-full max-w-md ">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Name</label>
-                      <input
-                        type="text"
-                        value={currentMaintainer.name}
-                        onChange={(e) =>
-                          setCurrentMaintainer({
-                            ...currentMaintainer,
-                            name: e.target.value
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded p-2 mb-4"
-                      />
-
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
-                      <input
-                        type="email"
-                        value={currentMaintainer.email}
-                        onChange={(e) =>
-                          setCurrentMaintainer({
-                            ...currentMaintainer,
-                            email: e.target.value
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded p-2 mb-4"
-                      />
-
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Phone</label>
-                      <input
-                        type="text"
-                        value={currentMaintainer.phone}
-                        onChange={(e) =>
-                          setCurrentMaintainer({
-                            ...currentMaintainer,
-                            phone: e.target.value
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded p-2 mb-4"
-                      />
-
-                      <label className="block text-sm font-medium text-gray-600 mb-1">
-                        Password
-                      </label>
-                      <div className="flex">
-                        <input
-                          type={passVis ? 'text' : 'password'}
-                          value={currentMaintainer.password}
-                          onChange={(e) =>
-                            setCurrentMaintainer({
-                              ...currentMaintainer,
-                              password: e.target.value
-                            })
-                          }
-                          className="w-full border border-gray-300 rounded p-2 mb-4"
-                        />
-                        <div
-                          className="bg-gray-100 border-[1px] border-gray-300 mb-4 w-[45px] h-[42px] flex justify-center items-center rounded-r-lg"
-                          onClick={() => setPassVis((prev) => !prev)}
-                        >
-                          {passVis ? <GoEye /> : <GoEyeClosed />}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={resetModal}
-                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={handleSave}
-                        className="px-4 py-2 bg-yellow-400 text-white rounded hover:bg-yellow-500"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </div>
+                  <AddMaintainer
+                    currentMaintainer={currentMaintainer}
+                    setCurrentMaintainer={setCurrentMaintainer}
+                    setIsModalOpen={setIsModalOpen}
+                  />
                 </Dialog.Panel>
               </Transition.Child>
             </div>

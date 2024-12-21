@@ -14,6 +14,9 @@ import '../main/middleware/auth'
 import { customerHandler } from './ipc/customer'
 // import { registerEnv } from './ipc/configEnv'
 import { BranchApi } from './ipc/branch'
+import { MaintainerApi } from './ipc/maintainer'
+import { ComboApi } from './ipc/combo'
+import { CouponApi } from './ipc/coupon'
 // const __dirname = dirname(fileURLToPath(import.meta.url))
 // console.log(__dirname)
 // const store = new Store()
@@ -82,6 +85,9 @@ app.whenReady().then(() => {
   ServiceApi(ipcMain)
   BranchApi(ipcMain)
   customerHandler(ipcMain)
+  MaintainerApi(ipcMain)
+  ComboApi(ipcMain)
+  CouponApi(ipcMain)
   // registerEnv(ipcMain)
   // loadEnv({ SERVER_URL, SALON_ID, BRANCH_ID })
 
@@ -104,7 +110,7 @@ app.whenReady().then(() => {
   })
 })
 
-// Expense ease reference 
+// Expense ease reference
 // ipcMain.handle('updateTruck', async (e, args) => {
 //   try {
 //     const response = await axios.patch('http://127.0.0.1:8000/chand/Vehicle/', args)

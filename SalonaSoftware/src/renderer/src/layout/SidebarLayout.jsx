@@ -36,7 +36,7 @@ console.log(visible)
           <div className="w-full relative h-screen flex-1 custom-scrollbar overflow-y-scroll">
             <Outlet />
             <div
-              className={`w-full h-[calc(100vh - 20%)] bg-cyan-500 absolute top-0 left-0 ${visible ? 'visible h-full' : 'hidden opacity-0'}`}
+              className={`w-full h-screen bg-gray-700 absolute top-0 left-0 ${visible ? 'visible h-full' : 'hidden opacity-0'}`}
             >
               <WebView visible={visible} setVisible={setVisible} />
             </div>

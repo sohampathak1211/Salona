@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import CreateUser from './CreateUser'
 import EditUser from './EditUser'
-import Modal from 'react-modal'
 import useAuth from '../../services/useAuth'
 import useCustomer from '../../services/useCustomer'
 

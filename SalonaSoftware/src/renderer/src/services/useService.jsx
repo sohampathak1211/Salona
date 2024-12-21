@@ -6,26 +6,31 @@ const useService = () => {
     const res = await window.electron.ipcRenderer.invoke('createService', data)
     return res
   }
-  
+
   const editService = async (data) => {
     const res = await window.electron.ipcRenderer.invoke('editService', data)
     return res
   }
-  
+
+  const getSalonServices = async () => {
+    const res = await window.electron.ipcRenderer.invoke('getSalonServices')
+    return res
+  }
+
   const getAllServices = async (data, params) => {
     const res = await window.electron.ipcRenderer.invoke('getAllServices', params)
     return res
   }
-  
+
   const getBranchServices = async (data, params) => {
     return await window.electron.ipcRenderer
-    .invoke('getServices', params)
-    .then((data) => {
-      return data
-    })
-    .catch((err) => {
-      return err
-    })
+      .invoke('getServices', params)
+      .then((data) => {
+        return data
+      })
+      .catch((err) => {
+        return err
+      })
   }
 
   // THIS IS THE REFERENCE FROM THE EXPENSE EASE SOFTWARE
@@ -38,7 +43,7 @@ const useService = () => {
   //     .catch(() => console.log('error'))
   //   console.log('Updated vendor details:', vendor)
 
-  return { createService, editService, getAllServices, getBranchServices }
+  return { createService, editService, getAllServices, getBranchServices, getSalonServices }
 }
 
 export default useService

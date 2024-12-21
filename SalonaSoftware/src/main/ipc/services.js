@@ -4,11 +4,9 @@ import { getAllStoreData } from './store'
 import Request from '../middleware/auth'
 
 export const ServiceApi = (ipcMain) => {
-  ipcMain.handle('createServices', async (event, { data, params }) => {
+  ipcMain.handle('createService', async (event, data) => {
     try {
-      const allData = getAllStoreData();
-      console.log("ALLL DATA",allData.data)
-      const response = await Request.post(data)
+      const response = await Request.post(services, data)
       return response
     } catch (e) {
       console.error(e)
@@ -17,7 +15,15 @@ export const ServiceApi = (ipcMain) => {
   })
   ipcMain.handle('getServices', async (event, params) => {
     try {
-      const response = await Request.get(services,{ params})
+      const response = await Request.get(services, { params })
+      return response
+    } catch (e) {
+      return e
+    }
+  })
+  ipcMain.handle('getSalonServices', async (event) => {
+    try {
+      const response = await Request.get(services)
       return response
     } catch (e) {
       return e

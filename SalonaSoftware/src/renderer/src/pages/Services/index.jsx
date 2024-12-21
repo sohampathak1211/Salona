@@ -1,36 +1,48 @@
 import React, { useEffect, useState, Fragment } from 'react'
 import CreateService from './CreateService'
-import Modal from 'react-modal'
 import EditService from './EditService'
 import useService from '../../services/useService'
 import useBranch from '../../services/useBranch'
 import { Dialog, Transition } from '@headlessui/react'
 import { AiFillShop } from 'react-icons/ai'
+import { useDispatch, useSelector } from 'react-redux'
+import { branchRequest, branchSuccess } from '../../slices/branchSlice'
+import {
+  selectService,
+  serviceEdit,
+  serviceRequest,
+  serviceSuccess
+} from '../../slices/serviceSlice'
 
 const Services = () => {
-  const [VendorDetails, setVendorDetails] = useState([])
-  const { getBranchServices } = useService()
+  const dispatch = useDispatch()
   const { getSalonBranches } = useBranch()
+  const { getSalonServices } = useService()
+  const services = useSelector(selectService)
 
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
-  const [branch, setBranch] = useState([])
 
-  const fetchVendor = async () => {
-    const data = await getBranchServices({}, { branch_id: 2 })
-    console.log('Data For services', data)
-    setVendorDetails(() => data)
+  const getBranches = async () => {
+    dispatch(branchRequest())
+    const data = await getSalonBranches({}, {})
+    dispatch(branchSuccess(data))
+    // }
   }
 
-  const fetchBranches = async () => {
-    const data = await getSalonBranches({}, { salon_id: 1 })
-    console.log('Salon Data', data)
+  console.log('Redux services', services)
+  const getServices = async () => {
+    dispatch(serviceRequest())
+    const serv = await getSalonServices()
+    dispatch(serviceSuccess(serv))
   }
 
   useEffect(() => {
-    fetchBranches()
-    fetchVendor()
+    if (services.length <= 0) {
+      getServices()
+    }
+    getBranches()
   }, [])
 
   const handleEditVendor = (vendor) => {
@@ -46,7 +58,6 @@ const Services = () => {
   const handleDelete = (id) => {
     // Logic for deleting vendor details
     console.log(`Delete vendor with id: ${id}`)
-    setVendorDetails(VendorDetails.filter((vendor) => vendor.id !== id))
   }
 
   return (
@@ -54,17 +65,7 @@ const Services = () => {
       <div className="w-full p-10">
         <div className="flex justify-between">
           <div>
-            <h2
-              className="text-sm font-bold text-subheading"
-              onClick={() =>
-                window.electron.ipcRenderer
-                  .invoke('createServices', { key: 'data', value: {} })
-                  .then((d) => console.log('Success'))
-                  .catch((e) => console.log(e))
-              }
-            >
-              Services
-            </h2>
+            <h2 className="text-sm font-bold text-subheading">Services</h2>
             <h2 className="text-3xl font-bold">Services</h2>
           </div>
           <button
@@ -80,6 +81,9 @@ const Services = () => {
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-subheading bg-white border-b">
               <tr>
+                <th scope="col" className="px-6 py-3">
+                  Branch Name
+                </th>
                 <th scope="col" className="px-6 py-3">
                   Service Name
                 </th>
@@ -101,9 +105,15 @@ const Services = () => {
               </tr>
             </thead>
             <tbody>
-              {VendorDetails.length > 0 &&
-                VendorDetails.map((item) => (
+              {services.length > 0 &&
+                services.map((item) => (
                   <tr key={item.service_id} className="bg-white text-large">
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                    >
+                      {item.branch.address}
+                    </th>
                     <th
                       scope="row"
                       className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
@@ -175,22 +185,53 @@ const Services = () => {
                     <AiFillShop size={25} color="gray" className="mr-2" />
                     New Service
                   </Dialog.Title>
-                  <CreateService fetchVendor={fetchVendor} setCreate={setCreate} create={create} />
+                  <CreateService setCreate={setCreate} />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
           </div>
         </Dialog>
       </Transition>
-      {edit && (
-        <EditService
-          setEdit={setEdit}
-          edit={edit}
-          vendorToEdit={vendorToEdit}
-          setVendorDetails={setVendorDetails}
-          fetchVendor={fetchVendor}
-        />
-      )}
+      <Transition appear show={edit} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={() => setEdit(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="flex text-xl pb-2 font-semibold leading-6 text-gray-900"
+                  >
+                    <AiFillShop size={25} color="gray" className="mr-2" />
+                    Edit Service
+                  </Dialog.Title>
+                  <EditService setEdit={setEdit} edit={edit} vendorToEdit={vendorToEdit} />
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   )
 }

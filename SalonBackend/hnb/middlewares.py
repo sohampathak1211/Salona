@@ -23,9 +23,15 @@ class ChatUserEnabledMiddleware:
 
     def __call__(self, request):
         logger.info(f"Request path: {request.path}")
-        if request.path.startswith('/hnb/salon_owner') or request.path.startswith('/admin') or request.path.startswith('/hnb/salon_maintainer'):
+        
+        path_pass = request.path.startswith('/hnb/salon_owner') or request.path.startswith('/hnb/salon_maintainer')
+        if path_pass and request.method == 'POST':
             logger.info("Request is for salon owner")
             return self.get_response(request)
+        if request.path.startswith('/admin'):
+            logger.info("Request is for salon owner")
+            return self.get_response(request)
+        
         try:
             auth = request.headers.get('Authorization', None)
             if not auth:

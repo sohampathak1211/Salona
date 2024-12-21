@@ -10,7 +10,11 @@ from Salon.settings import SECRET_KEY,JWT_EXPIRY
 class MaintainerRest(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            data = SalonMaintainer.objects.all()
+            is_owner = request.is_owner
+            if not is_owner:
+                return Response({"error":"Only salon owner can get maintainer account"},status=status.HTTP_400_BAD_REQUEST)
+            branch_ids = request.branch_id
+            data = SalonMaintainer.objects.filter(branch_id__in=branch_ids)
             serializer = SalonMaintainerSerializer(data, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:

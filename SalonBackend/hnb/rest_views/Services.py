@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from hnb.models import Service
-from hnb.serializer import ServiceSerializer
+from hnb.serializer import ServiceSerializer,ServiceBranchIdSerilaizer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 class ServicesRest(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            print(request.query_params)
             service_id = request.query_params.get('service_id')
             branch_id = request.branch_id
+            print(branch_id)
             
             if request.is_owner:
                 services = Service.objects.filter(branch_id__in=branch_id)
-                return Response(ServiceSerializer(services, many=True).data, status=status.HTTP_200_OK)
+                return Response(ServiceBranchIdSerilaizer(services, many=True).data, status=status.HTTP_200_OK)
             print("service_id",service_id)
             print("branch_id",branch_id)
             if service_id:
@@ -38,11 +38,13 @@ class ServicesRest(APIView):
 
     def post(self, request, *args, **kwargs):
         logger.info('Creating new service')
+        print(request.data)
         serializer = ServiceSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            service = serializer.save()
+            service_data = ServiceBranchIdSerilaizer(service).data
             logger.info('Service created successfully')
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(service_data, status=status.HTTP_201_CREATED)
         logger.error(f'Error creating service: {serializer.errors}')
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

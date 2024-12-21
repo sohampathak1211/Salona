@@ -9,7 +9,10 @@ class ComboREST(APIView):
         try:
             search = request.query_params.get('search')
             combo_id = request.query_params.get('combo_id')
-            branch_id = request.query_params.get('branch_id')
+            branch_id = request.branch_id
+            if request.is_owner:
+                combos = Combo.objects.filter(branch_id__in=branch_id)
+                return Response(GetSalonBranchComboSerializer(combos, many=True).data, status=status.HTTP_200_OK)
             if combo_id:
                 combo = Combo.objects.get(id=combo_id)
                 serializer = GetSalonBranchComboSerializer(combo,many=False)
@@ -27,8 +30,9 @@ class ComboREST(APIView):
     def post(self, request, *args, **kwargs):
         serializer = ComboSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            combo = serializer.save()
+            seri = GetSalonBranchComboSerializer(combo,many=False)
+            return Response(seri.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, *args, **kwargs):

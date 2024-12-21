@@ -2,7 +2,7 @@ import React from "react";
 
 const MaintainerCard = ({ maintainer, onEdit, onDelete }) => {
   return (
-    <div className="w-full bg-white border-b border-gray-300 p-4 flex items-center justify-between">
+    <div className="w-full rounded-2xl bg-white border-b border-gray-300 p-4 flex items-center justify-between">
       <div>
         <h3 className="text-lg font-semibold text-gray-800">{maintainer.name}</h3>
         <p className="text-sm text-gray-600">Email: {maintainer.email}</p>

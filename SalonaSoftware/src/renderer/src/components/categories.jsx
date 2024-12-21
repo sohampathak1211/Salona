@@ -7,6 +7,7 @@ import { IoMdBookmarks } from 'react-icons/io'
 import { MdAutoGraph } from 'react-icons/md'
 import { PiScissorsFill } from "react-icons/pi";
 import { MdCleaningServices } from "react-icons/md";
+import { GiTicket } from "react-icons/gi";
 
 const useAssets = () => {
   const categories = [
@@ -18,7 +19,7 @@ const useAssets = () => {
     },
     {
       id: 1,
-      name: 'Appointment',
+      name: 'Billing',
       icon: <IoMdBookmarks className="transition-all duration-500" size={25} />,
       link: '/appointment'
     },
@@ -35,22 +36,34 @@ const useAssets = () => {
       link: '/combos'
     },
     {
-      id: 3,
+      id: 4,
       name: 'Coupons',
-      icon: <RiColorFilterFill className="transition-all duration-500" size={25} />,
-      link: '/combos'
+      icon: <GiTicket className="transition-all duration-500" size={25} />,
+      link: '/coupons'
     },
     {
-      id: 3,
+      id: 5,
       name: 'Customers',
       icon: <FaUsers className="transition-all duration-500" size={25} />,
       link: '/customer'
     },
     {
-      id: 5,
+      id: 6,
       name: 'Music',
       icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
       link: '/music'
+    },
+    {
+      id: 7,
+      name: 'Invoice',
+      icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
+      link: '/invoice'
+    },
+    {
+      id: 8,
+      name: 'Modern Invoice',
+      icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
+      link: '/moderninvoice'
     },
   ]
   const options = [

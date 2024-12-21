@@ -12,10 +12,11 @@ class BranchRest(APIView):
             search_query = request.query_params.get('search', '').strip()
             branch_id = request.query_params.get('branch_id')
             salon_id = request.salon_id
+            is_owner = request.is_owner
             only_names_and_locations = request.GET.get('names_and_locations', 'false').lower() == 'true'
             print("Salonid   --->>>",salon_id)
             # Fetch by salon_id if provided           
-            if salon_id:
+            if is_owner and salon_id:
                 branches = Branch.objects.filter(salon=salon_id)
                 if not branches.exists():  # Check if the queryset is empty
                     return Response({"error": "No branch found for the provided salon and branch ID"}, status=status.HTTP_404_NOT_FOUND)
@@ -39,7 +40,7 @@ class BranchRest(APIView):
                 serializer = SearchBranchSerializer(branches,many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                branches = Branch.objects.all()
+                branches = Branch.objects.filter(salon=salon_id)
 
             serializer = BranchSerializer(branches, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)

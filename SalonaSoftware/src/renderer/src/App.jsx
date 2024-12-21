@@ -17,6 +17,7 @@ import { useEffect } from 'react'
 import Coupons from './pages/Coupons'
 import Invoice from './components/Invoice'
 import ModernInvoice from './components/ModernInvoice'
+import Product from './pages/Product'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
@@ -42,6 +43,7 @@ function App() {
           <Route path="customer" element={<Customer />} />
           <Route path="customer/:id" element={<Customer />} />
           <Route path="music" element={<Music />} />
+          <Route path="product" element={<Product />} />
           <Route path="invoice" element={<Invoice />} />
           <Route path="moderninvoice" element={<ModernInvoice />} />
           <Route path="settings" element={<Settings />} />

@@ -7,6 +7,7 @@ const MaintainerCard = ({ maintainer, onEdit, onDelete }) => {
         <h3 className="text-lg font-semibold text-gray-800">{maintainer.name}</h3>
         <p className="text-sm text-gray-600">Email: {maintainer.email}</p>
         <p className="text-sm text-gray-600">Phone: {maintainer.phone}</p>
+        <p className="text-sm text-gray-600">Branch: {maintainer.branch}</p>
       </div>
       <div className="flex gap-2">
         <button

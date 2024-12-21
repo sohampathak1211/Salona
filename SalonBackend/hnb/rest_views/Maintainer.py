@@ -55,6 +55,9 @@ class MaintainerRest(APIView):
             return Response({"error":"Error in the maintainer api"},status=status.HTTP_400_BAD_REQUEST)
             
     def post(self, request, *args, **kwargs):
+        is_owner = request.is_owner
+        if is_owner:
+            pass
         action = request.data.get('action')
         email = request.data.get('email')
         if action == 'signin':

@@ -17,6 +17,7 @@ import { BranchApi } from './ipc/branch'
 import { MaintainerApi } from './ipc/maintainer'
 import { ComboApi } from './ipc/combo'
 import { CouponApi } from './ipc/coupon'
+import { ProductApi } from './ipc/product'
 // const __dirname = dirname(fileURLToPath(import.meta.url))
 // console.log(__dirname)
 // const store = new Store()
@@ -88,6 +89,7 @@ app.whenReady().then(() => {
   MaintainerApi(ipcMain)
   ComboApi(ipcMain)
   CouponApi(ipcMain)
+  ProductApi(ipcMain)
   // registerEnv(ipcMain)
   // loadEnv({ SERVER_URL, SALON_ID, BRANCH_ID })
 

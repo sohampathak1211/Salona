@@ -5,9 +5,9 @@ import { FaUsers } from 'react-icons/fa'
 import { RiColorFilterFill } from 'react-icons/ri'
 import { IoMdBookmarks } from 'react-icons/io'
 import { MdAutoGraph } from 'react-icons/md'
-import { PiScissorsFill } from "react-icons/pi";
-import { MdCleaningServices } from "react-icons/md";
-import { GiTicket } from "react-icons/gi";
+import { PiScissorsFill } from 'react-icons/pi'
+import { MdCleaningServices } from 'react-icons/md'
+import { GiTicket } from 'react-icons/gi'
 
 const useAssets = () => {
   const categories = [
@@ -49,22 +49,28 @@ const useAssets = () => {
     },
     {
       id: 6,
-      name: 'Music',
+      name: 'Product',
       icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
-      link: '/music'
+      link: '/product'
     },
     {
       id: 7,
-      name: 'Invoice',
+      name: 'Music',
       icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
-      link: '/invoice'
-    },
-    {
-      id: 8,
-      name: 'Modern Invoice',
-      icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
-      link: '/moderninvoice'
-    },
+      link: '/music'
+    }
+    // {
+    //   id: 7,
+    //   name: 'Invoice',
+    //   icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
+    //   link: '/invoice'
+    // },
+    // {
+    //   id: 8,
+    //   name: 'Modern Invoice',
+    //   icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
+    //   link: '/moderninvoice'
+    // },
   ]
   const options = [
     // {
@@ -83,8 +89,8 @@ const useAssets = () => {
       id: 0,
       name: 'Settings',
       icon: <GrSettingsOption className="transition-all duration-500" size={25} />,
-      link:"settings"
-    },
+      link: 'settings'
+    }
   ]
   return { categories, options }
 }

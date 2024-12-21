@@ -16,28 +16,28 @@ const Maintainer = () => {
       name: 'John Doe',
       email: 'johndoe@example.com',
       phone: '123-456-7890',
-      password: 'ABC@123'
+      branch: 'ABC@123'
     },
     {
       id: 2,
       name: 'Jane Smith',
       email: 'janesmith@example.com',
       phone: '987-654-3210',
-      password: 'ABC@123'
+      branch: 'ABC@123'
     },
     {
       id: 3,
       name: 'Alice Johnson',
       email: 'alicej@example.com',
       phone: '456-789-0123',
-      password: 'ABC@123'
+      branch: 'ABC@123'
     },
     {
       id: 4,
       name: 'Bob Brown',
       email: 'bobbrown@example.com',
       phone: '321-654-9870',
-      password: 'ABC@123'
+      branch: 'ABC@123'
     }
   ])
   const selectBranch = useSelector((state) => state.branch.result)
@@ -56,6 +56,7 @@ const Maintainer = () => {
   const fetchMaintainers = async () => {
     const data = await getSalonMaintainers()
     console.log('Data for the maintainers', data)
+    setMaintainers((prev) => [...prev, ...data])
   }
 
   useEffect(() => {

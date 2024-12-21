@@ -10,6 +10,7 @@ from hnb.rest_views.Customer import CustomerREST
 from hnb.rest_views.Coupon import CouponREST
 from hnb.rest_views.Bill import BillREST
 from hnb.rest_views.Combo import ComboREST
+from hnb.rest_views.Product import ProductRest
 from hnb.views import SignupView, SigninView, OtpVerificationView, OtpResendView
 
 urlpatterns = [
@@ -23,7 +24,7 @@ urlpatterns = [
     path("customer/", CustomerREST.as_view()),
     path("coupon/", CouponREST.as_view()),
     path("bill/", BillREST.as_view()),
-    
+    path("product/", ProductRest.as_view()),
     
     
     path("salon_owner/signup/", SignupView.as_view(), name="signup"),

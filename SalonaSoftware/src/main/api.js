@@ -9,3 +9,4 @@ export const combo = `${API_URL}combo/`;
 export const coupon = `${API_URL}coupon/`;
 export const branch = `${API_URL}branch/`;
 export const maintainer = `${API_URL}salon_maintainer/`;
+export const product = `${API_URL}product/`;

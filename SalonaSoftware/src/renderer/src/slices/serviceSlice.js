@@ -26,12 +26,23 @@ const serviceSlice = createSlice({
     serviceEdit: (state, action) => {
       const newResult = state.result.filter((vendor) => vendor.id !== action.payload.id)
       state.result = newResult
+    },
+    serviceReset: (state, action) => {
+      state.loading = false
+      state.error = null
+      state.result = []
     }
   }
 })
 
 export const selectService = (state) => state.service.result
 
-export const { serviceFailed, serviceSuccess, serviceRequest, serviceAddService, serviceEdit } =
-  serviceSlice.actions
+export const {
+  serviceFailed,
+  serviceSuccess,
+  serviceRequest,
+  serviceAddService,
+  serviceEdit,
+  serviceReset
+} = serviceSlice.actions
 export default serviceSlice.reducer

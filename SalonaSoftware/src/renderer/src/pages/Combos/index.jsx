@@ -6,7 +6,7 @@ import useBranch from '../../services/useBranch'
 import { Dialog, Transition } from '@headlessui/react'
 import { AiFillShop } from 'react-icons/ai'
 import { useDispatch, useSelector } from 'react-redux'
-import { branchRequest, branchSuccess } from '../../slices/branchSlice'
+import { branchFailed, branchRequest, branchSuccess, selectBranch } from '../../slices/branchSlice'
 import {
   selectService,
   serviceEdit,
@@ -15,6 +15,7 @@ import {
 } from '../../slices/serviceSlice'
 import useCombo from '../../services/useCombo'
 import { comboRequest, comboSuccess, selectCombo } from '../../slices/comboSLice'
+import { toast } from 'react-toastify'
 
 const Combos = () => {
   const dispatch = useDispatch()
@@ -22,8 +23,10 @@ const Combos = () => {
   const { getSalonServices } = useService()
   const { getSalonCombos } = useCombo()
   const services = useSelector(selectService)
+  const branches = useSelector(selectBranch)
   const combos = useSelector(selectCombo)
-
+  const temp = useSelector((state) => state.branch)
+  console.log('TEMP', temp)
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
@@ -31,7 +34,13 @@ const Combos = () => {
   const getBranches = async () => {
     dispatch(branchRequest())
     const data = await getSalonBranches({}, {})
+    if (data.error) {
+      dispatch(branchFailed(data.error))
+      toast.info("You don't have branches. Open the settings page and add a branch to continue")
+      return
+    }
     dispatch(branchSuccess(data))
+    // }
   }
 
   const getServices = async () => {
@@ -50,8 +59,12 @@ const Combos = () => {
     if (services.length <= 0) {
       getServices()
     }
-    getBranches()
-    getCombos()
+    if (branches.length <= 0) {
+      getBranches()
+    }
+    if (combos.length <= 0) {
+      getCombos()
+    }
   }, [])
 
   const handleEditVendor = (vendor) => {
@@ -69,6 +82,15 @@ const Combos = () => {
     console.log(`Delete vendor with id: ${id}`)
   }
 
+  const handleServiceOpen = () => {
+    if (branches.length <= 0) {
+      toast.info("You don't have branches. Open the settings page and add a branch to continue")
+      return
+    } else {
+      setCreate(true)
+    }
+  }
+
   return (
     <div className="flex flex-1 justify-center relative">
       <div className="w-full p-10">
@@ -78,7 +100,7 @@ const Combos = () => {
             <h2 className="text-3xl font-bold">Combos</h2>
           </div>
           <button
-            onClick={() => setCreate(true)}
+            onClick={handleServiceOpen}
             className="m-3 mr-10 px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
           >
             Add a new Combos

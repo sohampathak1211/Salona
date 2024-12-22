@@ -7,30 +7,15 @@ import { Dialog, Transition } from '@headlessui/react'
 import { AiFillShop } from 'react-icons/ai'
 import useBranch from '../../../services/useBranch'
 import { useDispatch, useSelector } from 'react-redux'
-import { branchAddBranch, branchRequest, branchSuccess } from '../../../slices/branchSlice'
-
-
-const dummyBranches = [
-  {
-    id: 1,
-    address: '1234 Elm Street, Springfield',
-    phone: '123-456-7890',
-    description: 'This branch offers premium services.',
-    created_at: '2023-12-01T10:00:00Z'
-  },
-  {
-    id: 2,
-    address: '5678 Oak Avenue, Metropolis',
-    phone: '987-654-3210',
-    description: 'Known for its friendly staff and quick service.',
-    created_at: '2023-11-15T14:30:00Z'
-  }
-]
+import {
+  branchAddBranch,
+  branchFailed,
+  branchRequest,
+  branchSuccess
+} from '../../../slices/branchSlice'
 
 const Branch = () => {
-  const [branches, setBranches] = useState(dummyBranches)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [temp, setTemp] = useState({})
   const { createBranch, getSalonBranches } = useBranch()
   const branchData = useSelector((state) => state.branch)
   const dispatch = useDispatch()
@@ -40,12 +25,14 @@ const Branch = () => {
   }
 
   const getBranches = async () => {
-    console.log('Branch Data', branchData)
-    // if (branchData.result.length <= 0) {
     dispatch(branchRequest())
     const data = await getSalonBranches({}, {})
+    if (data.error) {
+      dispatch(branchFailed(data.error))
+      toast.info("You don't have branches. Open the settings page and add a branch to continue")
+      return
+    }
     dispatch(branchSuccess(data))
-    // }
   }
 
   useEffect(() => {

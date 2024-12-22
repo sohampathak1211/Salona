@@ -3,7 +3,7 @@ import SidebarLayout from './layout/SidebarLayout'
 import Dashboard from './pages/Dashboard'
 import Services from './pages/Services'
 import Music from './pages/Music'
-import Appointment from './pages/Appointment'
+import Bill from './pages/Bill'
 import Settings from './pages/Settings'
 import SplashScreen from './pages/Auth/SplashScreen'
 import SignIn from './pages/Auth/SignIn'
@@ -33,7 +33,7 @@ function App() {
         <Route path="/otp" element={<Otp />} />
         <Route path="/auth" element={<SidebarLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="appointment" element={<Appointment />} />
+          <Route path="bill" element={<Bill />} />
           <Route path="service" element={<Services />} />
           <Route path="service/:id" element={<Services />} />
           <Route path="combos" element={<Combos />} />

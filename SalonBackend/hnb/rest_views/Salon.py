@@ -14,6 +14,13 @@ class SalonRest(APIView):
             owner_id = request.query_params.get('owner_id')
             only_names_and_locations = request.GET.get('names_and_locations', 'false').lower() == 'true'
             
+            is_owner = request.is_owner
+            
+            if is_owner:
+                salon = Salon.objects.filter(id=request.salon_id).first()
+                if salon:
+                    return Response(SalonSerializer(salon).data,status=status.HTTP_200_OK)
+                return Response({'error':'Salon not found'},status=status.HTTP_404_NOT_FOUND)
             if owner_id:
                 salon = Salon.objects.filter(owner=owner_id).first()
                 if salon:

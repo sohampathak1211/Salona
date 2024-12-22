@@ -5,12 +5,14 @@ import { toast } from 'react-toastify'
 import useAuth from '../../services/useAuth'
 import useLocalStorage from '../../services/useLocalStorage'
 import Logo from '../../assets/logo.png?react'
+import { useSelector } from 'react-redux'
 
 export default function SignIn() {
   const navigate = useNavigate()
   const { salonSignIn, maintainerSignIn } = useAuth()
   const { setData } = useLocalStorage()
-
+  const state = useSelector(state=>state)
+  console.log("state",state)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 

@@ -15,7 +15,7 @@ class SalonOwner(models.Model):
 class Salon(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    address = models.TextField()
+    # address = models.TextField()
     email = models.CharField(max_length=100,null=True)
     phone = models.CharField(max_length=15)
     description = models.TextField()
@@ -46,6 +46,7 @@ class SalonMaintainer(models.Model):
     phone = models.CharField(max_length=13)
     password = models.CharField(max_length=100)
     branch = models.ForeignKey(Branch,on_delete=models.DO_NOTHING,related_name="Maintains")
+    
     def __str__(self):
         return self.name
 
@@ -83,8 +84,10 @@ class Combo(models.Model):
         return f"{self.branch.address} - {self.name}"
 
 class Coupon(models.Model):
-    branch = models.ForeignKey("Branch", on_delete=models.CASCADE, related_name="coupon", null=True, blank=True)
-    code = models.CharField(max_length=20, unique=True)
+    id = models.AutoField(primary_key=True)
+    branch = models.ForeignKey("Branch", on_delete=models.CASCADE, related_name="coupon", blank=True)
+    code = models.CharField(max_length=20,unique=False)
+    by_percent = models.BooleanField(default=True)  
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # e.g., 10.00 for 10%
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)     # e.g., 200 for flat 200 off
     valid_services = models.ManyToManyField(Service, blank=True, related_name="coupons")

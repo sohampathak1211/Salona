@@ -21,7 +21,7 @@ const useAssets = () => {
       id: 1,
       name: 'Billing',
       icon: <IoMdBookmarks className="transition-all duration-500" size={25} />,
-      link: '/appointment'
+      link: '/bill'
     },
     {
       id: 2,

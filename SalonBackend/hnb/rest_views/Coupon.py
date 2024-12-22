@@ -7,6 +7,12 @@ from hnb.serializer import CouponSerializer
 class CouponREST(APIView):
     def get(self, request, *args, **kwargs):
         try:
+            is_owner = request.is_owner
+            branch_id = request.data.get('branch_id')
+            if is_owner:
+                coupons = Coupon.objects.filter(branch__in=branch_id)
+                seri = CouponSerializer(coupons, many=True)
+                return Response(seri.data, status=status.HTTP_200_OK)
             data = Coupon.objects.all()
             serializer = CouponSerializer(data, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -14,6 +20,9 @@ class CouponREST(APIView):
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
+        is_owner = request.is_owner
+        
+        
         serializer = CouponSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

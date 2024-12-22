@@ -5,11 +5,13 @@ import { FaChevronUp } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 import useService from '../../../services/useService'
 import { ImCheckmark } from 'react-icons/im'
+import useCoupon from '../../../services/useCoupon'
 
 const CreateCoupon = ({ setCreate }) => {
   const [coupon, setCoupon] = useState({
     branch: null,
     code: '',
+    by_percent: true,
     discount_percentage: 0,
     discount_amount: 0,
     valid_services: [],
@@ -28,7 +30,7 @@ const CreateCoupon = ({ setCreate }) => {
   const [enabled, setEnabled] = useState(true)
 
   console.log('dsa', selectedCombos)
-  const { createCoupon } = useService()
+  const { createCoupon } = useCoupon()
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -78,6 +80,7 @@ const CreateCoupon = ({ setCreate }) => {
 
     const payload = {
       ...coupon,
+      by_percent: !enabled,
       branch: selectedBranch.id,
       valid_services: selectedServices.map((service) => service.id),
       valid_combos: selectedCombos.map((combo) => combo.id)

@@ -1,34 +1,34 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const branchSlice = createSlice({
-  name: 'branch',
+const couponSlice = createSlice({
+  name: 'coupon',
   initialState: {
     loading: false,
     error: null,
     result: []
   },
   reducers: {
-    branchRequest: (state, action) => {
+    couponRequest: (state, action) => {
       state.loading = true
       state.error = null
       state.result = []
     },
-    branchSuccess: (state, action) => {
+    couponSuccess: (state, action) => {
       state.loading = false
       state.result = action.payload
-      state.error = null
+      state.result = null
     },
-    branchFailed: (state, action) => {
+    couponFailed: (state, action) => {
       state.loading = false
       state.error = action.payload
       state.result = []
     },
-    branchAddBranch: (state, action) => {
+    couponAddCoupon: (state, action) => {
       state.result = [...state.result, action.payload]
       state.loading = false
       state.result = action.payload
     },
-    branchReset: (state, action) => {
+    couponReset: (state, action) => {
       state.loading = false
       state.error = null
       state.result = []
@@ -36,8 +36,8 @@ const branchSlice = createSlice({
   }
 })
 
-export const selectBranch = (state) => state.branch.result;
+export const selectCoupon = (state) => state.coupon.result
 
-export const { branchFailed, branchSuccess, branchRequest, branchAddBranch, branchReset } =
-  branchSlice.actions
-export default branchSlice.reducer
+export const { couponFailed, couponSuccess, couponRequest, couponAddCoupon, couponReset } =
+  couponSlice.actions
+export default couponSlice.reducer

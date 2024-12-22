@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react'
 import ViewBill from './ViewBill'
 import CreateBill from './CreateBill'
 
-const Appointment = () => {
+const Bill = () => {
   const [billDetails, setBillDetails] = useState([])
-  const [company,setCompany] = useState(null);
+  const [company, setCompany] = useState(null)
   const [view, setView] = useState(false)
   const [viewBill, setBill] = useState(null)
 
@@ -28,7 +28,6 @@ const Appointment = () => {
     fetchBills()
     getComp()
   }, [])
-
 
   const handleBillView = (item) => {
     setBill(item)
@@ -57,8 +56,8 @@ const Appointment = () => {
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-subheading bg-white border-b">
               <tr>
-                <th scope="col" className="px-6 py-3 max-w-10">
-                  ID
+                <th scope="col" className="px-6 py-3">
+                  Branch Name
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Date
@@ -69,12 +68,9 @@ const Appointment = () => {
                 <th scope="col" className="px-6 py-3">
                   Customer Phone
                 </th>
-                <th scope="col" className="px-6 py-3">
-                  Vehicle Number
-                </th>{' '}
                 {/* Added Vehicle Number */}
                 <th scope="col" className="px-6 py-3">
-                  Total Amount
+                  Final Amount
                 </th>
                 {/* <th scope="col" className="px-6 py-3">
                   Actions
@@ -92,22 +88,19 @@ const Appointment = () => {
                     scope="row"
                     className={`pl-6 py-4 font-medium text-gray-900 whitespace-nowrap`}
                   >
-                    {item.id}
+                    {item.branch.address}
                   </th>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.date.split('-').reverse().join('-')}
+                    {item.created_at.split('-').reverse().join('-')}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item?.customer_id?.name}
+                    {item?.customer?.name}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item?.customer_id?.phone}
+                    {item?.customer?.phone}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.veh_id ? item.veh_id.number : 'Vehicle was deleted'}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    ₹{item.total_amt}
+                    ₹{item.final_amount}
                   </td>
                   {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     <button
@@ -145,4 +138,4 @@ const Appointment = () => {
   )
 }
 
-export default Appointment
+export default Bill

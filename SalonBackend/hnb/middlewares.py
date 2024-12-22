@@ -6,6 +6,7 @@ import logging
 from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework import status
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +25,24 @@ class ChatUserEnabledMiddleware:
     def __call__(self, request):
         logger.info(f"Request path: {request.path}")
         
-        path_pass = request.path.startswith('/hnb/salon_owner') or request.path.startswith('/hnb/salon_maintainer')
-        if path_pass and request.method == 'POST':
-            logger.info("Request is for salon owner")
-            return self.get_response(request)
         if request.path.startswith('/admin'):
             logger.info("Request is for salon owner")
+            return self.get_response(request)
+        
+        # path_pass = request.path.startswith('/hnb/salon_owner') or request.path.startswith('/hnb/salon_maintainer')
+        # if path_pass and request.method == 'POST':
+        #     has_action = None
+        #     if request.method == 'POST':
+        #         try:
+        #             body_data = json.loads(request.body.decode('utf-8'))
+        #             has_action = body_data.get('action', None)
+        #         except json.JSONDecodeError:
+        #             logger.warning("Invalid JSON in request body")
+        #     if has_action is not None:
+        #         logger.info("Request is for salon owner")
+        #         return self.get_response(request)
+        
+        if request.path.startswith('/hnb/auth') and request.method == 'POST':
             return self.get_response(request)
         
         try:

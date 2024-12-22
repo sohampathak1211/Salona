@@ -11,7 +11,8 @@ const authSlice = createSlice({
     is_enabled: true,
     role: 'SO',
     exp: 1736791698,
-    salon_id: 2
+    salon_id: -1,
+    branch_id: -1
   },
   reducers: {
     setAuth: (state, action) => {
@@ -22,6 +23,7 @@ const authSlice = createSlice({
       state.token = action.payload.token
       state.role = action.payload.role
       state.salon_id = action.payload.salon_id
+      state.branch_id = action.payload.branch_id
     }
   }
 })

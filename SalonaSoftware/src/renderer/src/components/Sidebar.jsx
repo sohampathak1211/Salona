@@ -15,6 +15,7 @@ import { branchReset } from '../slices/branchSlice.js'
 import { couponReset } from '../slices/couponSlice.js'
 import { serviceReset } from '../slices/serviceSlice.js'
 import { comboReset } from '../slices/comboSlice.js'
+import { maintainerReset } from '../slices/maintainerSlice.js';
 
 const Sidebar = ({ sidebar, setSidebar }) => {
   const { categories, options } = useAssets()
@@ -28,6 +29,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
       dispatch(couponReset())
       dispatch(serviceReset())
       dispatch(comboReset())
+      dispatch(maintainerReset())
       await setData('cUser', {})
       await setData('token', {})
       toast.success('Successfully logged out')

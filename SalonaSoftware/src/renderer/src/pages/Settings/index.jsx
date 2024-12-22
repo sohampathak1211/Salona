@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { branchFailed, branchRequest, branchSuccess } from '../../slices/branchSlice'
 import useBranch from '../../services/useBranch'
 import { toast } from 'react-toastify'
+import Salon from './Salon'
 
 const Settings = () => {
   const { getSalonBranches } = useBranch()
@@ -28,6 +29,7 @@ const Settings = () => {
 
   return (
     <div>
+      <Salon />
       <Branch />
       <Maintainer />
     </div>

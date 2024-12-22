@@ -57,7 +57,7 @@ const Maintainer = () => {
   const fetchMaintainers = async () => {
     const data = await getSalonMaintainers()
     console.log('Data for the maintainers', data)
-    setMaintainers((prev) => [...prev, ...data])
+    setMaintainers(data)
   }
 
   useEffect(() => {

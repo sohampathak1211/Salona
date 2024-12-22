@@ -34,7 +34,7 @@ class SalonOwnerAdmin(admin.ModelAdmin):
 # Salon Admin
 @admin.register(Salon)
 class SalonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone', 'owner', 'address', 'created_at')  # Fields to display in the list view
+    list_display = ('name', 'phone', 'owner','created_at')  # Fields to display in the list view
     list_filter = ('created_at', 'owner')  # Filters for creation date and owner
     search_fields = ('name', 'phone', 'address', 'owner__name')  # Search fields
     ordering = ('-created_at',)  # Order by creation date in descending order

@@ -10,15 +10,18 @@ const maintainerSlice = createSlice({
   reducers: {
     maintainerRequest: (state, action) => {
       state.loading = true
+      state.result = []
       state.error = null
     },
     maintainerSuccess: (state, action) => {
       state.loading = false
       state.result = action.payload
+      state.error = null
     },
     maintainerFailed: (state, action) => {
       state.loading = false
       state.error = action.payload
+      state.result = []
     },
     maintainerAddService: (state, action) => {
       state.result = [...state.result, action.payload]

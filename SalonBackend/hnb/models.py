@@ -15,7 +15,7 @@ class SalonOwner(models.Model):
 class Salon(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    address = models.TextField()
+    # address = models.TextField()
     email = models.CharField(max_length=100,null=True)
     phone = models.CharField(max_length=15)
     description = models.TextField()

@@ -3,6 +3,16 @@ import useRequest from '../utils/useRequest'
 
 const useSalon = () => {
   const { Request } = useRequest()
+  const getSalon = async () => {
+    const response = await window.electron.ipcRenderer.invoke('getSalon')
+    return response
+  }
+
+  const updateSalon = async (data) => {
+    const response = await window.electron.ipcRenderer.invoke('updateSalon', data)
+    return response
+  }
+
   const searchSalon = async (search) => {
     const res = await window.electron.ipcRenderer.invoke('searchSalon', {
       params: { search }
@@ -61,7 +71,9 @@ const useSalon = () => {
     getNamesAndLocation,
     getSalonOfOwner,
     getBranchNamesAndLocation,
-    createSalon
+    createSalon,
+    getSalon,
+    updateSalon
   }
 }
 

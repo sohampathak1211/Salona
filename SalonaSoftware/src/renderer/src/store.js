@@ -5,6 +5,7 @@ import serviceReducer from './slices/serviceSlice'
 import maintainerReducer from './slices/maintainerSlice'
 import comboReducer from './slices/comboSlice'
 import couponReducer from './slices/couponSlice'
+import salonReducer from './slices/salonSlice'
 export const store = configureStore({
   reducer: {
     todos: authReducer,
@@ -13,5 +14,6 @@ export const store = configureStore({
     maintainer: maintainerReducer,
     combo: comboReducer,
     coupon: couponReducer,
+    salon: salonReducer
   }
 })

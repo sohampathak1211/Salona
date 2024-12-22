@@ -11,6 +11,7 @@ const CreateCoupon = ({ setCreate }) => {
   const [coupon, setCoupon] = useState({
     branch: null,
     code: '',
+    by_percent: true,
     discount_percentage: 0,
     discount_amount: 0,
     valid_services: [],
@@ -79,6 +80,7 @@ const CreateCoupon = ({ setCreate }) => {
 
     const payload = {
       ...coupon,
+      by_percent: !enabled,
       branch: selectedBranch.id,
       valid_services: selectedServices.map((service) => service.id),
       valid_combos: selectedCombos.map((combo) => combo.id)

@@ -84,8 +84,10 @@ class Combo(models.Model):
         return f"{self.branch.address} - {self.name}"
 
 class Coupon(models.Model):
-    branch = models.ForeignKey("Branch", on_delete=models.CASCADE, related_name="coupon", null=True, blank=True)
-    code = models.CharField(max_length=20, unique=True)
+    id = models.AutoField(primary_key=True)
+    branch = models.ForeignKey("Branch", on_delete=models.CASCADE, related_name="coupon", blank=True)
+    code = models.CharField(max_length=20,unique=False)
+    by_percent = models.BooleanField(default=True)  
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # e.g., 10.00 for 10%
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)     # e.g., 200 for flat 200 off
     valid_services = models.ManyToManyField(Service, blank=True, related_name="coupons")

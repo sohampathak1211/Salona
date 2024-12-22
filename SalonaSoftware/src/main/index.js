@@ -22,7 +22,7 @@ import { ProductApi } from './ipc/product'
 // console.log(__dirname)
 // const store = new Store()
 
-export const SERVER_URL = process.env.SALONA_BACKEND_URL && 'http://127.0.0.1:8000/'
+export const SERVER_URL = process.env.SALONA_BACKEND_URL || 'http://127.0.0.1:8000/'
 export const SALON_ID = process.env.SALON_ID
 export const BRANCH_ID = process.env.BRANCH_ID
 

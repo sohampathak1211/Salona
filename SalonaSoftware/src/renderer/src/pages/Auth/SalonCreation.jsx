@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import useSalon from '../../services/useSalon'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import useLocalStorage from '../../services/useLocalStorage'
 
 const SalonCreation = () => {
   const { createSalon } = useSalon()
   const { getData } = useLocalStorage()
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     name: '',
@@ -122,6 +123,7 @@ const SalonCreation = () => {
       const response = await createSalon(formData)
       console.log('Salon creation', response)
       toast.success('Salon Successfully created')
+      navigate('/auth')
     } catch (e) {
       console.log(e)
       toast.error('Error creating the salon')

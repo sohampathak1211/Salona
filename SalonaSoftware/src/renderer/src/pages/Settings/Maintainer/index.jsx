@@ -9,6 +9,8 @@ import { useSelector } from 'react-redux'
 import AddMaintainer from './AddMaintainer'
 import { AiFillShop } from 'react-icons/ai'
 import { GrUserWorker } from 'react-icons/gr'
+import { toast } from 'react-toastify'
+import { selectBranch } from '../../../slices/branchSlice'
 const Maintainer = () => {
   const [maintainers, setMaintainers] = useState([
     {
@@ -16,32 +18,31 @@ const Maintainer = () => {
       name: 'John Doe',
       email: 'johndoe@example.com',
       phone: '123-456-7890',
-      branch: 'ABC@123'
+      branch: { address: 'ABC@123' }
     },
     {
       id: 2,
       name: 'Jane Smith',
       email: 'janesmith@example.com',
       phone: '987-654-3210',
-      branch: 'ABC@123'
+      branch: { address: 'ABC@123' }
     },
     {
       id: 3,
       name: 'Alice Johnson',
       email: 'alicej@example.com',
       phone: '456-789-0123',
-      branch: 'ABC@123'
+      branch: { address: 'ABC@123' }
     },
     {
       id: 4,
       name: 'Bob Brown',
       email: 'bobbrown@example.com',
       phone: '321-654-9870',
-      branch: 'ABC@123'
+      branch: { address: 'ABC@123' }
     }
   ])
-  const selectBranch = useSelector((state) => state.branch.result)
-  const [selected, setSelected] = useState(selectBranch[0])
+  const branches = useSelector(selectBranch)
   const { getSalonMaintainers } = useMaintainer()
 
   const [currentMaintainer, setCurrentMaintainer] = useState({
@@ -72,15 +73,22 @@ const Maintainer = () => {
     setIsModalOpen(false)
   }
 
+  const handleServiceOpen = () => {
+    if (branches.length <= 0) {
+      toast.info('Maintainer cannot be created without a branch. Please add a branch first.')
+      return
+    } else {
+      setCurrentMaintainer({ id: null, name: '', email: '', phone: '' })
+      setIsModalOpen(true)
+    }
+  }
+
   return (
     <div className="p-6 bg-gray-100">
       <div className="w-full flex justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Salon Maintainers</h2>
         <button
-          onClick={() => {
-            setCurrentMaintainer({ id: null, name: '', email: '', phone: '' })
-            setIsModalOpen(true)
-          }}
+          onClick={handleServiceOpen}
           className="w-40 text-center py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded"
         >
           Add Maintainer

@@ -10,14 +10,24 @@ import { Link, useNavigate } from 'react-router-dom'
 import useLocalStorage from '../services/useLocalStorage.jsx'
 import { toast } from 'react-toastify'
 import { RiLogoutCircleRLine } from 'react-icons/ri'
+import { useDispatch } from 'react-redux'
+import { branchReset } from '../slices/branchSlice.js'
+import { couponReset } from '../slices/couponSlice.js'
+import { serviceReset } from '../slices/serviceSlice.js'
+import { comboReset } from '../slices/comboSlice.js'
 
 const Sidebar = ({ sidebar, setSidebar }) => {
   const { categories, options } = useAssets()
   const navigate = useNavigate()
   const { setData } = useLocalStorage()
+  const dispatch = useDispatch()
 
   const handleLogout = async () => {
     try {
+      dispatch(branchReset())
+      dispatch(couponReset())
+      dispatch(serviceReset())
+      dispatch(comboReset())
       await setData('cUser', {})
       await setData('token', {})
       toast.success('Successfully logged out')

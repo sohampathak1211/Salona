@@ -10,6 +10,7 @@ import { branchFailed, branchRequest, branchSuccess, selectBranch } from '../../
 import {
   selectService,
   serviceEdit,
+  serviceFailed,
   serviceRequest,
   serviceSuccess
 } from '../../slices/serviceSlice'
@@ -26,9 +27,13 @@ const Services = () => {
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
 
+  const state = useSelector((state) => state)
+
+  console.log('State', state)
   const getBranches = async () => {
     dispatch(branchRequest())
     const data = await getSalonBranches({}, {})
+    console.log("BRanches of salon",data)
     if (data.error) {
       dispatch(branchFailed(data.error))
       toast.info("You don't have branches. Open the settings page and add a branch to continue")
@@ -42,6 +47,11 @@ const Services = () => {
   const getServices = async () => {
     dispatch(serviceRequest())
     const serv = await getSalonServices()
+    if (serv.error) {
+      toast.error(`Call 7887557175 \n ${serv.error}`)
+      dispatch(serviceFailed(serv.error))
+      return;
+    }
     dispatch(serviceSuccess(serv))
   }
 
@@ -68,7 +78,7 @@ const Services = () => {
     // Logic for deleting vendor details
     console.log(`Delete vendor with id: ${id}`)
   }
-  
+
   const handleServiceOpen = () => {
     if (branches.length <= 0) {
       toast.info("You don't have branches. Open the settings page and add a branch to continue")

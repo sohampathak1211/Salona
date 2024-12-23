@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
 import SidebarLayout from './layout/SidebarLayout'
 import Dashboard from './pages/Dashboard'
 import Services from './pages/Services'
@@ -9,7 +9,7 @@ import SplashScreen from './pages/Auth/SplashScreen'
 import SignIn from './pages/Auth/SignIn'
 import SignUp from './pages/Auth/SignUp'
 import Otp from './pages/Auth/Otp'
-import { ToastContainer } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import Combos from './pages/Combos'
 import Customer from './pages/Users'
 import SalonCreation from './pages/Auth/SalonCreation'
@@ -21,6 +21,8 @@ import Product from './pages/Product'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+
+  
 
   return (
     <Router>

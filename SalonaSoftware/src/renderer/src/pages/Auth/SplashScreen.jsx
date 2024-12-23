@@ -21,15 +21,16 @@ const SplashScreen = () => {
 
   const checkHasSalon = async () => {
     try {
-      const data = await getData('cUser')
-      dispatch(setAuth(data))
-      if (!data) {
+      const cUser = await getData('cUser')
+      const token = await getData('token')
+      if (!cUser) {
         setIsLogin(false)
         return
       }
+      dispatch(setAuth({ cUser, token }))
       setIsLogin(true)
       try {
-        const salon = await getSalonOfOwner(data.id)
+        const salon = await getSalonOfOwner(cUser.id)
         console.log('Fetched salon data:', salon)
         setHasSalon(!!salon) // Explicitly convert to boolean
       } catch (e) {

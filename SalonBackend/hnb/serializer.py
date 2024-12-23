@@ -109,7 +109,7 @@ class ComboSerializer(serializers.ModelSerializer):
         model = Combo
         fields = '__all__'
 
-class ComboSerializer(serializers.ModelSerializer):
+class ComboBranchSerializer(serializers.ModelSerializer):
     branch = BranchIdSerializer(many=False, read_only=True)
     class Meta:
         model = Combo

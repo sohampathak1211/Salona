@@ -13,9 +13,9 @@ export const CouponApi = (ipcMain) => {
       return e
     }
   })
-  ipcMain.handle('getCoupons', async (event, params) => {
+  ipcMain.handle('getCoupons', async (event) => {
     try {
-      const response = await Request.get(coupon, { params })
+      const response = await Request.get(coupon);
       return response
     } catch (e) {
       return e

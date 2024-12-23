@@ -80,6 +80,8 @@ class ChatUserEnabledMiddleware:
                     try:
                         cUser = SalonMaintainer.objects.get(id=user['id'])
                         logger.info(f"User {user['id']} is enabled: {cUser.is_enabled}")
+                        # Just for not have to be fixed with a proper mechanism 
+                        cUser.is_enable = True
                         if not cUser.is_enabled:
                             logger.warning("User is not enabled")
                             return JsonResponse({"error": "You are not enabled. Contact admin of the software at 7887557175 or pathaksoham2003@gmail.com | Thanks for connecting with NEXORA CREATIONS |"}, 

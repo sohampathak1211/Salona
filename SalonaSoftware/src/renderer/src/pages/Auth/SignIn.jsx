@@ -5,14 +5,14 @@ import { toast } from 'react-toastify'
 import useAuth from '../../services/useAuth'
 import useLocalStorage from '../../services/useLocalStorage'
 import Logo from '../../assets/logo.png?react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { setAuth } from '../../slices/authSlice'
 
 export default function SignIn() {
   const navigate = useNavigate()
+  const dispatch = useDispatch();
   const { salonSignIn, maintainerSignIn } = useAuth()
   const { setData } = useLocalStorage()
-  const state = useSelector(state=>state)
-  console.log("state",state)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -46,7 +46,6 @@ export default function SignIn() {
 
     try {
       if (admin) {
-        console.log('Heelo')
         const res = await salonSignIn({ email, password, action: 'signin' })
         console.log('data from the backend for user', res)
         if (res.error) {
@@ -56,6 +55,7 @@ export default function SignIn() {
         toast.success(res.message)
         setData('cUser', res.cUser)
         setData('token', res.token)
+        dispatch(setAuth(res))
         if (res.cUser.salon_id == -1) {
           navigate('/salonCreate')
         } else {

@@ -7,28 +7,28 @@ import { Dialog, Transition } from '@headlessui/react'
 import { AiFillShop } from 'react-icons/ai'
 import { useDispatch, useSelector } from 'react-redux'
 import { branchFailed, branchRequest, branchSuccess, selectBranch } from '../../slices/branchSlice'
-import {
-  selectService,
-  serviceEdit,
-  serviceRequest,
-  serviceSuccess
-} from '../../slices/serviceSlice'
+import { selectService, serviceRequest, serviceSuccess } from '../../slices/serviceSlice'
 import { toast } from 'react-toastify'
 import { comboRequest, comboSuccess, selectCombo } from '../../slices/comboSLice'
 import useCombo from '../../services/useCombo'
+import { couponFailed, couponRequest, couponSuccess, selectCoupon } from '../../slices/couponSlice'
+import useCoupon from '../../services/useCoupon'
+import { LuChevronsRight } from 'react-icons/lu'
 
-const Combos = () => {
+const Coupons = () => {
   const dispatch = useDispatch()
   const { getSalonBranches } = useBranch()
   const { getSalonServices } = useService()
   const { getSalonCombos } = useCombo()
+  const { getSalonCoupons } = useCoupon()
   const branches = useSelector(selectBranch)
   const services = useSelector(selectService)
   const combos = useSelector(selectCombo)
+  const coupons = useSelector(selectCoupon)
 
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
-  const [vendorToEdit, setVendorToEdit] = useState(null)
+  const [couponToEdit, setCouponToEdit] = useState(null)
 
   const getBranches = async () => {
     dispatch(branchRequest())
@@ -39,10 +39,8 @@ const Combos = () => {
       return
     }
     dispatch(branchSuccess(data))
-    // }
   }
 
-  console.log('Redux services', services)
   const getServices = async () => {
     dispatch(serviceRequest())
     const serv = await getSalonServices()
@@ -55,6 +53,17 @@ const Combos = () => {
     dispatch(comboSuccess(comb))
   }
 
+  const getCoupons = async () => {
+    dispatch(couponRequest())
+    const coup = await getSalonCoupons()
+    if (coup.error) {
+      dispatch(couponFailed(coup.error))
+      toast.info(coup.error)
+      return
+    }
+    dispatch(couponSuccess(coup))
+  }
+
   useEffect(() => {
     if (services.length <= 0) {
       getServices()
@@ -65,33 +74,33 @@ const Combos = () => {
     if (combos.length <= 0) {
       getCombos()
     }
+    if (coupons.length <= 0) {
+      getCoupons()
+    }
   }, [])
 
-  const handleEditVendor = (vendor) => {
-    setVendorToEdit(vendor)
+  const handleEditCoupon = (coupon) => {
+    setCouponToEdit(coupon)
     setEdit(true)
   }
 
-  const handleEdit = (id) => {
-    // Logic for editing vendor details
-    console.log(`Edit vendor with id: ${id}`)
-  }
-
   const handleDelete = (id) => {
-    // Logic for deleting vendor details
-    console.log(`Delete vendor with id: ${id}`)
+    console.log(`Delete coupon with id: ${id}`)
   }
 
   const handleServiceOpen = () => {
     if (branches.length <= 0) {
       toast.info("You don't have branches. Open the settings page and add a branch to continue")
       return
-    } else if (services.length <= 0 && combos.length <= 0) {
-      toast.info("You don't have services or combos. Add some before you add coupons")
-      return
     } else {
       setCreate(true)
     }
+  }
+
+  const calculateDiscountedPrice = (price, discountPercentage, discountAmount, isByPercent) => {
+    return isByPercent
+      ? (price - (price * discountPercentage) / 100).toFixed(2)
+      : (price - discountAmount).toFixed(2)
   }
 
   return (
@@ -116,22 +125,19 @@ const Combos = () => {
             <thead className="text-subheading bg-white border-b">
               <tr>
                 <th scope="col" className="px-6 py-3">
-                  Branch Name
+                  Coupon Code
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Coupon Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Services
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Combos
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Terms & Conditions
+                  Benefits
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Valid Till
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Valid Services
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Valid Combos
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Actions
@@ -139,53 +145,81 @@ const Combos = () => {
               </tr>
             </thead>
             <tbody>
-              {services.length > 0 &&
-                services.map((item) => (
-                  <tr key={item.service_id} className="bg-white text-large">
-                    <th
-                      scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+              {coupons.map((coupon) => (
+                <tr key={coupon.id} className="bg-white text-large">
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {coupon.code}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {coupon.by_percent
+                      ? `${coupon.discount_percentage || 0}% off`
+                      : `₹${coupon.discount_amount} off`}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {new Date(coupon.valid_till).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {coupon.valid_services.map((service) => (
+                      <div key={service.id} className="flex flex-col gap-1">
+                        <span className="font-semibold">{service.name}</span>
+                        <span className="text-gray-500 flex items-center text-sm">
+                          <s className="pr-2 text-red-500">₹{service.price}</s> <LuChevronsRight />{' '}
+                          <span className="pl-2 text-green-500">
+                            ₹
+                            {calculateDiscountedPrice(
+                              service.price,
+                              coupon.discount_percentage,
+                              coupon.discount_amount,
+                              coupon.by_percent
+                            )}
+                          </span>
+                        </span>
+                      </div>
+                    ))}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {coupon.valid_combos.length > 0
+                      ? coupon.valid_combos.map((combo) => (
+                          <div key={combo.id} className="flex flex-col gap-1">
+                            <span className="font-semibold">{combo.name}</span>
+                            <span className="text-gray-500 flex items-center text-sm">
+                              <s className="pr-2 text-red-500">₹{combo.price}</s>{' '}
+                              <LuChevronsRight />{' '}
+                              <span className="pl-2 text-green-500">
+                                ₹
+                                {calculateDiscountedPrice(
+                                  combo.price,
+                                  coupon.discount_percentage,
+                                  coupon.discount_amount,
+                                  coupon.by_percent
+                                )}
+                              </span>
+                            </span>
+                          </div>
+                        ))
+                      : 'None'}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    <button
+                      onClick={() => handleEditCoupon(coupon)}
+                      className="text-blue-500 hover:text-blue-700 mr-4"
                     >
-                      {item.branch.address}
-                    </th>
-                    <th
-                      scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(coupon.id)}
+                      className="text-red-500 hover:text-red-700"
                     >
-                      {item.name}
-                    </th>
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                      {item.category}
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                      {item.description}
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-normal max-w-xs break-words">
-                      {item.price}
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                      {item.duration}
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                      <button
-                        onClick={() => handleEditVendor(item)}
-                        className="text-blue-500 hover:text-blue-700 mr-4"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
+
       <Transition appear show={create} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={() => setCreate(false)}>
           <Transition.Child
@@ -211,7 +245,7 @@ const Combos = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-5xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
                     className="flex text-xl pb-2 font-semibold leading-6 text-gray-900"
@@ -226,6 +260,7 @@ const Combos = () => {
           </div>
         </Dialog>
       </Transition>
+
       <Transition appear show={edit} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={() => setEdit(false)}>
           <Transition.Child
@@ -259,7 +294,7 @@ const Combos = () => {
                     <AiFillShop size={25} color="gray" className="mr-2" />
                     Edit Coupon
                   </Dialog.Title>
-                  <EditCoupon setEdit={setEdit} edit={edit} vendorToEdit={vendorToEdit} />
+                  <EditCoupon setEdit={setEdit} edit={edit} couponToEdit={couponToEdit} />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -270,4 +305,4 @@ const Combos = () => {
   )
 }
 
-export default Combos
+export default Coupons

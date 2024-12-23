@@ -16,7 +16,7 @@ const couponSlice = createSlice({
     couponSuccess: (state, action) => {
       state.loading = false
       state.result = action.payload
-      state.result = null
+      state.error = null
     },
     couponFailed: (state, action) => {
       state.loading = false
@@ -26,7 +26,6 @@ const couponSlice = createSlice({
     couponAddCoupon: (state, action) => {
       state.result = [...state.result, action.payload]
       state.loading = false
-      state.result = action.payload
     },
     couponReset: (state, action) => {
       state.loading = false
@@ -36,7 +35,7 @@ const couponSlice = createSlice({
   }
 })
 
-export const selectCoupon = (state) => state.coupon.result
+export const selectCoupon = (state) => state.coupon.result;
 
 export const { couponFailed, couponSuccess, couponRequest, couponAddCoupon, couponReset } =
   couponSlice.actions

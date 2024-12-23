@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from hnb.models import SalonMaintainer,Branch
-from hnb.serializer import SalonMaintainerSerializer,BranchSerializer
+from hnb.serializer import SalonMaintainerSerializer,BranchSerializer,SalonMaintainerBranchSerializer
 from django.contrib.auth.hashers import make_password, check_password
 import jwt 
 from Salon.settings import SECRET_KEY,JWT_EXPIRY
@@ -66,20 +66,21 @@ class MaintainerRest(APIView):
         serializer = SalonMaintainerSerializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save()
-            payload = serializer.data
-            branch = Branch.objects.get(id=serializer.data['branch'])
-            seri_branch = BranchSerializer(branch,many=False)
-            payload['role'] = "MT"
-            payload['branch_id'] = serializer.data['branch']
-            payload['salon_id'] = seri_branch.data['salon']
-            payload['password'] = ''
-            payload['exp'] = int(JWT_EXPIRY)
-            access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            maintainer = serializer.save()
+            # payload = serializer.data
+            # branch = Branch.objects.get(id=serializer.data['branch'])
+            # seri_branch = BranchSerializer(branch,many=False)
+            # payload['role'] = "MT"
+            # payload['branch_id'] = serializer.data['branch']
+            # payload['salon_id'] = seri_branch.data['salon']
+            # payload['password'] = ''
+            # payload['exp'] = int(JWT_EXPIRY)
+            # access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            seri = SalonMaintainerBranchSerializer(maintainer,many=False)
             return Response(
-            {"message": "Maintainer Sign-in successful", "token": access_token, "cUser": payload},
+            seri.data,
             status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error':serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, *args, **kwargs):
         try:

@@ -2,14 +2,17 @@ import { Dialog, Listbox, Transition } from '@headlessui/react'
 import React, { Fragment, useEffect, useState } from 'react'
 import { FaChevronUp } from 'react-icons/fa'
 import { GoEye, GoEyeClosed } from 'react-icons/go'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import useMaintainer from '../../../../services/useMaintainer'
+import { toast } from 'react-toastify'
+import { maintainerAddMaintainer } from '../../../../slices/maintainerSlice'
 
 const AddMaintainer = ({ currentMaintainer, setCurrentMaintainer, setIsModalOpen }) => {
   const selectBranch = useSelector((state) => state.branch.result)
   const [selected, setSelected] = useState(selectBranch?.[0] || {})
   const [passVis, setPassVis] = useState(false)
   const { createMaintainer } = useMaintainer()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (selectBranch.length > 0) {
@@ -20,8 +23,17 @@ const AddMaintainer = ({ currentMaintainer, setCurrentMaintainer, setIsModalOpen
   const handleSave = async () => {
     // Save logic here
     // Reset the modal after saving
-    const data = await createMaintainer()
-    console.log("Save Maintainer call ",data)
+    const payload = {
+      ...currentMaintainer,
+      branch: selected.id
+    }
+    const data = await createMaintainer(payload)
+    console.log('Save Maintainer call ', data)
+    if (data.error) {
+      toast.info(data.error)
+      return
+    }
+    dispatch(maintainerAddMaintainer(data))
     resetModal()
   }
 

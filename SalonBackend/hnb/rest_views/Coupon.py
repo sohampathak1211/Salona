@@ -2,16 +2,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from hnb.models import Coupon
-from hnb.serializer import CouponSerializer
+from hnb.serializer import CouponSerializer,CouponComboServiceSerializer
 
 class CouponREST(APIView):
     def get(self, request, *args, **kwargs):
         try:
             is_owner = request.is_owner
-            branch_id = request.data.get('branch_id')
+            branch_id = request.branch_id
             if is_owner:
                 coupons = Coupon.objects.filter(branch__in=branch_id)
-                seri = CouponSerializer(coupons, many=True)
+                seri = CouponComboServiceSerializer(coupons, many=True)
                 return Response(seri.data, status=status.HTTP_200_OK)
             data = Coupon.objects.all()
             serializer = CouponSerializer(data, many=True)
@@ -21,12 +21,18 @@ class CouponREST(APIView):
 
     def post(self, request, *args, **kwargs):
         is_owner = request.is_owner
-        
+        branch_id = request.branch_id
+        if request.data.get('code'):
+            if is_owner:
+                data = Coupon.objects.filter(code=request.data.get('code'),branch_id__in=branch_id)
+                if data:
+                    return Response({"error": "Coupon with this code already exists"}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = CouponSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            coup = serializer.save()
+            seri = CouponComboServiceSerializer(coup, many=False)
+            return Response(seri.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, *args, **kwargs):

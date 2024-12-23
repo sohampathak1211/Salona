@@ -4,13 +4,16 @@ import Logo from '../../assets/logo.png?react'
 import useAuth from '../../services/useAuth'
 import useLocalStorage from '../../services/useLocalStorage'
 import useSalon from '../../services/useSalon'
+import { setAuth } from '../../slices/authSlice'
+import { useDispatch } from 'react-redux'
 
 const SplashScreen = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const { getData } = useLocalStorage()
   const { getSalonOfOwner } = useSalon()
- 
+
   const [hasSalon, setHasSalon] = useState(null) // Use `null` for unknown state
   const [isLogin, setIsLogin] = useState(null) // Use `null` for unknown state
 
@@ -19,7 +22,7 @@ const SplashScreen = () => {
   const checkHasSalon = async () => {
     try {
       const data = await getData('cUser')
-      console.log(data)
+      dispatch(setAuth(data))
       if (!data) {
         setIsLogin(false)
         return

@@ -6,6 +6,7 @@ import { branchFailed, branchRequest, branchSuccess } from '../../slices/branchS
 import useBranch from '../../services/useBranch'
 import { toast } from 'react-toastify'
 import Salon from './Salon'
+import SalonOwner from './SalonOwner'
 
 const Settings = () => {
   const { getSalonBranches } = useBranch()

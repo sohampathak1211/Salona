@@ -93,6 +93,8 @@ class Coupon(models.Model):
     valid_services = models.ManyToManyField(Service, blank=True, related_name="coupons")
     valid_combos = models.ManyToManyField(Combo, blank=True, related_name="coupons")
     valid_till = models.DateTimeField()
+    is_minimum_purchase = models.BooleanField(default=False)
+    minimum_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def is_valid(self):
         return self.valid_till >= timezone.now()

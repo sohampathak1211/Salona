@@ -8,6 +8,7 @@ import { FaInstagram, FaFacebook, FaWhatsapp } from 'react-icons/fa'
 import { MdLocationOn } from 'react-icons/md'
 import Image from '../../../assets/logo.png?react'
 import EditSalonModal from './EditSalon'
+import SalonOwner from '../SalonOwner'
 
 const Salon = () => {
   const salon = useSelector(selectSalon)
@@ -110,6 +111,7 @@ const Salon = () => {
             </div>
           )}
         </div>
+        <SalonOwner/>
       </div>
 
       {/* Edit Modal */}

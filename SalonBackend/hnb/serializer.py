@@ -20,6 +20,11 @@ class SalonMaintainerSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalonMaintainer
         fields = '__all__'
+        
+class SalonMaintainerBranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalonMaintainer
+        fields = '__all__'
 
 
 class SalonSerializer(serializers.ModelSerializer):
@@ -78,6 +83,10 @@ class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = '__all__'
+class ServiceNameIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ['id','name','price']
 class ServiceBranchIdSerilaizer(serializers.ModelSerializer):
     # salon = SalonSerializer(many=False,read_only=True)
     branch = BranchNameIdSerializer(many=False,read_only=True)
@@ -105,8 +114,20 @@ class ComboSerializer(serializers.ModelSerializer):
     class Meta:
         model = Combo
         fields = '__all__'
+class ComboNameIdSerializer(serializers.ModelSerializer):
+    # branch = BranchIdSerializer(many=False, read_only=True)
+    class Meta:
+        model = Combo
+        fields = ['id','name','price']
 
 class CouponSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = '__all__'
+class CouponComboServiceSerializer(serializers.ModelSerializer):
+    branch = BranchNameIdSerializer(many=False, read_only=True)
+    valid_services = ServiceNameIdSerializer(many=True, read_only=True)
+    valid_combos = ComboNameIdSerializer(many=True, read_only=True)
     class Meta:
         model = Coupon
         fields = '__all__'

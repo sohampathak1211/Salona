@@ -5,45 +5,24 @@ import { GoEyeClosed } from 'react-icons/go'
 import { FaChevronUp } from 'react-icons/fa6'
 import { Dialog, Listbox, Transition } from '@headlessui/react'
 import useMaintainer from '../../../services/useMaintainer'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import AddMaintainer from './AddMaintainer'
 import { AiFillShop } from 'react-icons/ai'
 import { GrUserWorker } from 'react-icons/gr'
 import { toast } from 'react-toastify'
 import { selectBranch } from '../../../slices/branchSlice'
+import {
+  maintainerFailed,
+  maintainerRequest,
+  maintainerSuccess,
+  selectMaintainer
+} from '../../../slices/maintainerSlice'
 const Maintainer = () => {
-  const [maintainers, setMaintainers] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'johndoe@example.com',
-      phone: '123-456-7890',
-      branch: { address: 'ABC@123' }
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      email: 'janesmith@example.com',
-      phone: '987-654-3210',
-      branch: { address: 'ABC@123' }
-    },
-    {
-      id: 3,
-      name: 'Alice Johnson',
-      email: 'alicej@example.com',
-      phone: '456-789-0123',
-      branch: { address: 'ABC@123' }
-    },
-    {
-      id: 4,
-      name: 'Bob Brown',
-      email: 'bobbrown@example.com',
-      phone: '321-654-9870',
-      branch: { address: 'ABC@123' }
-    }
-  ])
+  // const [maintainers, setMaintainers] = useState()
+  const maintainers = useSelector(selectMaintainer)
   const branches = useSelector(selectBranch)
   const { getSalonMaintainers } = useMaintainer()
+  const dispatch = useDispatch()
 
   const [currentMaintainer, setCurrentMaintainer] = useState({
     id: null,
@@ -55,9 +34,14 @@ const Maintainer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const fetchMaintainers = async () => {
+    dispatch(maintainerRequest())
     const data = await getSalonMaintainers()
-    console.log('Data for the maintainers', data)
-    setMaintainers(data)
+    if (data.error) {
+      dispatch(maintainerFailed(data.error))
+      toast.info("You don't have branches. Open the settings page and add a branch to continue")
+      return
+    }
+    dispatch(maintainerSuccess(data))
   }
 
   useEffect(() => {
@@ -65,7 +49,7 @@ const Maintainer = () => {
   }, [])
 
   const handleDelete = (id) => {
-    setMaintainers((prev) => prev.filter((maintainer) => maintainer.id !== id))
+    // setMaintainers((prev) => prev.filter((maintainer) => maintainer.id !== id))
   }
 
   const resetModal = () => {

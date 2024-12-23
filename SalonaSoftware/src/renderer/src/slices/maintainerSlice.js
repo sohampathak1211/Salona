@@ -23,7 +23,7 @@ const maintainerSlice = createSlice({
       state.error = action.payload
       state.result = []
     },
-    maintainerAddService: (state, action) => {
+    maintainerAddMaintainer: (state, action) => {
       state.result = [...state.result, action.payload]
     },
     maintainerReset: (state, action) => {
@@ -34,13 +34,13 @@ const maintainerSlice = createSlice({
   }
 })
 
-export const selectService = (state) => state.maintainer.result
+export const selectMaintainer = (state) => state.maintainer.result
 
 export const {
   maintainerFailed,
   maintainerSuccess,
   maintainerRequest,
-  maintainerAddService,
+  maintainerAddMaintainer,
   maintainerReset
 } = maintainerSlice.actions
 export default maintainerSlice.reducer

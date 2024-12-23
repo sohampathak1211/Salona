@@ -9,14 +9,15 @@ class BillREST(APIView):
         data = request.data
 
         # Extract inputs from the request
-        customer_id = data.get("customer_id")
+        c_phone = data.get("phone")
         branch_id = data.get("branch_id")
         services_ids = data.get("services_ids", [])
         combos_ids = data.get("combos_ids", [])
         coupon_code = data.get("coupon_code")
 
         # Fetch objects from the database
-        customer = get_object_or_404(Customer, id=customer_id)
+        customer = get_object_or_404(Customer, phone=c_phone)
+        print(customer)
         branch = get_object_or_404(Branch, id=branch_id)
         services = Service.objects.filter(id__in=services_ids)
         combos = Combo.objects.filter(id__in=combos_ids)

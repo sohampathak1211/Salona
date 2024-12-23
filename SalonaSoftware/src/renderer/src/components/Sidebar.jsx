@@ -16,6 +16,7 @@ import { couponReset } from '../slices/couponSlice.js'
 import { serviceReset } from '../slices/serviceSlice.js'
 import { comboReset } from '../slices/comboSlice.js'
 import { maintainerReset } from '../slices/maintainerSlice.js';
+import { clearAuth } from '../slices/authSlice.js'
 
 const Sidebar = ({ sidebar, setSidebar }) => {
   const { categories, options } = useAssets()
@@ -25,6 +26,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
 
   const handleLogout = async () => {
     try {
+      dispatch(clearAuth())
       dispatch(branchReset())
       dispatch(couponReset())
       dispatch(serviceReset())

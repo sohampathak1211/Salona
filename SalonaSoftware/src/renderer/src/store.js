@@ -8,7 +8,7 @@ import couponReducer from './slices/couponSlice'
 import salonReducer from './slices/salonSlice'
 export const store = configureStore({
   reducer: {
-    todos: authReducer,
+    auth: authReducer,
     branch: branchReducer,
     service: serviceReducer,
     maintainer: maintainerReducer,

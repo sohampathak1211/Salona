@@ -14,7 +14,7 @@ import {
   serviceSuccess
 } from '../../slices/serviceSlice'
 import useCombo from '../../services/useCombo'
-import { comboRequest, comboSuccess, selectCombo } from '../../slices/comboSLice'
+import { comboRequest, comboSuccess, selectCombo } from '../../slices/comboSlice'
 import { toast } from 'react-toastify'
 
 const Combos = () => {

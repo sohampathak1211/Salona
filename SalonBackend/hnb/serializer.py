@@ -128,6 +128,7 @@ class BillSerializer(serializers.ModelSerializer):
         fields = ['id', 'customer_name', 'branch_address', 'services', 'combos', 'total_amount', 'created_at']
 
 class ProductSerializer(serializers.ModelSerializer):
+    branch = BranchNameIdSerializer(read_only=True) 
     class Meta:
         model = Product
         fields = '__all__'  

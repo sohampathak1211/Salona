@@ -1,16 +1,135 @@
-import React, { Fragment, useState } from 'react'
+// i
+
+import React, { Fragment, useState, useEffect } from 'react'
 import CreateProduct from './CreateProduct'
 import { AiFillShop } from 'react-icons/ai'
 import { Dialog, Transition } from '@headlessui/react'
 import EditProduct from './EditProduct'
+import { FaRegEdit } from 'react-icons/fa'
+import { MdOutlineDelete } from 'react-icons/md'
+import { FaCartPlus } from "react-icons/fa";
 
 const Product = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState([
+    // Static example data for UI demonstration purposes
+    {
+      id: 1,
+      name: 'Product A',
+      brand: 'Brand X',
+      category: 'Category 1',
+      price: 100,
+      quantity: 10,
+      gender: 'Unisex',
+      expiry_date: '2025-12-31',
+      description: 'A sample product.',
+      branch: { address: '123 Main St' }
+    },
+    {
+      id: 2,
+      name: 'Product B',
+      brand: 'Brand Y',
+      category: 'Category 2',
+      price: 200,
+      quantity: 5,
+      gender: 'Male',
+      expiry_date: '2024-11-30',
+      description: 'Another sample product.',
+      branch: { address: '456 Elm Stmladfpds' }
+    },
+    {
+      id: 2,
+      name: ' Product Product BBProduct BProduct B ',
+      brand: 'Brand Y Product BProduct B ',
+      category: 'Category 2 Product B Product B',
+      price: 200,
+      quantity: 5,
+      gender: 'Male Product B Product B',
+      expiry_date: '2024-11-30 Product B Product B Product B',
+      description: 'Another sample product. Product B Product B Product B Product B',
+      branch: {
+        address:
+          '456 Elm Stmladfpds Product B Product BProduct B Product B Product B Product B Product B Product B'
+      }
+    },
+    {
+      id: 2,
+      name: 'Product B',
+      brand: 'Brand Y',
+      category: 'Category 2',
+      price: 200,
+      quantity: 5,
+      gender: 'Male',
+      expiry_date: '2024-11-30',
+      description: 'Another sample product.',
+      branch: { address: '456 Elm Stmladfpds' }
+    },
+    {
+      id: 2,
+      name: 'Product B',
+      brand: 'Brand Y',
+      category: 'Category 2',
+      price: 200,
+      quantity: 5,
+      gender: 'Male',
+      expiry_date: '2024-11-30',
+      description: 'Another sample product.',
+      branch: { address: '456 Elm Stmladfpds' }
+    },
+    {
+      id: 2,
+      name: 'Product B',
+      brand: 'Brand Y',
+      category: 'Category 2',
+      price: 200,
+      quantity: 5,
+      gender: 'Male',
+      expiry_date: '2024-11-30',
+      description: 'Another sample product.',
+      branch: { address: '456 Elm Stmladfpds' }
+    },
+    {
+      id: 2,
+      name: 'Product B',
+      brand: 'Brand Y',
+      category: 'Category 2',
+      price: 200,
+      quantity: 5,
+      gender: 'Male',
+      expiry_date: '2024-11-30',
+      description: 'Another sample product.',
+      branch: { address: '456 Elm Stmladfpds' }
+    },
+    {
+      id: 2,
+      name: 'Product B',
+      brand: 'Brand Y',
+      category: 'Category 2',
+      price: 200,
+      quantity: 5,
+      gender: 'Male',
+      expiry_date: '2024-11-30',
+      description: 'Another sample product.',
+      branch: { address: '456 Elm Stmladfpds' }
+    },
+    {
+      id: 2,
+      name: 'Product B',
+      brand: 'Brand Y',
+      category: 'Category 2',
+      price: 200,
+      quantity: 5,
+      gender: 'Male',
+      expiry_date: '2024-11-30',
+      description: 'Another sample product.',
+      branch: { address: '456 Elm Stmladfpds' }
+    }
+  ])
+
   return (
     <div className="flex flex-1 justify-center relative">
-      <div className="w-full p-10">
+      <div className="w-full p-5">
         <div className="flex justify-between">
           <div>
             <h2 className="text-sm font-bold text-subheading">Product</h2>
@@ -24,52 +143,81 @@ const Product = () => {
           </button>
         </div>
         <div className="relative rounded-2xl overflow-x-auto mt-5">
-          <h2 className="w-full bg-white p-5 text-xl font-bold" onClick={() => setEdit(true)}>
-            Product Details
-          </h2>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-subheading bg-white border-b">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Email
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Address
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Phone
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {products?.map((item) => (
-                <tr key={item.id} className="bg-white text-large">
-                  <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.name}
+          <h2 className="w-full bg-white p-5 text-xl font-bold items-center flex flex-row gap-2" >  
+          <div>
+<FaCartPlus size={18} fontWeight={20}/>
+          </div>
+          <div> Product Details
+          </div></h2>
+         
+          <div className="max-h-[620px] overflow-y-scroll">
+            {' '}
+            {/* Add this wrapper */}
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
+              <thead className="text-subheading bg-white border-b">
+                <tr>
+                  <th scope="col" className="px-6 py-3">
+                    Name
                   </th>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.email}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-normal max-w-xs break-words">
-                    {item.address}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.phone}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    <button className="text-blue-500 hover:text-blue-700 mr-4">Edit</button>
-                    <button className="text-red-500 hover:text-red-700">Delete</button>
-                  </td>
+                  <th scope="col" className="px-6 py-3">
+                    Brand
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Category
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Price
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Qty.
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Gender
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Expiry Date
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Branch Address
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {products?.map((item) => (
+                  <tr key={item.id} className="bg-white text-large">
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 break-words max-w-xs"
+                    >
+                      {item.name}
+                    </th>
+                    <td className="px-6 py-4 text-wrap break-words">{item.brand}</td>
+                    <td className="px-6 py-4">{item.category}</td>
+                    <td className="px-6 py-4">₹{item.price}</td>
+                    <td className="px-6 py-4">{item.quantity}</td>
+                    <td className="px-6 py-4">{item.gender}</td>
+                    <td className="px-6 py-4">{new Date(item.expiry_date).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 max-w-xs break-words">{item.description}</td>
+                    <td className="px-6 py-4">{item.branch?.address}</td>
+                    <td className="px-6 py-4 flex flex-row">
+                      <button className="text-black bg-yellow-400 px-2 p-1 mr-4 rounded-md items-center flex flex-row gap-1 mt-4">
+                        <div>
+                          <FaRegEdit />
+                        </div>
+                        <div>Edit</div>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <Transition appear show={create} as={Fragment}>

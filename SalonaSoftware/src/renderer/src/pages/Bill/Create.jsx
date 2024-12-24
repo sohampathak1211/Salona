@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
-import { Listbox } from '@headlessui/react'
+import { Listbox  } from '@headlessui/react'
 import { useSelector } from 'react-redux'
 import { selectService } from '../../slices/serviceSlice'
 import { selectCombo } from '../../slices/comboSlice'
 import { selectBranch } from '../../slices/branchSlice'
+import { Menu } from '@headlessui/react';
+import { Combobox } from '@headlessui/react'
+
 
 const CreateBill = () => {
   const branches = useSelector(selectBranch)
@@ -45,6 +48,24 @@ const CreateBill = () => {
 
   const calculateGrandTotal = () => items.reduce((sum, item) => sum + item.total, 0).toFixed(2)
 
+  const [query, setQuery] = useState('')
+
+  // Determine the items based on the selected type
+  const filteredOptions =
+    items.type === 'Service'
+      ? services
+      : items.type === 'Combo'
+      ? combos
+      : products
+
+  // Filter options based on the search query
+  const displayedOptions = query === ''
+    ? filteredOptions
+    : filteredOptions.filter((opt) =>
+        opt.name.toLowerCase().includes(query.toLowerCase())
+      )
+
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const billData = {
@@ -57,6 +78,16 @@ const CreateBill = () => {
     }
     console.log('Bill Data:', billData)
   }
+
+  const coupons = ['DISCOUNT10', 'SALE20', 'WELCOME5'];
+  const [searchTerm, setSearchTerm] = useState(''); // Renamed state for query
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+
+  const filteredCoupons = searchTerm === ''
+  ? coupons
+  : coupons.filter((coupon) =>
+      coupon.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   return (
     <form onSubmit={handleSubmit} className="p-5 bg-white rounded-lg shadow-md space-y-6">
@@ -107,37 +138,108 @@ const CreateBill = () => {
         {items.map((item, index) => (
           <div key={index} className="flex items-center gap-4 mb-3">
             {/* Type Dropdown */}
-            <Listbox value={item.type} onChange={(value) => handleItemChange(index, 'type', value)}>
-              <Listbox.Button className="p-2 border rounded-md">
-                {item.type || 'Select Type'}
-              </Listbox.Button>
-              <Listbox.Options className="border rounded-md mt-1 bg-white">
-                {['Service', 'Combo', 'Product'].map((type) => (
-                  <Listbox.Option key={type} value={type}>
-                    {type}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Listbox>
+            <Menu as="div" className="relative inline-block text-left">
+  {({ open }) => (
+    <>
+      <div>
+        <Menu.Button className="p-2 border rounded-md w-40 bg-gray-50 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 flex items-center justify-between">
+          {item.type || 'Select Type'}
+          <svg
+            className={`w-5 h-5 ml-2 transition-transform duration-300 ${
+              open ? 'rotate-180' : 'rotate-0'
+            }`}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </Menu.Button>
+      </div>
+      <Menu.Items className="absolute mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+        {['Service', 'Combo', 'Product'].map((type) => (
+          <Menu.Item key={type}>
+            {({ active }) => (
+              <button
+                onClick={() => handleItemChange(index, 'type', type)}
+                className={`w-full text-left px-4 py-2 text-sm ${
+                  active ? 'bg-blue-500 text-white' : 'text-gray-900'
+                }`}
+              >
+                {type}
+              </button>
+            )}
+          </Menu.Item>
+        ))}
+      </Menu.Items>
+    </>
+  )}
+</Menu>
 
             {/* Item Dropdown */}
-            <Listbox value={item.item} onChange={(value) => handleItemChange(index, 'item', value)}>
-              <Listbox.Button className="p-2 border rounded-md w-40">
-                {item.item ? item.item.name : 'Select Item'}
-              </Listbox.Button>
-              <Listbox.Options className="border rounded-md mt-1 bg-white">
-                {(item.type === 'Service'
-                  ? services
-                  : item.type === 'Combo'
-                    ? combos
-                    : products
-                ).map((opt) => (
-                  <Listbox.Option key={opt.id} value={opt}>
-                    {opt.name}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Listbox>
+            <Combobox
+  as="div"
+  className="relative "
+  value={item.item}
+  onChange={(value) => handleItemChange(index, 'item', value)}
+>
+  {({ open }) => (
+    <>
+      <div className="relative w-50">
+        <Combobox.Input
+          className="p-2 border rounded-md w-full"
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search or Select Item"
+          displayValue={(selected) => (selected ? selected.name : '')}
+        />
+        <svg
+          className={`absolute right-3 top-3 w-5 h-5 text-gray-500 transition-transform duration-300 ${
+            open ? 'rotate-180' : 'rotate-0'
+          }`}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+      <Combobox.Options className="absolute mt-1 max-h-60 w-40 overflow-auto bg-white border rounded-md shadow-lg z-10">
+        {displayedOptions.length > 0 ? (
+          displayedOptions.map((opt) => (
+            <Combobox.Option
+              key={opt.id}
+              value={opt}
+              className={({ active }) =>
+                `cursor-pointer select-none px-4 py-2 ${
+                  active ? 'bg-blue-500 text-white' : 'text-gray-900'
+                }`
+              }
+            >
+              {opt.name}
+            </Combobox.Option>
+          ))
+        ) : (
+          <div className="cursor-default select-none px-4 py-2 text-gray-500">
+            No results found
+          </div>
+        )}
+      </Combobox.Options>
+    </>
+  )}
+</Combobox>
+
 
             {/* Quantity */}
             <input
@@ -183,18 +285,63 @@ const CreateBill = () => {
       {/* Coupon Dropdown */}
       <div>
         <label className="block text-sm font-medium mb-1">Coupon</label>
-        <Listbox value={coupon} onChange={setCoupon}>
-          <Listbox.Button className="w-full p-2 border rounded-md">
-            {coupon || 'Select Coupon'}
-          </Listbox.Button>
-          <Listbox.Options className="border rounded-md mt-1 bg-white">
-            {['DISCOUNT10', 'SALE20', 'WELCOME5'].map((c) => (
-              <Listbox.Option key={c} value={c}>
-                {c}
-              </Listbox.Option>
-            ))}
-          </Listbox.Options>
-        </Listbox>
+        <Combobox value={selectedCoupon} onChange={setSelectedCoupon}>
+      {({ open }) => (
+        <div className="relative">
+          {/* Input Field with Dropdown Icon */}
+          <div className="relative">
+            <Combobox.Input
+              className="w-full p-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search or Select Coupon"
+              displayValue={(coupon) => coupon || ''}
+            />
+            <svg
+              className={`absolute right-3 top-3 w-5 h-5 text-gray-500 transition-transform duration-300 ${
+                open ? 'rotate-180' : 'rotate-0'
+              }`}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+
+          {/* Dropdown Options */}
+          <Combobox.Options
+            className="absolute mt-1 max-h-60 w-full bg-white border rounded-md shadow-lg z-10 overflow-auto"
+          >
+            {filteredCoupons.length > 0 ? (
+              filteredCoupons.map((coupon) => (
+                <Combobox.Option
+                  key={coupon}
+                  value={coupon}
+                  className={({ active }) =>
+                    `cursor-pointer select-none px-4 py-2 ${
+                      active ? 'bg-blue-500 text-white' : 'text-gray-900'
+                    }`
+                  }
+                >
+                  {coupon}
+                </Combobox.Option>
+              ))
+            ) : (
+              <div className="cursor-default select-none px-4 py-2 text-gray-500">
+                No results found
+              </div>
+            )}
+          </Combobox.Options>
+        </div>
+      )}
+    </Combobox>
+
       </div>
 
       {/* Grand Total */}

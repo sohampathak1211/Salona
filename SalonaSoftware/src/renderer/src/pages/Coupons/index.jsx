@@ -97,6 +97,12 @@ const Coupons = () => {
     }
   }
 
+  const isDateValid = (validTillDate) => {
+    const currentDate = new Date() // Current date and time
+    const validDate = new Date(validTillDate) // Convert input date to Date object
+    return validDate >= currentDate // Returns true if validDate is in the future or today, false otherwise
+  }
+
   const calculateDiscountedPrice = (price, discountPercentage, discountAmount, isByPercent) => {
     return isByPercent
       ? (price - (price * discountPercentage) / 100).toFixed(2)
@@ -156,26 +162,36 @@ const Coupons = () => {
                       : `₹${coupon.discount_amount} off`}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {new Date(coupon.valid_till).toLocaleDateString()}
+                    <div className='flex items-center'>
+                      <div
+                        className={`w-2 h-2 mr-1 rounded-full ${isDateValid(coupon.valid_till) ? 'bg-green-500' : 'bg-red-500'}`}
+                      ></div>{' '}
+                      {new Date(coupon.valid_till).toLocaleDateString()}
+                    </div>
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {coupon.valid_services.map((service) => (
-                      <div key={service.id} className="flex flex-col gap-1">
-                        <span className="font-semibold">{service.name}</span>
-                        <span className="text-gray-500 flex items-center text-sm">
-                          <s className="pr-2 text-red-500">₹{service.price}</s> <LuChevronsRight />{' '}
-                          <span className="pl-2 text-green-500">
-                            ₹
-                            {calculateDiscountedPrice(
-                              service.price,
-                              coupon.discount_percentage,
-                              coupon.discount_amount,
-                              coupon.by_percent
-                            )}
-                          </span>
-                        </span>
-                      </div>
-                    ))}
+                    {coupon.valid_services.length > 0
+                      ? coupon.valid_services.map((service) => (
+                          <div key={service.id} className="flex flex-col gap-1">
+                            <span className="font-semibold">{service.name}</span>
+                            <span className="text-gray-500 flex items-center text-sm">
+                              <s className="pr-2 text-red-500">₹{service.price}</s>{' '}
+                              <LuChevronsRight />{' '}
+                              <span className="pl-2 text-green-500">
+                                ₹
+                                {calculateDiscountedPrice(
+                                  service.price,
+                                  coupon.discount_percentage,
+                                  coupon.discount_amount,
+                                  coupon.by_percent
+                                )}
+                              </span>
+                            </span>
+                          </div>
+                        ))
+                      : coupon.is_minimum_purchase
+                        ? `On purchase of ${coupon.minimum_amount}`
+                        : 'None'}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {coupon.valid_combos.length > 0
@@ -197,7 +213,7 @@ const Coupons = () => {
                             </span>
                           </div>
                         ))
-                      : 'None'}
+                      : ''}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     <button

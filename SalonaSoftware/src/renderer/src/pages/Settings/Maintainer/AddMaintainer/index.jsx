@@ -46,7 +46,7 @@ const AddMaintainer = ({ currentMaintainer, setCurrentMaintainer, setIsModalOpen
   return (
     <div className="bg-white rounded-lg w-full">
       <div>
-        <label className="block text-sm font-medium text-gray-900">Category</label>
+        <label className="block text-sm font-medium text-gray-900">Branch</label>
         <Listbox value={selected} onChange={setSelected} className="pb-4">
           <div className="relative mt-1">
             <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold">

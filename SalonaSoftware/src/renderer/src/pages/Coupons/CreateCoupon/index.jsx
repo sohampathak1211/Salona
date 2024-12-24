@@ -95,6 +95,7 @@ const CreateCoupon = ({ setCreate }) => {
 
     const payload = {
       ...coupon,
+      is_minimum_purchase: is_minimum_purchase,
       by_percent: !enabled,
       branch: selectedBranch.id,
       valid_services: selectedServices.map((service) => service.id),

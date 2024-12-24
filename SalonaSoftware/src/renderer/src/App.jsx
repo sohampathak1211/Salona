@@ -18,6 +18,7 @@ import Coupons from './pages/Coupons'
 import Invoice from './components/Invoice'
 import ModernInvoice from './components/ModernInvoice'
 import Product from './pages/Product'
+import CreateBill from './pages/Bill/Create'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
@@ -35,7 +36,7 @@ function App() {
         <Route path="/otp" element={<Otp />} />
         <Route path="/auth" element={<SidebarLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="bill" element={<Bill />} />
+          <Route path="bill" element={<CreateBill />} />
           <Route path="service" element={<Services />} />
           <Route path="service/:id" element={<Services />} />
           <Route path="combos" element={<Combos />} />

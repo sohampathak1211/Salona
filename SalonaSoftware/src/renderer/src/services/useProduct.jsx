@@ -1,7 +1,7 @@
 import React from 'react'
 
-const ueProduct = () => {
-  const getSalonBranches = async (data = {}, params = {}) => {
+const useProduct = () => {
+  const getSalonProducts = async (data = {}, params = {}) => {
     return await window.electron.ipcRenderer
       .invoke('getSalonProducts', params)
       .then((data) => {
@@ -11,7 +11,7 @@ const ueProduct = () => {
         return err
       })
   }
-  const createBranch = async (data, param) => {
+  const createProduct = async (data, param) => {
     return await window.electron.ipcRenderer
       .invoke('createProduct', data)
       .then((data) => {
@@ -21,7 +21,7 @@ const ueProduct = () => {
         return err
       })
   }
-  return { getSalonBranches, createBranch }
+  return { getSalonProducts, createProduct }
 }
 
-export default ueProduct
+export default useProduct

@@ -7,125 +7,23 @@ import { Dialog, Transition } from '@headlessui/react'
 import EditProduct from './EditProduct'
 import { FaRegEdit } from 'react-icons/fa'
 import { MdOutlineDelete } from 'react-icons/md'
-import { FaCartPlus } from "react-icons/fa";
+import { FaCartPlus } from 'react-icons/fa'
+import useProduct from '../../services/useProduct'
 
 const Product = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
-  const [products, setProducts] = useState([
-    // Static example data for UI demonstration purposes
-    {
-      id: 1,
-      name: 'Product A',
-      brand: 'Brand X',
-      category: 'Category 1',
-      price: 100,
-      quantity: 10,
-      gender: 'Unisex',
-      expiry_date: '2025-12-31',
-      description: 'A sample product.',
-      branch: { address: '123 Main St' }
-    },
-    {
-      id: 2,
-      name: 'Product B',
-      brand: 'Brand Y',
-      category: 'Category 2',
-      price: 200,
-      quantity: 5,
-      gender: 'Male',
-      expiry_date: '2024-11-30',
-      description: 'Another sample product.',
-      branch: { address: '456 Elm Stmladfpds' }
-    },
-    {
-      id: 2,
-      name: ' Product Product BBProduct BProduct B ',
-      brand: 'Brand Y Product BProduct B ',
-      category: 'Category 2 Product B Product B',
-      price: 200,
-      quantity: 5,
-      gender: 'Male Product B Product B',
-      expiry_date: '2024-11-30 Product B Product B Product B',
-      description: 'Another sample product. Product B Product B Product B Product B',
-      branch: {
-        address:
-          '456 Elm Stmladfpds Product B Product BProduct B Product B Product B Product B Product B Product B'
-      }
-    },
-    {
-      id: 2,
-      name: 'Product B',
-      brand: 'Brand Y',
-      category: 'Category 2',
-      price: 200,
-      quantity: 5,
-      gender: 'Male',
-      expiry_date: '2024-11-30',
-      description: 'Another sample product.',
-      branch: { address: '456 Elm Stmladfpds' }
-    },
-    {
-      id: 2,
-      name: 'Product B',
-      brand: 'Brand Y',
-      category: 'Category 2',
-      price: 200,
-      quantity: 5,
-      gender: 'Male',
-      expiry_date: '2024-11-30',
-      description: 'Another sample product.',
-      branch: { address: '456 Elm Stmladfpds' }
-    },
-    {
-      id: 2,
-      name: 'Product B',
-      brand: 'Brand Y',
-      category: 'Category 2',
-      price: 200,
-      quantity: 5,
-      gender: 'Male',
-      expiry_date: '2024-11-30',
-      description: 'Another sample product.',
-      branch: { address: '456 Elm Stmladfpds' }
-    },
-    {
-      id: 2,
-      name: 'Product B',
-      brand: 'Brand Y',
-      category: 'Category 2',
-      price: 200,
-      quantity: 5,
-      gender: 'Male',
-      expiry_date: '2024-11-30',
-      description: 'Another sample product.',
-      branch: { address: '456 Elm Stmladfpds' }
-    },
-    {
-      id: 2,
-      name: 'Product B',
-      brand: 'Brand Y',
-      category: 'Category 2',
-      price: 200,
-      quantity: 5,
-      gender: 'Male',
-      expiry_date: '2024-11-30',
-      description: 'Another sample product.',
-      branch: { address: '456 Elm Stmladfpds' }
-    },
-    {
-      id: 2,
-      name: 'Product B',
-      brand: 'Brand Y',
-      category: 'Category 2',
-      price: 200,
-      quantity: 5,
-      gender: 'Male',
-      expiry_date: '2024-11-30',
-      description: 'Another sample product.',
-      branch: { address: '456 Elm Stmladfpds' }
-    }
-  ])
+  const [products, setProducts] = useState([])
+  const { getSalonProducts } = useProduct()
+
+  const getProducts = async () => {
+    const proData = await getSalonProducts()
+    setProducts(proData)
+  }
+
+  useEffect(() => {
+    getProducts()
+  }, [])
 
   return (
     <div className="flex flex-1 justify-center relative">
@@ -143,13 +41,13 @@ const Product = () => {
           </button>
         </div>
         <div className="relative rounded-2xl overflow-x-auto mt-5">
-          <h2 className="w-full bg-white p-5 text-xl font-bold items-center flex flex-row gap-2" >  
-          <div>
-<FaCartPlus size={18} fontWeight={20}/>
-          </div>
-          <div> Product Details
-          </div></h2>
-         
+          <h2 className="w-full bg-white p-5 text-xl font-bold items-center flex flex-row gap-2">
+            <div>
+              <FaCartPlus size={18} fontWeight={20} />
+            </div>
+            <div> Product Details</div>
+          </h2>
+
           <div className="max-h-[620px] overflow-y-scroll">
             {' '}
             {/* Add this wrapper */}
@@ -189,7 +87,7 @@ const Product = () => {
                 </tr>
               </thead>
               <tbody>
-                {products?.map((item) => (
+                {products.length > 0 && products?.map((item) => (
                   <tr key={item.id} className="bg-white text-large">
                     <th
                       scope="row"
@@ -253,7 +151,7 @@ const Product = () => {
                     <AiFillShop size={25} color="gray" className="mr-2" />
                     New Product
                   </Dialog.Title>
-                  <CreateProduct />
+                  <CreateProduct productRefetch={getProducts}/>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -293,7 +191,7 @@ const Product = () => {
                     <AiFillShop size={25} color="gray" className="mr-2" />
                     Edit Product
                   </Dialog.Title>
-                  <EditProduct />
+                  <EditProduct productRefetch={getProducts}/>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

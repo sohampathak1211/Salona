@@ -36,7 +36,8 @@ function App() {
         <Route path="/otp" element={<Otp />} />
         <Route path="/auth" element={<SidebarLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="bill" element={<CreateBill />} />
+          <Route path="bill" element={<Bill />} />
+          <Route path="createBill" element={<CreateBill />} />
           <Route path="service" element={<Services />} />
           <Route path="service/:id" element={<Services />} />
           <Route path="combos" element={<Combos />} />

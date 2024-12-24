@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react'
 // import EditBill from './EditBill';      // Modal component for editing an existing bill
 import ViewBill from './ViewBill'
 import CreateBill from './CreateBill'
+import { useNavigate } from 'react-router-dom'
 
 const Bill = () => {
   const [billDetails, setBillDetails] = useState([])
   const [company, setCompany] = useState(null)
   const [view, setView] = useState(false)
   const [viewBill, setBill] = useState(null)
+  const navigate = useNavigate()
 
   const fetchBills = () => {
     // Fetch bills from backend using Electron or API
@@ -44,7 +46,7 @@ const Bill = () => {
             <h2 className="text-3xl font-bold">Billing Section</h2>
           </div>
           <button
-            onClick={() => setView((prev) => !prev)}
+            onClick={() => navigate('/auth/createBill')}
             className="m-3 mr-10 bg-yellow-400 px-5 py-2 rounded-xl text-black font-bold hover:bg-yellow-500 transition-colors duration-300"
           >
             Add a Bill

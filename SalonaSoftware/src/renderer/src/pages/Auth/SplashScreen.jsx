@@ -26,13 +26,16 @@ const SplashScreen = () => {
       if (!cUser || Object.keys(cUser).length === 0) {
         setIsLogin(false)
         return
-      }
+      }  
       dispatch(setAuth({ cUser, token }))
       setIsLogin(true)
       try {
         const salon = await getSalonOfOwner(cUser.id)
         console.log('Fetched salon data:', salon)
-        setHasSalon(!!salon) // Explicitly convert to boolean
+        // setHasSalon(!!salon) // Explicitly convert to boolean
+        if(salon.error){
+          setHasSalon(false)
+        }
       } catch (e) {
         console.error('Error fetching salon:', e)
         setHasSalon(false)

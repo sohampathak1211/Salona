@@ -62,6 +62,7 @@ class ChatUserEnabledMiddleware:
                 if user['role'] == 'SO':
                     try:
                         cUser = SalonOwner.objects.get(id=user['id'])
+                        print("cUSer",cUser)
                         logger.info(f"User {user['id']} is enabled: {cUser.is_enabled}")
                         if not cUser.is_enabled:
                             logger.warning("User is not enabled")

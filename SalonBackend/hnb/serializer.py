@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SalonOwner, Salon, User, Service, Appointment,SalonMaintainer,Branch, Combo, Coupon, Bill
+from .models import SalonOwner, Salon, User, Service, Appointment,SalonMaintainer,Branch, Combo, Coupon, Bill , Product
 
 class SalonOwnerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,6 +49,12 @@ class BranchNameIdSerializer(serializers.ModelSerializer):
         model = Branch
         fields = ['id','address']
 class BranchIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ['id']
+        
+
+    
     class Meta:
         model = Branch
         fields = ['id']
@@ -141,3 +147,9 @@ class BillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bill
         fields = ['id', 'customer_name', 'branch_address', 'services', 'combos', 'total_amount', 'created_at']
+
+class ProductSerializer(serializers.ModelSerializer):
+    branch = BranchNameIdSerializer(read_only=True) 
+    class Meta:
+        model = Product
+        fields = '__all__'  

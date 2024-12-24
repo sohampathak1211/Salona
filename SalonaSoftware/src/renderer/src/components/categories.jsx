@@ -5,6 +5,7 @@ import { FaUsers } from 'react-icons/fa'
 import { RiColorFilterFill } from 'react-icons/ri'
 import { IoMdBookmarks } from 'react-icons/io'
 import { MdAutoGraph } from 'react-icons/md'
+import { IoStorefrontSharp } from 'react-icons/io5'
 import { PiScissorsFill } from 'react-icons/pi'
 import { MdCleaningServices } from 'react-icons/md'
 import { GiTicket } from 'react-icons/gi'
@@ -49,8 +50,8 @@ const useAssets = () => {
     },
     {
       id: 6,
-      name: 'Product',
-      icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
+      name: 'Products',
+      icon: <IoStorefrontSharp className="transition-all duration-500" size={25} />,
       link: '/product'
     },
     {

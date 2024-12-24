@@ -1,9 +1,28 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../../../slices/authSlice'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectUser, setAuth } from '../../../slices/authSlice'
+import useLocalStorage from '../../../services/useLocalStorage'
 
 const SalonOwner = () => {
   const salonOwnerDetails = useSelector(selectUser)
+  const { getData } = useLocalStorage()
+  const dispatch = useDispatch()
+
+  const getUser = async () => {
+    const data = await getData('cUser')
+    const token = await getData('token')
+    console.log('Data', data)
+    dispatch(setAuth({ cUser: data, token: token }))
+  }
+  console.log('Outer  api', salonOwnerDetails)
+  useEffect(() => {
+    if (!salonOwnerDetails?.id) {
+      console.log('Before api', salonOwnerDetails)
+      getUser()
+      console.log('After api', salonOwnerDetails)
+    }
+  }, [salonOwnerDetails])
+
   return (
     <div className="bg-gray-200 p-2 rounded-lg">
       <p className="text-xs">Owner Details</p>

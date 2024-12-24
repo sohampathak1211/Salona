@@ -87,32 +87,35 @@ const Product = () => {
                 </tr>
               </thead>
               <tbody>
-                {products.length > 0 && products?.map((item) => (
-                  <tr key={item.id} className="bg-white text-large">
-                    <th
-                      scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 break-words max-w-xs"
-                    >
-                      {item.name}
-                    </th>
-                    <td className="px-6 py-4 text-wrap break-words">{item.brand}</td>
-                    <td className="px-6 py-4">{item.category}</td>
-                    <td className="px-6 py-4">₹{item.price}</td>
-                    <td className="px-6 py-4">{item.quantity}</td>
-                    <td className="px-6 py-4">{item.gender}</td>
-                    <td className="px-6 py-4">{new Date(item.expiry_date).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 max-w-xs break-words">{item.description}</td>
-                    <td className="px-6 py-4">{item.branch?.address}</td>
-                    <td className="px-6 py-4 flex flex-row">
-                      <button className="text-black bg-yellow-400 px-2 p-1 mr-4 rounded-md items-center flex flex-row gap-1 mt-4">
-                        <div>
-                          <FaRegEdit />
-                        </div>
-                        <div>Edit</div>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {products.length > 0 &&
+                  products?.map((item) => (
+                    <tr key={item.id} className="bg-white text-large">
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 break-words max-w-xs"
+                      >
+                        {item.name}
+                      </th>
+                      <td className="px-6 py-4 text-wrap break-words">{item.brand}</td>
+                      <td className="px-6 py-4">{item.category}</td>
+                      <td className="px-6 py-4">₹{item.price}</td>
+                      <td className="px-6 py-4">{item.quantity}</td>
+                      <td className="px-6 py-4">{item.gender}</td>
+                      <td className="px-6 py-4">
+                        {new Date(item.expiry_date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 max-w-xs break-words">{item.description}</td>
+                      <td className="px-6 py-4">{item.branch?.address}</td>
+                      <td className="px-6 py-4 flex flex-row">
+                        <button className="text-black bg-yellow-400 px-2 p-1 mr-4 rounded-md items-center flex flex-row gap-1 mt-4">
+                          <div>
+                            <FaRegEdit />
+                          </div>
+                          <div>Edit</div>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -151,7 +154,7 @@ const Product = () => {
                     <AiFillShop size={25} color="gray" className="mr-2" />
                     New Product
                   </Dialog.Title>
-                  <CreateProduct productRefetch={getProducts}/>
+                  <CreateProduct productRefetch={getProducts} />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -191,7 +194,7 @@ const Product = () => {
                     <AiFillShop size={25} color="gray" className="mr-2" />
                     Edit Product
                   </Dialog.Title>
-                  <EditProduct productRefetch={getProducts}/>
+                  <EditProduct productRefetch={getProducts} />
                 </Dialog.Panel>
               </Transition.Child>
             </div>

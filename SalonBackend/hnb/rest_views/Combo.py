@@ -13,6 +13,9 @@ class ComboREST(APIView):
             if request.is_owner:
                 combos = Combo.objects.filter(branch_id__in=branch_id)
                 return Response(GetSalonBranchComboSerializer(combos, many=True).data, status=status.HTTP_200_OK)
+            combo = Combo.objects.filter(branch=branch_id)
+            serializer = GetSalonBranchComboSerializer(combo,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
             if combo_id:
                 combo = Combo.objects.get(id=combo_id)
                 serializer = GetSalonBranchComboSerializer(combo,many=False)

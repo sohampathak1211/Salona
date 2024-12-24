@@ -17,6 +17,10 @@ class ServicesRest(APIView):
             if request.is_owner:
                 services = Service.objects.filter(branch_id__in=branch_id)
                 return Response(ServiceBranchIdSerilaizer(services, many=True).data, status=status.HTTP_200_OK)
+            service = Service.objects.filter(branch=branch_id)
+            serializer = ServiceBranchIdSerilaizer(service,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+            
             print("service_id",service_id)
             print("branch_id",branch_id)
             if service_id:

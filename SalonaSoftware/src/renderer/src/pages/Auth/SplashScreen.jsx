@@ -23,7 +23,7 @@ const SplashScreen = () => {
     try {
       const cUser = await getData('cUser')
       const token = await getData('token')
-      if (!cUser) {
+      if (!cUser || Object.keys(cUser).length === 0) {
         setIsLogin(false)
         return
       }

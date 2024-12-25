@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { SiMusicbrainz } from 'react-icons/si'
 import { GrSettingsOption } from 'react-icons/gr'
 import { FaUsers } from 'react-icons/fa'
@@ -15,8 +15,7 @@ import { selectRole } from '../slices/authSlice'
 const useAssets = () => {
   const role = useSelector(selectRole)
   const isAdmin = role == 'SO'
-
-  const categories = [
+  const [categories,setCategories] = useState([
     {
       id: 0,
       name: 'Dashboard',
@@ -77,21 +76,13 @@ const useAssets = () => {
     //   icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
     //   link: '/moderninvoice'
     // },
-  ]
-  
+  ])
+
+  useEffect(()=>{
+    setCategories(prev=>prev.filter(cat=>cat.name!="Dashboard"))
+  },[isAdmin])
+
   const options = [
-    // {
-    //   id: 1,
-    //   name: 'SignIn',
-    //   icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
-    //   link: '/signin'
-    // },
-    // {
-    //   id: 2,
-    //   name: 'SignUp',
-    //   icon: <SiMusicbrainz className="transition-all duration-500" size={25} />,
-    //   link: '/signup'
-    // },
     {
       id: 0,
       name: 'Settings',

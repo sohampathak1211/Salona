@@ -9,12 +9,14 @@ import { FaRegEdit } from 'react-icons/fa'
 import { MdOutlineDelete } from 'react-icons/md'
 import { FaCartPlus } from 'react-icons/fa'
 import useProduct from '../../services/useProduct'
+import useAssets from '../../components/categories'
 
 const Product = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [products, setProducts] = useState([])
   const { getSalonProducts } = useProduct()
+  const { isAdmin } = useAssets()
 
   const getProducts = async () => {
     const proData = await getSalonProducts()
@@ -27,18 +29,20 @@ const Product = () => {
 
   return (
     <div className="flex flex-1 justify-center relative">
-      <div className="w-full p-5">
+      <div className="w-full p-10">
         <div className="flex justify-between">
           <div>
             <h2 className="text-sm font-bold text-subheading">Product</h2>
             <h2 className="text-3xl font-bold">Products</h2>
           </div>
-          <button
-            onClick={() => setCreate(true)}
-            className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500 transition-colors"
-          >
-            Add a new Product
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setCreate(true)}
+              className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500 transition-colors"
+            >
+              Add a new Product
+            </button>
+          )}
         </div>
         <div className="relative rounded-2xl overflow-x-auto mt-5">
           <h2 className="w-full bg-white p-5 text-xl font-bold items-center flex flex-row gap-2">

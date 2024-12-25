@@ -43,7 +43,7 @@ class ProductRest(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         # For maintainers, use the existing logic
-        branch_id = request.query_params.get('branch_id')
+        branch_id = request.branch_id
         if not branch_id:
             return Response(
                 {"error": "branch_id query parameter is required"},

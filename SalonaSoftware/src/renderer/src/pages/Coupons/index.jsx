@@ -14,9 +14,11 @@ import useCombo from '../../services/useCombo'
 import { couponFailed, couponRequest, couponSuccess, selectCoupon } from '../../slices/couponSlice'
 import useCoupon from '../../services/useCoupon'
 import { LuChevronsRight } from 'react-icons/lu'
+import useAssets from '../../components/categories'
 
 const Coupons = () => {
   const dispatch = useDispatch()
+  const { isAdmin } = useAssets()
   const { getSalonBranches } = useBranch()
   const { getSalonServices } = useService()
   const { getSalonCombos } = useCombo()
@@ -117,12 +119,16 @@ const Coupons = () => {
             <h2 className="text-sm font-bold text-subheading">Coupon</h2>
             <h2 className="text-3xl font-bold">Coupon</h2>
           </div>
-          <button
-            onClick={handleServiceOpen}
-            className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
-          >
-            Add a new Coupon
-          </button>
+          {isAdmin ? (
+            <button
+              onClick={handleServiceOpen}
+              className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
+            >
+              Add a new Coupon
+            </button>
+          ) : (
+            <Fragment></Fragment>
+          )}
         </div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">
@@ -162,7 +168,7 @@ const Coupons = () => {
                       : `₹${coupon.discount_amount} off`}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    <div className='flex items-center'>
+                    <div className="flex items-center">
                       <div
                         className={`w-2 h-2 mr-1 rounded-full ${isDateValid(coupon.valid_till) ? 'bg-green-500' : 'bg-red-500'}`}
                       ></div>{' '}

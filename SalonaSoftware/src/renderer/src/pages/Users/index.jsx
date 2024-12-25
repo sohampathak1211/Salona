@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import CreateUser from './CreateUser'
 import EditUser from './EditUser'
 import useAuth from '../../services/useAuth'
 import useCustomer from '../../services/useCustomer'
+import useAssets from '../../components/categories'
 
 const Customer = () => {
   const [VendorDetails, setVendorDetails] = useState([])
+  const { isAdmin } = useAssets()
   const { getUsers } = useAuth()
-  const {getSalonCustomer} = useCustomer();
+  const { getSalonCustomer } = useCustomer()
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
 
   const fetchUser = async () => {
-    const data = await getSalonCustomer();
-    console.log("Customer data",data)
+    const data = await getSalonCustomer()
+    console.log('Customer data', data)
     setVendorDetails([])
   }
 
@@ -46,12 +48,16 @@ const Customer = () => {
             <h2 className="text-sm font-bold text-subheading">Customer</h2>
             <h2 className="text-3xl font-bold">Customers</h2>
           </div>
-          <button
-            onClick={() => setCreate(true)}
-            className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500 transition-colors"
-          >
-            Add a new Customer
-          </button>
+          {isAdmin ? (
+            <button
+              onClick={() => setCreate(true)}
+              className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500 transition-colors"
+            >
+              Add a new Customer
+            </button>
+          ) : (
+            <Fragment></Fragment>
+          )}
         </div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">

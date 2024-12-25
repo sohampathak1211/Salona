@@ -16,6 +16,7 @@ import {
 import useCombo from '../../services/useCombo'
 import { comboRequest, comboSuccess, selectCombo } from '../../slices/comboSlice'
 import { toast } from 'react-toastify'
+import useAssets from '../../components/categories'
 
 const Combos = () => {
   const dispatch = useDispatch()
@@ -26,7 +27,7 @@ const Combos = () => {
   const branches = useSelector(selectBranch)
   const combos = useSelector(selectCombo)
   const temp = useSelector((state) => state.branch)
-  console.log('TEMP', temp)
+  const { isAdmin } = useAssets()
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
@@ -99,12 +100,12 @@ const Combos = () => {
             <h2 className="text-sm font-bold text-subheading">Combos</h2>
             <h2 className="text-3xl font-bold">Combos</h2>
           </div>
-          <button
+          {isAdmin ? <button
             onClick={handleServiceOpen}
             className="m-3 mr-10 px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
           >
             Add a new Combos
-          </button>
+          </button> : <Fragment></Fragment>}
         </div>
 
         <div className="relative rounded-2xl overflow-x-auto md:overflow-x-hidden mt-5">

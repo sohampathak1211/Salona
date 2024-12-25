@@ -15,9 +15,11 @@ import {
   serviceSuccess
 } from '../../slices/serviceSlice'
 import { toast } from 'react-toastify'
+import useAssets from '../../components/categories'
 
 const Services = () => {
   const dispatch = useDispatch()
+  const { isAdmin } = useAssets()
   const { getSalonBranches } = useBranch()
   const { getSalonServices } = useService()
   const services = useSelector(selectService)
@@ -33,7 +35,7 @@ const Services = () => {
   const getBranches = async () => {
     dispatch(branchRequest())
     const data = await getSalonBranches({}, {})
-    console.log("BRanches of salon",data)
+    console.log('BRanches of salon', data)
     if (data.error) {
       dispatch(branchFailed(data.error))
       toast.info("You don't have branches. Open the settings page and add a branch to continue")
@@ -50,7 +52,7 @@ const Services = () => {
     if (serv.error) {
       toast.error(`Call 7887557175 \n ${serv.error}`)
       dispatch(serviceFailed(serv.error))
-      return;
+      return
     }
     dispatch(serviceSuccess(serv))
   }
@@ -96,12 +98,16 @@ const Services = () => {
             <h2 className="text-sm font-bold text-subheading">Services</h2>
             <h2 className="text-3xl font-bold">Services</h2>
           </div>
-          <button
-            onClick={handleServiceOpen}
-            className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
-          >
-            Add a new Services
-          </button>
+          {isAdmin ? (
+            <button
+              onClick={handleServiceOpen}
+              className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
+            >
+              Add a new Services
+            </button>
+          ) : (
+            <Fragment></Fragment>
+          )}
         </div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">

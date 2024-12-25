@@ -9,8 +9,13 @@ import { IoStorefrontSharp } from 'react-icons/io5'
 import { PiScissorsFill } from 'react-icons/pi'
 import { MdCleaningServices } from 'react-icons/md'
 import { GiTicket } from 'react-icons/gi'
+import { useSelector } from 'react-redux'
+import { selectRole } from '../slices/authSlice'
 
 const useAssets = () => {
+  const role = useSelector(selectRole)
+  const isAdmin = role == 'SO'
+
   const categories = [
     {
       id: 0,
@@ -73,6 +78,7 @@ const useAssets = () => {
     //   link: '/moderninvoice'
     // },
   ]
+  
   const options = [
     // {
     //   id: 1,
@@ -93,7 +99,7 @@ const useAssets = () => {
       link: 'settings'
     }
   ]
-  return { categories, options }
+  return { categories, options, isAdmin }
 }
 
 export default useAssets

@@ -31,7 +31,12 @@ const Coupons = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [couponToEdit, setCouponToEdit] = useState(null)
-
+  
+  console.log('branch ', branches)
+  console.log('services ', services)
+  console.log('combos ', combos)
+  console.log('coupons ', coupons)
+  
   const getBranches = async () => {
     dispatch(branchRequest())
     const data = await getSalonBranches({}, {})

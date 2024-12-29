@@ -17,15 +17,6 @@ class ProductRest(APIView):
         print("is_owner:", getattr(request, "is_owner", None))
         print("cUserrrrrrrr:", getattr(request, "cUser", None))
 
-        # Log full cUser data
-        c_user = getattr(request, "cUser", None)
-        if c_user:
-            print("Full cUser data:", c_user)
-            print("cUser ID: {c_user.get('id', 'N/A')}")
-            print("cUser Name: {c_user.get('name', 'N/A')}")
-            print("cUser Email: {c_user.get('email', 'N/A')}")
-            print("cUser Branch IDs: {c_user.get('branch_id', 'N/A')}")
-        
         # Check if the user is an owner and use request.branch_id
         if request.is_owner:
             branch_ids = getattr(request, "branch_id", None)

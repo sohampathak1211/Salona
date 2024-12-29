@@ -18,6 +18,7 @@ import { MaintainerApi } from './ipc/maintainer'
 import { ComboApi } from './ipc/combo'
 import { CouponApi } from './ipc/coupon'
 import { ProductApi } from './ipc/product'
+import { BillApi } from './ipc/bill'
 // const __dirname = dirname(fileURLToPath(import.meta.url))
 // console.log(__dirname)
 // const store = new Store()
@@ -37,8 +38,8 @@ function createWindow() {
     mainWindow.reload()
   })
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1280,
+    height: 800,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -90,6 +91,7 @@ app.whenReady().then(() => {
   ComboApi(ipcMain)
   CouponApi(ipcMain)
   ProductApi(ipcMain)
+  BillApi(ipcMain)
   // registerEnv(ipcMain)
   // loadEnv({ SERVER_URL, SALON_ID, BRANCH_ID })
 

@@ -108,6 +108,7 @@ class Bill(models.Model):
     branch = models.ForeignKey("Branch", on_delete=models.CASCADE, related_name="bills", null=True, blank=True)
     services = models.ManyToManyField("Service", related_name="bills", blank=True)
     combos = models.ManyToManyField("Combo", related_name="bills", blank=True)
+    products = models.ManyToManyField("Product",related_name='bills',blank=True)
     coupons = models.ManyToManyField('Coupon',related_name="bills",blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_applied = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)

@@ -12,7 +12,6 @@ class ServicesRest(APIView):
         try:
             service_id = request.query_params.get('service_id')
             branch_id = request.branch_id
-            print(branch_id)
             
             if request.is_owner:
                 services = Service.objects.filter(branch_id__in=branch_id)

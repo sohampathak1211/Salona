@@ -14,7 +14,7 @@ class CouponREST(APIView):
                 seri = CouponComboServiceSerializer(coupons, many=True)
                 return Response(seri.data, status=status.HTTP_200_OK)
             data = Coupon.objects.all()
-            serializer = CouponSerializer(data, many=True)
+            serializer = CouponComboServiceSerializer(data, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)

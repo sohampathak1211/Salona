@@ -15,6 +15,7 @@ import { couponFailed, couponRequest, couponSuccess, selectCoupon } from '../../
 import useCoupon from '../../services/useCoupon'
 import { LuChevronsRight } from 'react-icons/lu'
 import useAssets from '../../components/categories'
+import { IoSearchSharp } from 'react-icons/io5'
 
 const Coupons = () => {
   const dispatch = useDispatch()
@@ -31,6 +32,7 @@ const Coupons = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [couponToEdit, setCouponToEdit] = useState(null)
+  const [searchQuery, setSearchQuery] = useState("") // New state for search query
   
   console.log('branch ', branches)
   console.log('services ', services)
@@ -116,6 +118,17 @@ const Coupons = () => {
       : (price - discountAmount).toFixed(2)
   }
 
+  const filteredCoupons = coupons.filter(
+    (coupon) =>
+      coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) || // Search by coupon code
+      coupon.valid_services.some(service =>
+        service.name.toLowerCase().includes(searchQuery.toLowerCase()) // Search by service name
+      ) ||
+      coupon.valid_combos.some(combo =>
+        combo.name.toLowerCase().includes(searchQuery.toLowerCase()) // Search by combo name
+      )
+  )
+
   return (
     <div className="flex flex-1 justify-center relative">
       <div className="w-full p-10">
@@ -135,6 +148,21 @@ const Coupons = () => {
             <Fragment></Fragment>
           )}
         </div>
+
+        <div className='w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3'>
+
+<IoSearchSharp size={22} className='ml-4' />
+
+<input
+   type="text"
+   value={searchQuery}
+   onChange={(e) => setSearchQuery(e.target.value)}
+ className='w-full px-2 py-2 text-black mr-1 border:none outline-none' 
+
+ placeholder='Search Product'
+  />
+
+</div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">
           <h2 className="w-full bg-white p-5 text-xl font-bold">Coupon Details</h2>
@@ -162,7 +190,7 @@ const Coupons = () => {
               </tr>
             </thead>
             <tbody>
-              {coupons.map((coupon) => (
+              {filteredCoupons.map((coupon) => (
                 <tr key={coupon.id} className="bg-white text-large">
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {coupon.code}

@@ -16,6 +16,7 @@ import {
 } from '../../slices/serviceSlice'
 import { toast } from 'react-toastify'
 import useAssets from '../../components/categories'
+import { IoSearchSharp } from 'react-icons/io5'
 
 const Services = () => {
   const dispatch = useDispatch()
@@ -28,6 +29,8 @@ const Services = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
+
+  const [searchQuery, setSearchQuery] = useState('') // Search query state
 
   const state = useSelector((state) => state)
 
@@ -90,8 +93,22 @@ const Services = () => {
     }
   }
 
+  // Filtered services based on search query
+const filteredServices = services.filter((service) => {
+  const query = searchQuery.toLowerCase();
+
   return (
-    <div className="flex flex-1 justify-center relative">
+    service.branch.address.toLowerCase().includes(query) || // Branch Name
+    service.name.toLowerCase().includes(query) ||          // Service Name
+    service.category.toLowerCase().includes(query) ||      // Category
+    service.description.toLowerCase().includes(query) ||   // Description
+    service.price.toString().includes(query) ||            // Price (convert to string for matching)
+    service.duration.toString().includes(query)            // Duration (convert to string for matching)
+  );
+});
+
+  return (
+    <div className="flex flex-1 justify-center relative ">
       <div className="w-full p-10">
         <div className="flex justify-between">
           <div>
@@ -109,6 +126,21 @@ const Services = () => {
             <Fragment></Fragment>
           )}
         </div>
+
+        <div className='w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3'>
+
+<IoSearchSharp size={22} className='ml-4' />
+
+<input
+   type="text"
+   value={searchQuery}
+   onChange={(e) => setSearchQuery(e.target.value)}
+ className='w-full px-2 py-2 text-black mr-1 border:none outline-none' 
+
+ placeholder='Search Product'
+  />
+
+</div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">
           <h2 className="w-full bg-white p-5 text-xl font-bold">Services Details</h2>
@@ -139,8 +171,8 @@ const Services = () => {
               </tr>
             </thead>
             <tbody>
-              {services.length > 0 &&
-                services.map((item) => (
+              {
+                filteredServices.map((item) => (
                   <tr key={item.service_id} className="bg-white text-large">
                     <th
                       scope="row"
@@ -271,3 +303,5 @@ const Services = () => {
 }
 
 export default Services
+
+

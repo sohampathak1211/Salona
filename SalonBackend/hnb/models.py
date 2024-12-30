@@ -1,5 +1,5 @@
 from django.db import models
-from pytz import timezone
+from django.utils.timezone import now
 
 class SalonOwner(models.Model):
     id = models.AutoField(primary_key=True)
@@ -97,19 +97,42 @@ class Coupon(models.Model):
     minimum_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def is_valid(self):
-        return self.valid_till >= timezone.now()
+        return self.valid_till >= now()
 
     def __str__(self):
         return f"Coupon {self.code} ({'Flat ₹' + str(self.discount_amount) if self.discount_amount else str(self.discount_percentage) + '% off'})"
+
+class BillService(models.Model):
+    bill = models.ForeignKey('Bill', on_delete=models.CASCADE, related_name='bill_services')
+    service = models.ForeignKey('Service', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)  # Quantity of the service
+
+    def __str__(self):
+        return f"Service: {self.service.name} (Qty: {self.quantity})"
+
+
+class BillCombo(models.Model):
+    bill = models.ForeignKey('Bill', on_delete=models.CASCADE, related_name='bill_combos')
+    combo = models.ForeignKey('Combo', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)  # Quantity of the combo
+
+    def __str__(self):
+        return f"Combo: {self.combo.name} (Qty: {self.quantity})"
+
+
+class BillProduct(models.Model):
+    bill = models.ForeignKey('Bill', on_delete=models.CASCADE, related_name='bill_products')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)  # Quantity of the product
+
+    def __str__(self):
+        return f"Product: {self.product.name} (Qty: {self.quantity})"
 
 class Bill(models.Model):
     id = models.AutoField(primary_key=True)
     customer = models.ForeignKey("Customer", on_delete=models.CASCADE, related_name="bills")
     branch = models.ForeignKey("Branch", on_delete=models.CASCADE, related_name="bills", null=True, blank=True)
-    services = models.ManyToManyField("Service", related_name="bills", blank=True)
-    combos = models.ManyToManyField("Combo", related_name="bills", blank=True)
-    products = models.ManyToManyField("Product",related_name='bills',blank=True)
-    coupons = models.ManyToManyField('Coupon',related_name="bills",blank=True)
+    coupons = models.ManyToManyField('Coupon', related_name="bills", blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_applied = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     final_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -117,18 +140,47 @@ class Bill(models.Model):
 
     def calculate_totals(self):
         """
-        Calculate total, apply discounts, and update fields.
+        Calculate total amounts for services, combos, and products with quantities,
+        apply discounts, and update fields.
         """
-        service_total = sum(service.price for service in self.services.all())
-        combo_total = sum(combo.price for combo in self.combos.all())
-        self.total_amount = service_total + combo_total
+        # Calculate totals with quantities
+        service_total = sum(
+            bill_service.service.price * bill_service.quantity
+            for bill_service in self.bill_services.all()
+        )
+        combo_total = sum(
+            bill_combo.combo.price * bill_combo.quantity
+            for bill_combo in self.bill_combos.all()
+        )
+        product_total = sum(
+            bill_product.product.price * bill_product.quantity
+            for bill_product in self.bill_products.all()
+        )
 
-        # Assuming discount_applied is set beforehand
+        # Calculate total before discounts
+        self.total_amount = service_total + combo_total + product_total
+
+        # Apply discounts
+        self.discount_applied = self.calculate_discount()
         self.final_amount = self.total_amount - self.discount_applied
         self.save()
 
+    def calculate_discount(self):
+        """
+        Calculate the total discount based on applied coupons.
+        """
+        discount = 0
+        for coupon in self.coupons.all():
+            if coupon.is_valid():
+                if coupon.by_percent:
+                    discount += self.total_amount * (coupon.discount_percentage / 100)
+                else:
+                    discount += coupon.discount_amount
+        return discount
+
     def __str__(self):
         return f"Bill {self.id} - Customer: {self.customer.name}"
+
 
 class Product(models.Model):
     id = models.AutoField(primary_key=True)

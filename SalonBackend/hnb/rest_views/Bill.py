@@ -2,68 +2,107 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from hnb.models import Customer, Branch, Service, Combo, Coupon, Bill,Product
 from django.utils.timezone import now
+from hnb.models import (
+    Customer,
+    Branch,
+    Service,
+    Combo,
+    Coupon,
+    Bill,
+    Product,
+    BillService,
+    BillCombo,
+    BillProduct,
+)
 
 class BillREST(APIView):
     def post(self, request):
         data = request.data
 
-        # Extract inputs from the request
+        # Extract inputs
         c_name = data.get("c_name")
         c_phone = data.get("c_phone")
         salon_id = request.salon_id
         branch_id = data.get("branch_id") if request.is_owner else request.branch_id
-        services_ids = data.get("services_ids", [])
-        combos_ids = data.get("combos_ids", [])
-        coupon_code = data.get("coupon_code")
-        product_ids = data.get("product_ids", [])
+        services_data = data.get("services", [])
+        combos_data = data.get("combos", [])
+        products_data = data.get("products", [])
+        coupon_id = data.get("coupon")
 
         # Fetch or create customer
         customer, created = Customer.objects.get_or_create(
-            phone=c_phone,salon_id=salon_id, defaults={"name": c_name or f"Customer-{c_phone}"}
+            phone=c_phone,
+            salon_id=salon_id,
+            defaults={"name": c_name or f"Customer-{c_phone}"},
         )
-        
-        # Fetch other objects from the database
-        branch = get_object_or_404(Branch, id=branch_id)
-        services = Service.objects.filter(id__in=services_ids)
-        combos = Combo.objects.filter(id__in=combos_ids)
-        products = Product.objects.filter(id__in=product_ids)
-        coupon = Coupon.objects.filter(code=coupon_code,branch=branch_id, valid_till__gte=now()).first()
 
-        # Calculate the total amount before discount
-        total_services = sum(service.price for service in services)
-        total_combos = sum(combo.price for combo in combos)
-        total_products = sum(product.price for product in products)
+        # Fetch branch
+        branch = get_object_or_404(Branch, id=branch_id)
+
+        # Fetch services, combos, and products
+        services = [
+            {"service": get_object_or_404(Service, id=item["id"]), "quantity": item["quantity"]}
+            for item in services_data
+        ]
+        combos = [
+            {"combo": get_object_or_404(Combo, id=item["id"]), "quantity": item["quantity"]}
+            for item in combos_data
+        ]
+        products = [
+            {"product": get_object_or_404(Product, id=item["id"]), "quantity": item["quantity"]}
+            for item in products_data
+        ]
+
+        # Fetch coupon
+        coupon = Coupon.objects.filter(
+            id=coupon_id, branch=branch_id, valid_till__gte=now()
+        ).first()
+
+        # Calculate totals
+        total_services = sum(item["service"].price * item["quantity"] for item in services)
+        total_combos = sum(item["combo"].price * item["quantity"] for item in combos)
+        total_products = sum(item["product"].price * item["quantity"] for item in products)
         total_amount = total_services + total_combos + total_products
 
-        discount = 0  # Initialize discount
+        discount = 0
 
-        # Apply coupon if valid and conditions are met
+        # Apply coupon if valid
         if coupon and coupon.is_valid():
-            eligible_amount = 0
+            if coupon.is_minimum_purchase:
+                # Check minimum purchase requirement
+                if total_amount >= coupon.minimum_amount:
+                    if coupon.by_percent:
+                        discount = total_amount * (coupon.discount_percentage / 100)
+                    else:
+                        discount = coupon.discount_amount
+            else:
+                # Calculate discount for eligible services and combos
+                eligible_services = sum(
+                    item["service"].price * item["quantity"]
+                    for item in services
+                    if item["service"] in coupon.valid_services.all()
+                )
+                eligible_combos = sum(
+                    item["combo"].price * item["quantity"]
+                    for item in combos
+                    if item["combo"] in coupon.valid_combos.all()
+                )
+                print(eligible_services)
+                print(eligible_combos)
+                eligible_amount = eligible_services + eligible_combos
 
-            # Calculate eligible amount based on valid services and combos
-            eligible_amount += sum(service.price for service in services if service in coupon.valid_services.all())
-            eligible_amount += sum(combo.price for combo in combos if combo in coupon.valid_combos.all())
+                if eligible_amount > 0:
+                    if coupon.by_percent:
+                        discount = eligible_amount * (coupon.discount_percentage / 100)
+                    else:
+                        discount = min(eligible_amount, coupon.discount_amount)
 
-            # Apply percentage discount
-            if coupon.by_percent and coupon.discount_percentage:
-                discount += eligible_amount * (coupon.discount_percentage / 100)
-
-            # Apply flat discount
-            if not coupon.by_percent and coupon.discount_amount:
-                discount += coupon.discount_amount
-
-            # Ensure minimum purchase requirements are met
-            if coupon.is_minimum_purchase and coupon.minimum_amount and total_amount < coupon.minimum_amount:
-                discount = 0  # Reset discount if the minimum amount condition fails
-
-        # Calculate the final amount
+        # Final amount
         final_amount = total_amount - discount
-        final_amount = max(0, final_amount)  # Ensure it cannot go negative
+        final_amount = max(0, final_amount)  # Ensure final amount is non-negative
 
-        # Create and save the bill
+        # Create bill
         bill = Bill.objects.create(
             customer=customer,
             branch=branch,
@@ -71,24 +110,38 @@ class BillREST(APIView):
             discount_applied=round(discount, 2),
             final_amount=round(final_amount, 2),
         )
-        bill.services.add(*services)
-        bill.combos.add(*combos)
-        bill.products.add(*products)
+
+        # Add services, combos, and products to bill
+        for item in services:
+            BillService.objects.create(bill=bill, service=item["service"], quantity=item["quantity"])
+        for item in combos:
+            BillCombo.objects.create(bill=bill, combo=item["combo"], quantity=item["quantity"])
+        for item in products:
+            BillProduct.objects.create(bill=bill, product=item["product"], quantity=item["quantity"])
+
+        # Associate coupon with bill
         if coupon:
             bill.coupons.add(coupon)
 
-        # Serialize and return the response
+        # Prepare response
         response_data = {
             "bill_id": bill.id,
             "customer": customer.name,
             "branch": branch.address,
-            "services": [service.name for service in services],
-            "combos": [combo.name for combo in combos],
-            "products": [product.name for product in products],
+            "services": [
+                {"name": item["service"].name, "quantity": item["quantity"]} for item in services
+            ],
+            "combos": [
+                {"name": item["combo"].name, "quantity": item["quantity"]} for item in combos
+            ],
+            "products": [
+                {"name": item["product"].name, "quantity": item["quantity"]} for item in products
+            ],
             "coupon": coupon.code if coupon else "No coupon applied",
             "discount": round(discount, 2),
             "total_amount": round(total_amount, 2),
             "final_amount": round(final_amount, 2),
             "created_at": bill.created_at,
         }
+
         return Response(response_data, status=status.HTTP_201_CREATED)

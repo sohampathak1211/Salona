@@ -27,7 +27,7 @@ const CreateBill = () => {
   const [selectedCoupon, setSelectedCoupon] = useState(null)
   const [items, setItems] = useState([{ type: '', item: null, quantity: 1, price: 0, total: 0 }])
   const [query, setQuery] = useState('')
-
+console.log(selectedCoupon,"selecsf")
   useEffect(() => {
     const getProducts = async () => {
       const proData = await getSalonProducts()
@@ -136,32 +136,46 @@ const CreateBill = () => {
     e.preventDefault()
     if (!validateBill()) return
 
-    const services_ids = items
+    const services_data = items
       .filter((item) => item.type === 'Service')
-      .map((service) => service.item.id)
+      .map((service) => ({
+        id: service.item.id,
+        quantity: service.quantity
+      }))
 
-    const combos_ids = items.filter((item) => item.type === 'Combo').map((combo) => combo.item.id)
+    const combos_data = items
+      .filter((item) => item.type === 'Combo')
+      .map((combo) => ({
+        id: combo.item.id,
+        quantity: combo.quantity
+      }))
 
-    const product_ids = items
+    const products_data = items
       .filter((item) => item.type === 'Product')
-      .map((product) => product.item.id)
+      .map((product) => ({
+        id: product.item.id,
+        quantity: product.quantity
+      }))
 
     const billData = {
       c_name: customerName,
       c_phone: contactNumber,
-      services_ids: services_ids,
-      combos_ids: combos_ids,
-      coupon_code: selectedCoupon ? selectedCoupon.id : null,
-      product_ids: product_ids
+      branch_id: isAdmin && selectedBranch ? selectedBranch.id : null,
+      services: services_data,
+      combos: combos_data,
+      products: products_data,
+      coupon: selectedCoupon.id
     }
+    console.log(billData)
 
-    let payload = { ...billData }
-    if (isAdmin) {
-      payload = { ...payload, branch_id: selectedBranch.id }
+    try {
+      const response = await createBill(billData)
+      toast.success('Bill created successfully!')
+      console.log('Payload Data:', response)
+    } catch (error) {
+      toast.error('Failed to create bill. Please try again.')
+      console.error('Error creating bill:', error)
     }
-
-    const response = await createBill(payload)
-    console.log('Payload Data:', response)
   }
 
   return (

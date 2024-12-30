@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Line from '../../components/Line'
 import Invoice from '../../components/Invoice'
 import ModernInvoice from '../../components/ModernInvoice'
@@ -8,8 +8,11 @@ import RecentBill from './Lists/RecentBill'
 import ServicesPie from './Graphs/ServicesPie'
 import ServiceDoughnut from './Graphs/ServiceDoughnut'
 import BranchBar from './Graphs/BranchBar'
+import useDashboard from '../../services/useDashboard'
 
 const Dashboard = () => {
+  
+
   return (
     <div className="flex w-full h-full min-h-screen flex-col p-10">
       {/* <Line /> */}
@@ -25,7 +28,7 @@ const Dashboard = () => {
           <ServiceDoughnut />
         </div>
       </div>
-      <div className='mt-10'>
+      <div className="mt-10">
         <h2>Herlgoewhgrh</h2>
       </div>
     </div>

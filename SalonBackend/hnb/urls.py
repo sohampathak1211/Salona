@@ -10,9 +10,11 @@ from hnb.rest_views.Coupon import CouponREST
 from hnb.rest_views.Bill import BillREST
 from hnb.rest_views.Combo import ComboREST
 from hnb.rest_views.Product import ProductRest
+from hnb.rest_views.Dashboard import sales_graph
 
 urlpatterns = [
     path("auth/", include("hnb.auth_urls")),
+    path("dashboard/", include("hnb.dashboard_urls")),
     path("Appointment/", AppointmentRest.as_view()),
     path("salon/", SalonRest.as_view()),
     path("branch/", BranchRest.as_view()),

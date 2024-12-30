@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SalonOwner, Salon, User, Service, Appointment,SalonMaintainer,Branch, Combo, Coupon, Bill , Product
+from .models import SalonOwner, Salon, User, Service, Appointment,SalonMaintainer,Branch, Combo, Coupon, Bill , Product,BillService,BillCombo,BillProduct,Customer
 
 class SalonOwnerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -138,18 +138,92 @@ class CouponComboServiceSerializer(serializers.ModelSerializer):
         model = Coupon
         fields = '__all__'
 
-class BillSerializer(serializers.ModelSerializer):
-    services = ServiceSerializer(many=True, read_only=True)
-    combos = ComboSerializer(many=True, read_only=True)
-    customer_name = serializers.CharField(source='customer.name', read_only=True)
-    branch_address = serializers.CharField(source='branch.address', read_only=True)
-
-    class Meta:
-        model = Bill
-        fields = ['id', 'customer_name', 'branch_address', 'services', 'combos', 'total_amount', 'created_at']
 
 class ProductSerializer(serializers.ModelSerializer):
     branch = BranchNameIdSerializer(read_only=True) 
     class Meta:
         model = Product
         fields = '__all__'  
+
+
+
+class BillComboSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="combo.name")
+    price = serializers.DecimalField(source="combo.price", max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = BillCombo
+        fields = ["combo_id", "name", "price", "quantity"]
+
+class CouponSerializer(serializers.ModelSerializer):
+    valid_services = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="name"
+    )
+    valid_combos = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="name"
+    )
+
+    class Meta:
+        model = Coupon
+        fields = [
+            "id",
+            "code",
+            "by_percent",
+            "discount_percentage",
+            "discount_amount",
+            "valid_services",
+            "valid_combos",
+            "valid_till",
+            "is_minimum_purchase",
+            "minimum_amount",
+        ]
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ["id", "name", "phone"]
+
+class BranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ["id", "address"]
+
+
+class BillServiceSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="service.name")
+    price = serializers.DecimalField(source="service.price", max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = BillService
+        fields = ["service_id", "name", "price", "quantity"]
+        
+class BillProductSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="product.name")
+    price = serializers.DecimalField(source="product.price", max_digits=10, decimal_places=2)
+    class Meta:
+        model = BillProduct
+        fields = ["product_id", "name", "price", "quantity"]
+        
+class BillDetailSerializer(serializers.ModelSerializer):
+    services = BillServiceSerializer(source="bill_services", many=True)
+    combos = BillComboSerializer(source="bill_combos", many=True)
+    product = BillProductSerializer(source="bill_products",many=True)
+    coupons = CouponSerializer(many=True)
+    customer = CustomerSerializer()
+    branch = BranchSerializer()
+
+    class Meta:
+        model = Bill
+        fields = [
+            "id",
+            "customer",
+            "branch",
+            "services",
+            "combos",
+            "product",
+            "coupons",
+            "total_amount",
+            "discount_applied",
+            "final_amount",
+            "created_at",
+        ]

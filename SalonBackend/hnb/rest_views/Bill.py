@@ -15,8 +15,33 @@ from hnb.models import (
     BillCombo,
     BillProduct,
 )
-
+from hnb.serializer import (BillDetailSerializer)
+from hnb.wrappers.Pagination import CustomPageNumberPagination
 class BillREST(APIView):
+    pagination_class = CustomPageNumberPagination 
+    def get(self, request, *args, **kwargs):
+        try:
+            branch_id = request.branch_id
+            
+            # Fetch bills based on user's role and branch_id
+            if request.is_owner:
+                bills = Bill.objects.filter(branch_id__in=branch_id)
+            else:
+                bills = Service.objects.filter(branch=branch_id)
+
+            # Apply pagination to the queryset
+            paginator = CustomPageNumberPagination()
+            paginated_bills = paginator.paginate_queryset(bills, request)
+
+            # Serialize the paginated results
+            serializer = BillDetailSerializer(paginated_bills, many=True)
+
+            # Return only the paginated results (without pagination metadata)
+            return paginator.get_paginated_response(serializer.data)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
     def post(self, request):
         data = request.data
 
@@ -117,6 +142,14 @@ class BillREST(APIView):
         for item in combos:
             BillCombo.objects.create(bill=bill, combo=item["combo"], quantity=item["quantity"])
         for item in products:
+            product = item["product"]
+            product.quantity -= item["quantity"]
+            if product.quantity < 0:
+                return Response(
+                    {"error": f"Insufficient stock for product {product.name}"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            product.save()
             BillProduct.objects.create(bill=bill, product=item["product"], quantity=item["quantity"])
 
         # Associate coupon with bill

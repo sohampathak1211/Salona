@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import './print.css'
-import { printCssString } from './stringcss'
+import React, { useEffect, useRef } from 'react'
 import { ToWords } from 'to-words'
-import EXLogo  from '../../../assets/logo.png?react'
+import EXLogo from '../../../assets/logo.png?react'
 
-const ViewBill = ({company, view, setView }) => {
+const ViewBill = ({ company, view, setView }) => {
   const toWords = new ToWords({
     localeCode: 'en-IN',
     converterOptions: {
@@ -13,7 +11,6 @@ const ViewBill = ({company, view, setView }) => {
       ignoreZeroCurrency: false,
       doNotAddOnly: false,
       currencyOptions: {
-        // can be used to override defaults for the selected locale
         name: 'Rupee',
         plural: 'Rupees',
         symbol: '₹',
@@ -26,61 +23,21 @@ const ViewBill = ({company, view, setView }) => {
     }
   })
 
-  const [total_cgst,setCgst] = useState(0.0)
-  const [total_sgst,setSgst] = useState(0.0)
-  
-  useEffect(()=>{
-    let tempCGST = 0.0;
-    let tempSGST = 0.0;
-    view.items.map(item=>{
-      tempCGST+= parseFloat(item.cgst)
-      tempSGST+= parseFloat(item.sgst)
-    })
-    setCgst(tempCGST)
-    setSgst(tempSGST)
-  },[])
+  const printRef = useRef()
 
   const handleClose = () => {
     setView(null)
   }
-  console.log(view)
 
   const handlePrint = () => {
-    // Select the container content
-    const containerElement = document.querySelector('.container')
+    const printContents = printRef.current.innerHTML
+    const originalContents = document.body.innerHTML
 
-    // If the container exists, get its innerHTML
-    if (containerElement) {
-      // Get the content inside the container
-      let contentInsideContainerClass = containerElement.innerHTML
+    document.body.innerHTML = printContents
+    window.print()
 
-      // Replace all occurrences of 'className' with 'class' in the content
-      contentInsideContainerClass = contentInsideContainerClass.replace(/className/g, 'class')
-
-      // Create the full HTML content for the print request
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Invoice</title>
-            <link rel="stylesheet" href="./print.css">
-            <style>
-             ${printCssString}
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              ${contentInsideContainerClass}
-            </div>
-          </body>
-        </html>
-      `
-
-      // Send the HTML content to Electron for printing
-      window.electron.ipcRenderer.send('print-content', htmlContent)
-    }
+    document.body.innerHTML = originalContents
+    window.location.reload()
   }
 
   return (
@@ -93,7 +50,7 @@ const ViewBill = ({company, view, setView }) => {
     >
       <div
         className="relative p-4 w-full max-w-5xl max-h-full bg-white rounded-lg shadow transform transition-opacity duration-300 ease-out"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="w-full flex justify-end">
           <button
@@ -109,130 +66,112 @@ const ViewBill = ({company, view, setView }) => {
             Print
           </button>
         </div>
+
         <div className="w-full overflow-y-scroll border mt-5 h-[600px] p-3">
-          <div className="container">
-            <div className="header">
-              <div className="company-info">
-                <div className="company-details">
-                  <h2>{company?.cName}</h2>
-                  <span>{company?.address}</span>
-                  <span>Email: {company?.email}</span>
-                  <span>GST No: {company?.gst_n}</span>
+          <div ref={printRef} className="max-w-[1000px] mx-auto">
+            <div className="flex justify-between mb-5">
+              <div className="flex flex-col max-w-[60%]">
+                <div className="flex flex-col">
+                  <h2 className="text-lg font-bold">{company?.cName}</h2>
+                  <span className="text-sm">{company?.address}</span>
+                  <span className="text-sm">Email: {company?.email}</span>
                 </div>
-                <div className="bill-to">
-                  <h2>Bill To:</h2>
-                  <span>{view.ven_id.name}</span>
-                  <span>{view.ven_id.address}</span>
-                  <span>Email: {view.ven_id.email}</span>
-                  <span>GST No: {view.ven_id.gst_no}</span>
+                <div className="flex flex-col mt-5">
+                  <h2 className="text-lg font-bold">Bill To:</h2>
+                  <span className="text-sm">{view?.customer?.name}</span>
+                  <span className="text-sm">{view?.branch?.address}</span>
+                  <span className="text-sm">Email: {view?.customer?.email}</span>
+                  <span className="text-sm">GST No: {view?.customer?.gst_no}</span>
                 </div>
               </div>
-              <div className="invoice-details">
-                <img
-                  src={EXLogo}
-                  alt="Shivaji Maharaj Icon"
-                  className="invoice-img"
-                />
-                <p>Invoice No: {view.id}</p>
-                <p>Date: {view.date.split('-').reverse().join('-')}</p>
+              <div className="flex flex-col items-end">
+                <img src={EXLogo} alt="Logo" className="h-28 w-24" />
+                <p className="text-sm">Invoice No: {view.id}</p>
+                <p className="text-sm">
+                  Date: {view.created_at.split('T')[0].split('-').reverse().join('-')}
+                </p>
               </div>
             </div>
 
-            <h3>Transportation Details:</h3>
-            <div className="transportation-details">
-              <div className="from-to">
-                <span>
-                  <strong>From:</strong> {view.from_add}
-                </span>
-                <span>
-                  <strong>To:</strong> {view.to_add}
-                </span>
-              </div>
-              <span>
-                <strong>Vehicle No:</strong>
-                {view.veh_id == null ? 'Vehicle was deleted' : view.veh_id.number}
-              </span>
-            </div>
+            <h3 className="text-base font-semibold mb-2">Items:</h3>
 
-            <div className="table-container">
-              <table className="invoice-table">
+            <div className="overflow-x-auto mb-4">
+              <table className="w-full border border-gray-300 border-collapse">
                 <thead>
-                  <tr>
-                    <th className="sr">Sr.</th>
-                    <th>Item</th>
-                    <th className="hsn">HSN SAC</th>
-                    <th className="qty">Qty.</th>
-                    <th className="unit">Unit</th>
-                    <th className="ppu">Price/Unit</th>
-                    <th className="tt">Taxable</th>
-                    <th className="cgst">CGST 6%</th>
-                    <th className="sgst">SGST 6%</th>
-                    <th className="amount">Amount</th>
+                  <tr className="bg-gray-200">
+                    <th className="border border-gray-300 px-2 py-1 text-left">Sr.</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left">Type</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left">Item</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left">Qty.</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left">Price/Unit</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {view.items.map((item, index) => (
-                    <tr>
-                      <td className="sr">{index + 1}</td>
-                      <td>{item.name}</td>
-                      <td className="hsn">{item.hsn_sac}</td>
-                      <td className="qty">{item.quantity}</td>
-                      <td className="unit">{item.unit}</td>
-                      <td className="ppu">{item.price_per_unit}</td>
-                      <td className="tt">{item.taxable_amt}</td>
-                      <td className="cgst">{item.cgst}</td>
-                      <td className="sgst">{item.sgst}</td>
-                      <td className="amount">
-                        ₹
-                        {parseFloat(item.taxable_amt) +
-                          parseFloat(item.cgst) +
-                          parseFloat(item.sgst)}
+                  {view.services.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                      <td className="border border-gray-300 px-2 py-1">Service</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.name}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.quantity}</td>
+                      <td className="border border-gray-300 px-2 py-1">₹{item.price}</td>
+                      <td className="border border-gray-300 px-2 py-1">
+                        ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                  {view.combos.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                      <td className="border border-gray-300 px-2 py-1">Combo</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.name}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.quantity}</td>
+                      <td className="border border-gray-300 px-2 py-1">₹{item.price}</td>
+                      <td className="border border-gray-300 px-2 py-1">
+                        ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                  {view.product.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                      <td className="border border-gray-300 px-2 py-1">Product</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.name}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.quantity}</td>
+                      <td className="border border-gray-300 px-2 py-1">₹{item.price}</td>
+                      <td className="border border-gray-300 px-2 py-1">
+                        ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="amount-section">
-              <div className="sub-total">
-                <span>
-                  <strong>Amount in words: </strong>
-                  {toWords.convert(view.total_amt)}
+
+            <div className="flex justify-between border-t border-gray-300 pt-4">
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold">
+                  Amount in words: {toWords.convert(view.total_amount)}
                 </span>
               </div>
-              <div className="total">
-                <span>
-                  <strong>Total: </strong>₹{view.total_amt}
-                </span>
-                <span>
-                  <strong>Round Off: </strong>
-                  {view.round_amt}
-                </span>
-              </div>
-              <div className="total">
-                <span>
-                  <strong>Recieved: </strong>₹
-                  {parseFloat(view.total_amt) - parseFloat(view.pending)}
-                </span>
-                <span>
-                  <strong>Balance: </strong>₹{parseFloat(view.pending)}
+              <div className="flex flex-col text-right">
+                <span className="text-sm font-semibold">Total: ₹{view.total_amount}</span>
+                <span className="text-sm font-semibold">
+                  After Discount: ₹
+                  {parseFloat(view.total_amount) - parseFloat(view.discount_applied)}
                 </span>
               </div>
             </div>
 
-            <div className="tax-details">
-              <div className="tax-breakdown">
-                <span>CGST 6%: ₹{total_cgst}</span>
-                <span>SGST 6%: ₹{total_sgst}</span>
-              </div>
-              <div className="thanks">
-                <p>Thanks for Doing Business with Chandrabhaga Transport</p>
+            <div className="flex justify-between items-center mt-4">
+              <div className="text-center italic">
+                <p>Thanks for Doing Business with {company?.cName}</p>
               </div>
             </div>
 
-            <div className="footer">
+            <div className="bg-gray-200 text-center py-2 mt-4 text-sm text-gray-700">
               <strong>
-                Bill is generated by ExpenseEase Software | Build Website, Software, Apps |
+                Generated by Salona Software powered by Nexora Creations | Build Website, Software, Apps |
                 7887557175 | pathaksoham2003@gmail.com
               </strong>
             </div>

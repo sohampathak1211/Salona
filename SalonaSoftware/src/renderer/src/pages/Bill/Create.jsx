@@ -164,7 +164,7 @@ console.log(selectedCoupon,"selecsf")
       services: services_data,
       combos: combos_data,
       products: products_data,
-      coupon: selectedCoupon.id
+      coupon: selectedCoupon ? selectedCoupon.id : null
     }
     console.log(billData)
 

@@ -11,11 +11,13 @@ import { MdCleaningServices } from 'react-icons/md'
 import { GiTicket } from 'react-icons/gi'
 import { useSelector } from 'react-redux'
 import { selectRole } from '../slices/authSlice'
+import useLocalStorage from '../services/useLocalStorage'
 
 const useAssets = () => {
   const role = useSelector(selectRole)
-  const isAdmin = role == 'SO'
-  const [categories,setCategories] = useState([
+  const { getData } = useLocalStorage()
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [categories, setCategories] = useState([
     {
       id: 0,
       name: 'Dashboard',
@@ -78,9 +80,22 @@ const useAssets = () => {
     // },
   ])
 
-  useEffect(()=>{
-    setCategories(prev=>prev.filter(cat=>cat.name!="Dashboard"))
-  },[isAdmin])
+  const checkAdmin = async () => {
+    const data = await getData('cUser')
+    if (data.role == 'SO') {
+      setIsAdmin(true)
+      return
+    }
+    setIsAdmin(false)
+  }
+
+  useEffect(() => {
+    checkAdmin()
+  }, [])
+  
+  useEffect(() => {
+    setCategories((prev) => prev.filter((cat) => cat.name != 'Dashboard' || cat.name != 'Customer'))
+  }, [isAdmin])
 
   const options = [
     {

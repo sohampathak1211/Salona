@@ -8,45 +8,35 @@ import { MdOutlineDelete } from 'react-icons/md'
 import { FaCartPlus } from 'react-icons/fa'
 import useProduct from '../../services/useProduct'
 import useAssets from '../../components/categories'
-import { IoSearchSharp } from "react-icons/io5";
+import { IoSearchSharp } from 'react-icons/io5'
 
 const Product = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [products, setProducts] = useState([])
-  const [filteredProducts, setFilteredProducts] = useState([]); // Filtered product list
-  const [query, setQuery] = useState(''); // Search query
- 
+  const [filteredProducts, setFilteredProducts] = useState([]) // Filtered product list
+  const [query, setQuery] = useState('') // Search query
+
   const { getSalonProducts } = useProduct()
   const { isAdmin } = useAssets()
-  
 
   const getProducts = async () => {
     const proData = await getSalonProducts()
     setProducts(proData)
+    setFilteredProducts(proData)
   }
 
   useEffect(() => {
     getProducts()
   }, [])
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const productData = await getSalonProducts(); // Assume this fetches all products
-      setProducts(productData);
-      setFilteredProducts(productData);
-    };
-
-    fetchProducts();
-  }, [getSalonProducts]);
-
   // Filter products when the query changes
   useEffect(() => {
     if (query === '') {
-      setFilteredProducts(products);
+      setFilteredProducts(products)
     } else {
-      const filtered = products.filter(product => {
-        const queryLower = query.toLowerCase();
+      const filtered = products.filter((product) => {
+        const queryLower = query.toLowerCase()
         return (
           product.name?.toLowerCase().includes(queryLower) ||
           product.brand?.toLowerCase().includes(queryLower) ||
@@ -57,11 +47,11 @@ const Product = () => {
           new Date(product.expiry_date).toLocaleDateString().toLowerCase().includes(queryLower) ||
           product.description?.toLowerCase().includes(queryLower) ||
           product.branch?.address?.toLowerCase().includes(queryLower)
-        );
-      });
-      setFilteredProducts(filtered);
+        )
+      })
+      setFilteredProducts(filtered)
     }
-  }, [query, products]);
+  }, [query, products])
 
   return (
     <div className="flex flex-1 justify-center relative ">
@@ -81,19 +71,16 @@ const Product = () => {
           )}
         </div>
 
-        <div className='w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3'>
+        <div className="w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3">
+          <IoSearchSharp size={22} className="ml-4" />
 
-        <IoSearchSharp size={22} className='ml-4' />
-
-        <input
-             type="text"
-             value={query}
-             onChange={(e) => setQuery(e.target.value)}
-         className='w-full px-2 py-2 text-black mr-1 border:none outline-none' 
-
-         placeholder='Search Product'
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full px-2 py-2 text-black mr-1 border:none outline-none"
+            placeholder="Search Product"
           />
-
         </div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">

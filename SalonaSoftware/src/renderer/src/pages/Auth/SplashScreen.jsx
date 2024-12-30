@@ -36,7 +36,7 @@ const SplashScreen = () => {
       try {
         const salon = await getSalonOfOwner(cUser.id)
         console.log('Fetched salon data:', salon)
-        // setHasSalon(!!salon) // Explicitly convert to boolean
+        setHasSalon(!!salon) // Explicitly convert to boolean
         if (salon.error) {
           setHasSalon(false)
         }

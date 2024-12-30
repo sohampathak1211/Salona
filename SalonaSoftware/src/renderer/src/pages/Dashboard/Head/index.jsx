@@ -11,6 +11,8 @@ import { FaArrowTrendUp } from 'react-icons/fa6'
 import { FaArrowTrendDown } from 'react-icons/fa6'
 
 const Head = () => {
+
+  
   return (
     <div className="w-full">
       <div className="flex justify-between">
@@ -18,7 +20,7 @@ const Head = () => {
           <h2 className="text-sm font-bold text-subheading">Dashboard</h2>
           <h2 className="text-3xl font-bold">Salon Dashboard</h2>
         </div>
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <div className="text-right">
             <Menu>
               <MenuButton className="inline-flex items-center gap-2 rounded-md bg-gray-800 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-700 data-[open]:bg-gray-700 data-[focus]:outline-1 data-[focus]:outline-white">
@@ -54,10 +56,7 @@ const Head = () => {
               </MenuItems>
             </Menu>
           </div>
-          <button className="m-3 mr-10 bg-yellow-400 px-5 py-2 rounded-xl text-black font-bold hover:bg-yellow-500 transition-colors duration-300">
-            Add a Bill
-          </button>
-        </div>
+        </div> */}
       </div>
       <div className="w-full grid grid-cols-4 gap-2 py-4">
         <div className="flex justify-between bg-gray-200 p-4 rounded-xl">

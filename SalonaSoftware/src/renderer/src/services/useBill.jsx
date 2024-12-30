@@ -1,7 +1,7 @@
 import React from 'react'
 
 const useBill = () => {
-  const getBill = async (params = {}) => {
+  const getBill = async (params) => {
     return await window.electron.ipcRenderer
       .invoke('getBills', params)
       .then((data) => {

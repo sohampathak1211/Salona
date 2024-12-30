@@ -1,25 +1,62 @@
-import React, { useEffect, useState } from 'react'
-// import CreateBill from './CreateBill';  // Modal component for creating a new bill
-// import EditBill from './EditBill';      // Modal component for editing an existing bill
+import React, { useEffect, useState, useRef } from 'react'
 import ViewBill from './ViewBill'
 import CreateBill from './CreateBill'
 import { useNavigate } from 'react-router-dom'
+import useBill from '../../services/useBill'
+import FlatList from 'flatlist-react'
 
 const Bill = () => {
-  const [billDetails, setBillDetails] = useState([])
-  const [company, setCompany] = useState(null)
-  const [view, setView] = useState(false)
-  const [viewBill, setBill] = useState(null)
-  const navigate = useNavigate()
+  const { getBill } = useBill() // Custom hook to fetch bill data
+  const [billDetails, setBillDetails] = useState([]) // Store bill details
+  const [company, setCompany] = useState(null) // Company info (if required)
+  const [view, setView] = useState(false) // Toggle for detailed view
+  const [viewBill, setBill] = useState(null) // Selected bill details
+  const navigate = useNavigate() // For routing
+  const [page, setPage] = useState(1)
+  const sentinelRef = useRef(null) // Ref for the "Load More" sentinel
+  const [isLoading, setIsLoading] = useState(false) // To prevent multiple triggers
 
-  
+  // Fetch bill data
+  const getProducts = async () => {
+    const billData = await getBill({ page: page })
+    console.log('Bill Data', billData)
+    setBillDetails((prev) => [...prev, ...billData]) // Append new data to existing list
+    setIsLoading(false)
+  }
+
   useEffect(() => {
-  
-  }, [])
+    getProducts()
+  }, [page])
 
+  // Handle viewing a specific bill
   const handleBillView = (item) => {
     setBill(item)
   }
+
+  // Intersection Observer for infinite scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (entry.isIntersecting && !isLoading) {
+          setIsLoading(true)
+          setPage((prev) => prev + 1)
+        }
+      },
+      { threshold: 1.0 }
+    )
+
+    const currentSentinel = sentinelRef.current
+    if (currentSentinel) {
+      observer.observe(currentSentinel)
+    }
+
+    return () => {
+      if (currentSentinel) {
+        observer.unobserve(currentSentinel)
+      }
+    }
+  }, [isLoading])
 
   return (
     <div className="flex flex-1 justify-center relative">
@@ -39,6 +76,7 @@ const Bill = () => {
           </button>
         </div>
 
+        {/* Table Section */}
         <div className={`relative rounded-2xl overflow-x-auto mt-5 ${view ? 'hidden' : 'block'}`}>
           <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -56,13 +94,9 @@ const Bill = () => {
                 <th scope="col" className="px-6 py-3">
                   Customer Phone
                 </th>
-                {/* Added Vehicle Number */}
                 <th scope="col" className="px-6 py-3">
                   Final Amount
                 </th>
-                {/* <th scope="col" className="px-6 py-3">
-                  Actions
-                </th> */}
               </tr>
             </thead>
             <tbody>
@@ -70,58 +104,30 @@ const Bill = () => {
                 <tr
                   key={item.id}
                   onClick={() => handleBillView(item)}
-                  className="bg-white hover:bg-slate-50 text-large"
+                  className="bg-white hover:bg-slate-50 text-large cursor-pointer"
                 >
-                  <th
-                    scope="row"
-                    className={`pl-6 py-4 font-medium text-gray-900 whitespace-nowrap`}
-                  >
+                  <th scope="row" className="pl-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {item.branch.address}
                   </th>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.created_at.split('-').reverse().join('-')}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item?.customer?.name}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item?.customer?.phone}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    ₹{item.final_amount}
-                  </td>
-                  {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    <button
-                      onClick={() => handleEditBill(item)}
-                      className="text-blue-500 hover:text-blue-700 mr-4"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteBill(item.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
-                  </td> */}
+                  <td className="px-6 py-4">{new Date(item.created_at).toLocaleDateString()}</td>
+                  <td className="px-6 py-4">{item?.customer?.name}</td>
+                  <td className="px-6 py-4">{item?.customer?.phone}</td>
+                  <td className="px-6 py-4">₹{item.final_amount}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          {/* Sentinel for IntersectionObserver */}
+          <div ref={sentinelRef} className="h-10 bg-transparent"></div>
         </div>
+
+        {/* Add Create Bill Component */}
         <CreateBill view={view} />
       </div>
+
+      {/* Add View Bill Component */}
       {viewBill && <ViewBill company={company} view={viewBill} setView={setBill} />}
-      {/* {create && <CreateBill fetchBills={fetchBills} setCreate={setCreate} />}
-      {edit && (
-        <EditBill
-          setEdit={setEdit}
-          edit={edit}
-          billToEdit={billToEdit}
-          setBillDetails={setBillDetails}
-          fetchBills={fetchBills}
-        />
-      )} */}
     </div>
   )
 }

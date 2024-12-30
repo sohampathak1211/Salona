@@ -7,7 +7,8 @@ from hnb.serializer import CustomerSerializer
 class CustomerREST(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            data = Customer.objects.all()
+            salon_id = request.salon_id
+            data = Customer.objects.filter(salon_id=salon_id)
             serializer = CustomerSerializer(data, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:

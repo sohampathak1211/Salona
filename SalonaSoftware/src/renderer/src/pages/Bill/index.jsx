@@ -12,23 +12,9 @@ const Bill = () => {
   const [viewBill, setBill] = useState(null)
   const navigate = useNavigate()
 
-  const fetchBills = () => {
-    // Fetch bills from backend using Electron or API
-    // window.electron.ipcRenderer
-    //   .invoke('getBills') // Example IPC communication for Electron
-    //   .then((data) => setBillDetails(data))
-    //   .catch((e) => console.log(e))
-  }
-
-  const getComp = () => {
-    // window.electron.ipcRenderer.invoke('getCompany', 'Hiiii').then((data) => {
-    //   setCompany(data[0])
-    // })
-  }
-
+  
   useEffect(() => {
-    fetchBills()
-    getComp()
+  
   }, [])
 
   const handleBillView = (item) => {

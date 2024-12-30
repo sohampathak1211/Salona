@@ -17,6 +17,7 @@ import useCombo from '../../services/useCombo'
 import { comboRequest, comboSuccess, selectCombo } from '../../slices/comboSlice'
 import { toast } from 'react-toastify'
 import useAssets from '../../components/categories'
+import { IoSearchSharp } from 'react-icons/io5'
 
 const Combos = () => {
   const dispatch = useDispatch()
@@ -31,6 +32,7 @@ const Combos = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('') // Search query state
 
   const getBranches = async () => {
     dispatch(branchRequest())
@@ -92,6 +94,18 @@ const Combos = () => {
     }
   }
 
+  const filteredCombos = combos.filter((combo) => {
+    const query = searchQuery.toLowerCase()
+    return (
+      combo.branch?.address.toLowerCase().includes(query) || // Branch Name
+      combo.name.toLowerCase().includes(query) ||            // Combo Name
+      combo.description.toLowerCase().includes(query) ||     // Description
+      combo.price.toString().includes(query) ||              // Price
+      combo.services.some((service) => service.name.toLowerCase().includes(query)) // Services
+    )
+  })
+
+
   return (
     <div className="flex flex-1 justify-center relative">
       <div className="w-full p-10">
@@ -107,7 +121,20 @@ const Combos = () => {
             Add a new Combos
           </button> : <Fragment></Fragment>}
         </div>
+        <div className='w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3'>
 
+<IoSearchSharp size={22} className='ml-4' />
+
+<input
+   type="text"
+   value={searchQuery}
+   onChange={(e) => setSearchQuery(e.target.value)}
+ className='w-full px-2 py-2 text-black mr-1 border:none outline-none' 
+
+ placeholder='Search Product'
+  />
+
+</div>
         <div className="relative rounded-2xl overflow-x-auto md:overflow-x-hidden mt-5">
           <h2 className="w-full bg-white p-5 text-xl font-bold">Combos Details</h2>
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -137,8 +164,8 @@ const Combos = () => {
               </tr>
             </thead>
             <tbody>
-              {combos.length > 0 &&
-                combos.map((item) => (
+              {filteredCombos.length > 0 &&
+                filteredCombos.map((item) => (
                   <tr key={item.id} className="bg-white border-b-[1px] border-gray-100 text-large">
                     <td
                       scope="row"

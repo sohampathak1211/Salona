@@ -27,7 +27,7 @@ const CreateBill = () => {
   const [selectedCoupon, setSelectedCoupon] = useState(null)
   const [items, setItems] = useState([{ type: '', item: null, quantity: 1, price: 0, total: 0 }])
   const [query, setQuery] = useState('')
-console.log(selectedCoupon,"selecsf")
+  console.log(selectedCoupon, 'selecsf')
   useEffect(() => {
     const getProducts = async () => {
       const proData = await getSalonProducts()
@@ -179,269 +179,291 @@ console.log(selectedCoupon,"selecsf")
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-5 bg-white rounded-lg shadow-md space-y-6">
-      {/* Branch Dropdown */}
-      <div className="h-full">
-        <label className="block text-sm font-medium text-gray-900">Branch</label>
-        <Listbox value={selectedBranch} onChange={setSelectedBranch}>
-          <div className="relative mt-1">
-            <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-              <span className="block truncate">
-                {selectedBranch ? selectedBranch.address : 'Select Branch'}
-              </span>
-              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-              </span>
-            </Listbox.Button>
-            <Transition
-              as={Fragment}
-              leave="transition ease-in duration-100"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                {branches.map((branch) => (
-                  <Listbox.Option
-                    key={branch.id}
-                    className={({ active }) =>
-                      `relative cursor-default select-none p-2 ${
-                        active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
-                      }`
-                    }
-                    value={branch}
+    <div className="flex flex-1 justify-center relative">
+      <div className="w-full p-10">
+        <div className="flex justify-between">
+          <div>
+            {/* <h2 className="text-sm font-bold text-subheading">
+              Billing {view ? '   >    Create Bill' : ''}
+            </h2>
+            <h2 className="text-3xl font-bold">Billing Section</h2> */}
+          </div>
+        </div>
+
+        {/* Table Section */}
+        <div className={`relative rounded-2xl overflow-x-auto mt-5 `}>
+          <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
+          <form onSubmit={handleSubmit} className="p-5 bg-white rounded-lg shadow-md space-y-6">
+            {/* Branch Dropdown */}
+            <div className="h-full">
+              <label className="block text-sm font-medium text-gray-900">Branch</label>
+              <Listbox value={selectedBranch} onChange={setSelectedBranch}>
+                <div className="relative mt-1">
+                  <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                    <span className="block truncate">
+                      {selectedBranch ? selectedBranch.address : 'Select Branch'}
+                    </span>
+                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </span>
+                  </Listbox.Button>
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
                   >
-                    <span className={`block text-sm truncate font-normal`}>{branch.address}</span>
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Transition>
-          </div>
-        </Listbox>
-      </div>
-
-      {/* Customer Details */}
-      <div>
-        <label className="block text-sm font-medium mb-1">Customer Name</label>
-        <input
-          type="text"
-          value={customerName}
-          onChange={(e) => setCustomerName(e.target.value)}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter customer name"
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Contact Number</label>
-        <input
-          type="tel"
-          value={contactNumber}
-          onChange={(e) => setContactNumber(e.target.value)}
-          className="w-full p-2 border rounded-md"
-          placeholder="Enter contact number"
-          required
-        />
-      </div>
-
-      {/* Items Section */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">Items</h3>
-        <div className="grid grid-cols-5 gap-2 font-medium text-gray-700">
-          <div>Type</div>
-          <div>Item</div>
-          <div>Quantity</div>
-          <div>Price</div>
-          <div>Total</div>
-        </div>
-        {items.map((item, index) => (
-          <div key={index} className="flex items-center gap-4 mb-3">
-            {/* Type Dropdown */}
-            <Listbox value={item.type} onChange={(value) => handleItemChange(index, 'type', value)}>
-              <div className="relative mt-1">
-                <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-                  <span className="block truncate">{item.type || 'Select Type'}</span>
-                  <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                    <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                  </span>
-                </Listbox.Button>
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                    {['Service', 'Combo', 'Product'].map((type) => (
-                      <Listbox.Option
-                        key={type}
-                        className={({ active }) =>
-                          `relative cursor-default select-none p-2 ${
-                            active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
-                          }`
-                        }
-                        value={type}
-                      >
-                        <span className="block text-sm truncate font-normal">{type}</span>
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
-              </div>
-            </Listbox>
-
-            {/* Item Dropdown */}
-            <Combobox
-              value={item.item}
-              onChange={(value) => handleItemChange(index, 'item', value)}
-              as="div"
-              className="relative w-full"
-            >
-              <div>
-                <Combobox.Input
-                  className="p-2 border rounded-md w-full"
-                  placeholder="Search or Select Item"
-                  onChange={(e) => setQuery(e.target.value)}
-                  displayValue={(selected) => (selected ? selected.name : '')}
-                />
-                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                  <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                </Combobox.Button>
-              </div>
-              <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto bg-white border rounded-md shadow-lg z-10">
-                {displayedOptions(index).length > 0 ? (
-                  displayedOptions(index).map((opt) => (
-                    <Combobox.Option
-                      key={opt.id}
-                      value={opt}
-                      className={({ active }) =>
-                        `cursor-pointer select-none px-4 py-2 ${
-                          active ? 'bg-blue-500 text-white' : 'text-gray-900'
-                        }`
-                      }
-                    >
-                      {opt.name}
-                    </Combobox.Option>
-                  ))
-                ) : (
-                  <div className="cursor-default select-none px-4 py-2 text-gray-500">
-                    No results found
-                  </div>
-                )}
-              </Combobox.Options>
-            </Combobox>
-
-            {/* Quantity */}
-            <input
-              type="number"
-              min="1"
-              value={item.quantity}
-              onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
-              className="w-20 p-2 border rounded-md"
-            />
-
-            {/* Price */}
-            <input
-              type="number"
-              value={item.price}
-              readOnly
-              className="w-24 p-2 border rounded-md bg-gray-100"
-            />
-
-            {/* Total */}
-            <input
-              type="number"
-              value={item.total}
-              readOnly
-              className="w-24 p-2 border rounded-md bg-gray-100"
-            />
-
-            {/* Remove Item */}
-            <button
-              type="button"
-              onClick={() => removeItem(index)}
-              className="text-red-500 hover:text-red-700"
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-        <div className="flex mt-2 justify-between">
-          <button
-            type="button"
-            onClick={addItem}
-            className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            Add Item
-          </button>
-          <div className="h-full flex items-center">
-            <label className="block text-md font-medium mr-4 text-gray-900">Coupon</label>
-            <Listbox value={selectedCoupon} onChange={setSelectedCoupon}>
-              <div className="relative mt-1 w-[400px]">
-                <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-                  <span className="block truncate">
-                    {selectedCoupon ? selectedCoupon.code : 'Select Coupon'}
-                  </span>
-                  <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                    <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                  </span>
-                </Listbox.Button>
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                    {coupons.map((coupon) => (
-                      <Listbox.Option
-                        key={coupon.id}
-                        className={({ active }) =>
-                          `relative cursor-default select-none p-2 ${
-                            active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
-                          }`
-                        }
-                        value={coupon}
-                      >
-                        <span className={`block text-sm truncate font-normal`}>
-                          {coupon.code}{' '}
-                          <span className="text-gray-400">
-                            {coupon.is_minimum_purchase
-                              ? `Min Purchase of ${coupon.minimum_amount}`
-                              : `${coupon.by_percent ? coupon.discount_percentage : coupon.discount_amount} ${coupon.by_percent ? '%' : 'Rs.'} off on ${coupon.valid_services.map((service) => service.name).join(',')} & ${coupon.valid_combos.map((combo) => combo.name).join(',')}`}
+                    <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                      {branches.map((branch) => (
+                        <Listbox.Option
+                          key={branch.id}
+                          className={({ active }) =>
+                            `relative cursor-default select-none p-2 ${
+                              active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                            }`
+                          }
+                          value={branch}
+                        >
+                          <span className={`block text-sm truncate font-normal`}>
+                            {branch.address}
                           </span>
-                        </span>
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                </div>
+              </Listbox>
+            </div>
+
+            {/* Customer Details */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Customer Name</label>
+              <input
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter customer name"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Contact Number</label>
+              <input
+                type="tel"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter contact number"
+                required
+              />
+            </div>
+
+            {/* Items Section */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Items</h3>
+              <div className="grid grid-cols-5 gap-2 font-medium text-gray-700">
+                <div>Type</div>
+                <div>Item</div>
+                <div>Quantity</div>
+                <div>Price</div>
+                <div>Total</div>
               </div>
-            </Listbox>
-          </div>
-        </div>
-      </div>
+              {items.map((item, index) => (
+                <div key={index} className="flex items-center gap-4 mb-3">
+                  {/* Type Dropdown */}
+                  <Listbox
+                    value={item.type}
+                    onChange={(value) => handleItemChange(index, 'type', value)}
+                  >
+                    <div className="relative mt-1">
+                      <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                        <span className="block truncate">{item.type || 'Select Type'}</span>
+                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                          <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        </span>
+                      </Listbox.Button>
+                      <Transition
+                        as={Fragment}
+                        leave="transition ease-in duration-100"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                          {['Service', 'Combo', 'Product'].map((type) => (
+                            <Listbox.Option
+                              key={type}
+                              className={({ active }) =>
+                                `relative cursor-default select-none p-2 ${
+                                  active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                                }`
+                              }
+                              value={type}
+                            >
+                              <span className="block text-sm truncate font-normal">{type}</span>
+                            </Listbox.Option>
+                          ))}
+                        </Listbox.Options>
+                      </Transition>
+                    </div>
+                  </Listbox>
 
-      {/* Total Section */}
-      <div className="mt-4 w-[300px]">
-        <div className="flex justify-between">
-          <span className="font-medium text-gray-700">Total Before Coupon:</span>
-          <span>{calculateGrandTotal().beforeCoupon}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-medium text-gray-700">Total After Coupon:</span>
-          <span>{calculateGrandTotal().afterCoupon}</span>
-        </div>
-      </div>
+                  {/* Item Dropdown */}
+                  <Combobox
+                    value={item.item}
+                    onChange={(value) => handleItemChange(index, 'item', value)}
+                    as="div"
+                    className="relative w-full"
+                  >
+                    <div>
+                      <Combobox.Input
+                        className="p-2 border rounded-md w-full"
+                        placeholder="Search or Select Item"
+                        onChange={(e) => setQuery(e.target.value)}
+                        displayValue={(selected) => (selected ? selected.name : '')}
+                      />
+                      <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                        <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                      </Combobox.Button>
+                    </div>
+                    <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto bg-white border rounded-md shadow-lg z-10">
+                      {displayedOptions(index).length > 0 ? (
+                        displayedOptions(index).map((opt) => (
+                          <Combobox.Option
+                            key={opt.id}
+                            value={opt}
+                            className={({ active }) =>
+                              `cursor-pointer select-none px-4 py-2 ${
+                                active ? 'bg-blue-500 text-white' : 'text-gray-900'
+                              }`
+                            }
+                          >
+                            {opt.name}
+                          </Combobox.Option>
+                        ))
+                      ) : (
+                        <div className="cursor-default select-none px-4 py-2 text-gray-500">
+                          No results found
+                        </div>
+                      )}
+                    </Combobox.Options>
+                  </Combobox>
 
-      {/* Submit Button */}
-      <div className="mt-6">
-        <button
-          type="submit"
-          className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-        >
-          Submit Bill
-        </button>
+                  {/* Quantity */}
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.quantity}
+                    onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                    className="w-20 p-2 border rounded-md"
+                  />
+
+                  {/* Price */}
+                  <input
+                    type="number"
+                    value={item.price}
+                    readOnly
+                    className="w-24 p-2 border rounded-md bg-gray-100"
+                  />
+
+                  {/* Total */}
+                  <input
+                    type="number"
+                    value={item.total}
+                    readOnly
+                    className="w-24 p-2 border rounded-md bg-gray-100"
+                  />
+
+                  {/* Remove Item */}
+                  <button
+                    type="button"
+                    onClick={() => removeItem(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <div className="flex mt-2 justify-between">
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Add Item
+                </button>
+                <div className="h-full flex items-center">
+                  <label className="block text-md font-medium mr-4 text-gray-900">Coupon</label>
+                  <Listbox value={selectedCoupon} onChange={setSelectedCoupon}>
+                    <div className="relative mt-1 w-[400px]">
+                      <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                        <span className="block truncate">
+                          {selectedCoupon ? selectedCoupon.code : 'Select Coupon'}
+                        </span>
+                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                          <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        </span>
+                      </Listbox.Button>
+                      <Transition
+                        as={Fragment}
+                        leave="transition ease-in duration-100"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                          {coupons.map((coupon) => (
+                            <Listbox.Option
+                              key={coupon.id}
+                              className={({ active }) =>
+                                `relative cursor-default select-none p-2 ${
+                                  active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                                }`
+                              }
+                              value={coupon}
+                            >
+                              <span className={`block text-sm truncate font-normal`}>
+                                {coupon.code}{' '}
+                                <span className="text-gray-400">
+                                  {coupon.is_minimum_purchase
+                                    ? `Min Purchase of ${coupon.minimum_amount}`
+                                    : `${coupon.by_percent ? coupon.discount_percentage : coupon.discount_amount} ${coupon.by_percent ? '%' : 'Rs.'} off on ${coupon.valid_services.map((service) => service.name).join(',')} & ${coupon.valid_combos.map((combo) => combo.name).join(',')}`}
+                                </span>
+                              </span>
+                            </Listbox.Option>
+                          ))}
+                        </Listbox.Options>
+                      </Transition>
+                    </div>
+                  </Listbox>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Section */}
+            <div className="mt-4 w-[300px]">
+              <div className="flex justify-between">
+                <span className="font-medium text-gray-700">Total Before Coupon:</span>
+                <span>{calculateGrandTotal().beforeCoupon}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium text-gray-700">Total After Coupon:</span>
+                <span>{calculateGrandTotal().afterCoupon}</span>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="mt-6">
+              <button
+                type="submit"
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+              >
+                Submit Bill
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </form>
+    </div>
   )
 }
 

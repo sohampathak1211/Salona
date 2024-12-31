@@ -23,8 +23,6 @@ import CreateBill from './pages/Bill/Create'
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 
-  
-
   return (
     <Router>
       <ToastContainer position="top-left" autoClose={1500} />
@@ -35,7 +33,7 @@ function App() {
         <Route path="/salonCreate" element={<SalonCreation />} />
         <Route path="/otp" element={<Otp />} />
         <Route path="/auth" element={<SidebarLayout />}>
-          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="bill" element={<Bill />} />
           <Route path="createBill" element={<CreateBill />} />
           <Route path="service" element={<Services />} />

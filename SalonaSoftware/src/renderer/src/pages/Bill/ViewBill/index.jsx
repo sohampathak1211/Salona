@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react'
-import { ToWords } from 'to-words'
-import EXLogo from '../../../assets/logo.png?react'
+import React, { useRef } from 'react';
+import { ToWords } from 'to-words';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import EXLogo from '../../../assets/logo.png?react';
 
 const ViewBill = ({ company, view, setView }) => {
   const toWords = new ToWords({
@@ -17,35 +19,64 @@ const ViewBill = ({ company, view, setView }) => {
         fractionalUnit: {
           name: 'Paisa',
           plural: 'Paise',
-          symbol: ''
-        }
-      }
-    }
-  })
+          symbol: '',
+        },
+      },
+    },
+  });
 
-  const printRef = useRef()
+  const printRef = useRef();
 
   const handleClose = () => {
-    setView(null)
-  }
+    setView(null);
+  };
 
   const handlePrint = () => {
-    const printContents = printRef.current.innerHTML
-    const originalContents = document.body.innerHTML
+    const printContents = printRef.current.innerHTML;
+    const originalContents = document.body.innerHTML;
 
-    document.body.innerHTML = printContents
-    window.print()
+    document.body.innerHTML = printContents;
+    window.print();
 
-    document.body.innerHTML = originalContents
-    window.location.reload()
-  }
+    document.body.innerHTML = originalContents;
+    window.location.reload();
+  };
+
+  const handlePDFDownload = async () => {
+    const input = printRef.current;
+
+    const canvas = await html2canvas(input, { scale: 2 });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210; // A4 width in mm
+    const pageHeight = 297; // A4 height in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+
+    let position = 0;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`Invoice-${view.id}.pdf`);
+  };
 
   return (
+    
     <div
       id="default-modal"
       tabIndex="-1"
       aria-hidden="true"
-      className={`fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 transition-opacity duration-300 ease-out ${view ? 'opacity-100' : 'opacity-0'}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 transition-opacity duration-300 ease-out ${
+        view ? 'opacity-100' : 'opacity-0'
+      }`}
       onClick={handleClose}
     >
       <div
@@ -54,10 +85,10 @@ const ViewBill = ({ company, view, setView }) => {
       >
         <div className="w-full flex justify-end">
           <button
-            onClick={handlePrint}
+            onClick={handlePDFDownload}
             className="bg-green-500 font-semibold text-black mx-2 rounded-lg py-2 px-4 hover:bg-green-400 transition-colors duration-300"
           >
-            Get pdf
+            Get PDF
           </button>
           <button
             onClick={handlePrint}
@@ -67,8 +98,9 @@ const ViewBill = ({ company, view, setView }) => {
           </button>
         </div>
 
-        <div className="w-full overflow-y-scroll border mt-5 h-[600px] p-3">
-          <div ref={printRef} className="max-w-[1000px] mx-auto">
+        <div ref={printRef} className="w-full overflow-y-scroll border mt-5 h-[600px] p-3">
+          <div className="max-w-[1000px] mx-auto">
+            {/* Bill content */}
             <div className="flex justify-between mb-5">
               <div className="flex flex-col max-w-[60%]">
                 <div className="flex flex-col">
@@ -92,9 +124,7 @@ const ViewBill = ({ company, view, setView }) => {
                 </p>
               </div>
             </div>
-
-            <h3 className="text-base font-semibold mb-2">Items:</h3>
-
+            {/* Table and totals */}
             <div className="overflow-x-auto mb-4">
               <table className="w-full border border-gray-300 border-collapse">
                 <thead>
@@ -120,34 +150,9 @@ const ViewBill = ({ company, view, setView }) => {
                       </td>
                     </tr>
                   ))}
-                  {view.combos.map((item, index) => (
-                    <tr key={index}>
-                      <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-                      <td className="border border-gray-300 px-2 py-1">Combo</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.name}</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.quantity}</td>
-                      <td className="border border-gray-300 px-2 py-1">₹{item.price}</td>
-                      <td className="border border-gray-300 px-2 py-1">
-                        ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                  {view.product.map((item, index) => (
-                    <tr key={index}>
-                      <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-                      <td className="border border-gray-300 px-2 py-1">Product</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.name}</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.quantity}</td>
-                      <td className="border border-gray-300 px-2 py-1">₹{item.price}</td>
-                      <td className="border border-gray-300 px-2 py-1">
-                        ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
                 </tbody>
               </table>
             </div>
-
             <div className="flex justify-between border-t border-gray-300 pt-4">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">
@@ -162,24 +167,11 @@ const ViewBill = ({ company, view, setView }) => {
                 </span>
               </div>
             </div>
-
-            <div className="flex justify-between items-center mt-4">
-              <div className="text-center italic">
-                <p>Thanks for Doing Business with {company?.cName}</p>
-              </div>
-            </div>
-
-            <div className="bg-gray-200 text-center py-2 mt-4 text-sm text-gray-700">
-              <strong>
-                Generated by Salona Software powered by Nexora Creations | Build Website, Software, Apps |
-                7887557175 | pathaksoham2003@gmail.com
-              </strong>
-            </div>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ViewBill
+export default ViewBill;

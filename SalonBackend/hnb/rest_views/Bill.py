@@ -22,15 +22,25 @@ class BillREST(APIView):
     def get(self, request, *args, **kwargs):
         try:
             branch_id = request.branch_id
-            
+            phone = request.query_params.get('phone')
             # Fetch bills based on user's role and branch_id
-            if request.is_owner:
-                bills = Bill.objects.filter(branch_id__in=branch_id)
+            paginator = CustomPageNumberPagination()
+            if phone:
+            # Fetch bills for the customer with the provided phone number
+                customer = Customer.objects.filter(phone=phone).first()
+                print("CUstomer",customer)
+                if not customer:
+                    return paginator.get_paginated_response([])
+                # Retrieve bills for the found customer
+                bills = Bill.objects.filter(customer=customer)
             else:
-                bills = Service.objects.filter(branch=branch_id)
+                # Fetch bills based on the user's role
+                if request.is_owner:
+                    bills = Bill.objects.filter(branch_id__in=branch_id)
+                else:
+                    bills = Bill.objects.filter(branch=branch_id)
 
             # Apply pagination to the queryset
-            paginator = CustomPageNumberPagination()
             paginated_bills = paginator.paginate_queryset(bills, request)
 
             # Serialize the paginated results

@@ -4,6 +4,8 @@ import CreateBill from './CreateBill'
 import { useNavigate } from 'react-router-dom'
 import useBill from '../../services/useBill'
 import FlatList from 'flatlist-react'
+import useAssets from '../../components/categories'
+import { toast } from 'react-toastify'
 
 const Bill = () => {
   const { getBill } = useBill() // Custom hook to fetch bill data
@@ -15,6 +17,8 @@ const Bill = () => {
   const [page, setPage] = useState(1)
   const sentinelRef = useRef(null) // Ref for the "Load More" sentinel
   const [isLoading, setIsLoading] = useState(false) // To prevent multiple triggers
+  const [search, setSearch] = useState('')
+  const { isAdmin } = useAssets()
 
   // Fetch bill data
   const getProducts = async () => {
@@ -25,12 +29,29 @@ const Bill = () => {
   }
 
   useEffect(() => {
-    getProducts()
+    if (isAdmin) {
+      getProducts()
+    }
   }, [page])
 
   // Handle viewing a specific bill
   const handleBillView = (item) => {
     setBill(item)
+  }
+
+  const handleSearch = async () => {
+    if (search.length !== 10) {
+      toast.info('Phone number should be exactly 10 digits!')
+      return
+    }
+
+    const billData = await getBill({ page: 1, phone: search })
+    console.log('Bill Data', billData)
+    if (billData.length == 0) {
+      toast.info("No bills found for this phone number!")
+    }
+    setBillDetails(billData) // Set the fetched data
+    setIsLoading(false)
   }
 
   // Intersection Observer for infinite scrolling
@@ -61,7 +82,7 @@ const Bill = () => {
   return (
     <div className="flex flex-1 justify-center relative">
       <div className="w-full p-10">
-        <div className="flex justify-between">
+        <div className="sticky top-0 flex justify-between">
           <div>
             <h2 className="text-sm font-bold text-subheading">
               Billing {view ? '   >    Create Bill' : ''}
@@ -78,7 +99,26 @@ const Bill = () => {
 
         {/* Table Section */}
         <div className={`relative rounded-2xl overflow-x-auto mt-5 ${view ? 'hidden' : 'block'}`}>
-          <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
+          <div className="flex bg-white p-2">
+            <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
+            {!isAdmin && (
+              <div className="flex items-center mb-5">
+                <input
+                  type="number"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)} // Update search state
+                  placeholder="Search by customer phone..."
+                  className="w-40 p-2 border rounded-lg"
+                />
+                <button
+                  onClick={() => handleSearch()}
+                  className="m-3 mr-10 bg-yellow-400 px-5 py-2 rounded-xl text-black font-bold hover:bg-yellow-500 transition-colors duration-300"
+                >
+                  Search
+                </button>
+              </div>
+            )}
+          </div>
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-subheading bg-white border-b">
               <tr>

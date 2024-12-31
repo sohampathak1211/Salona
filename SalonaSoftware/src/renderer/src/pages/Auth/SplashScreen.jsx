@@ -4,12 +4,14 @@ import Logo from '../../assets/logo.png?react'
 import useAuth from '../../services/useAuth'
 import useLocalStorage from '../../services/useLocalStorage'
 import useSalon from '../../services/useSalon'
-import { setAuth } from '../../slices/authSlice'
-import { useDispatch } from 'react-redux'
+import { selectRole, setAuth } from '../../slices/authSlice'
+import { useDispatch, useSelector } from 'react-redux'
 
 const SplashScreen = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const [temp, setTemp] = useState({})
+  // const role = useSelector(selectRole)
 
   const { getData } = useLocalStorage()
   const { getSalonOfOwner } = useSalon()
@@ -27,11 +29,12 @@ const SplashScreen = () => {
         setIsLogin(false)
         return
       }
+      setTemp(cUser)
       dispatch(setAuth({ cUser, token }))
       setIsLogin(true)
       if (cUser.role == 'MT') {
         setHasSalon(true)
-        return;
+        return
       }
       try {
         const salon = await getSalonOfOwner(cUser.id)
@@ -65,7 +68,13 @@ const SplashScreen = () => {
       } else if (!hasSalon) {
         navigate('/salonCreate')
       } else {
-        navigate('/auth')
+        if (temp.role == 'MT') {
+          console.log("MAINTAINER")
+          navigate('/auth/bill')
+        } else {
+          console.log("sALON OWNERR")
+          navigate('/auth/dashboard')
+        }
       }
     }
   }, [isLogin, hasSalon, moveAheas])

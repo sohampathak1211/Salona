@@ -59,7 +59,7 @@ export default function SignIn() {
         if (res.cUser.salon_id == -1) {
           navigate('/salonCreate')
         } else {
-          navigate('/auth')
+          navigate('/auth/dashboard')
         }
       } else {
         const res = await maintainerSignIn({ email, password, action: 'signin' })
@@ -71,7 +71,7 @@ export default function SignIn() {
         toast.success(res.message)
         setData('cUser', res.cUser)
         setData('token', res.token)
-        navigate('/auth')
+        navigate('/auth/bill')
       }
     } catch (err) {
       toast.error(err)

@@ -7,7 +7,7 @@ from Salon.settings import SECRET_KEY,JWT_EXPIRY
 from hnb.models import SalonOwner, SalonMaintainer, Branch
 import logging
 from django.contrib.auth.hashers import make_password, check_password
-from hnb.serializer import SalonOwnerSerializer,SalonSerializer,BranchSerializer,SalonMaintainerSerializer,SalonIdSerializer,BranchIdSerializer
+from hnb.serializer import SalonOwnerSerializer,SalonSerializer,BranchSerializer,SalonMaintainerSerializer,SalonIdSerializer,BranchIdSerializer,BranchAllSerializer
 from hnb.models import SalonOwner,Salon,Branch
 
 logger = logging.getLogger(__name__)
@@ -130,7 +130,7 @@ def salon_maintainer_signin(request):
                 payload = serializer.data
                 payload['role'] = 'MT'
                 branch = Branch.objects.get(id=serializer.data['branch'])
-                seri_branch = BranchSerializer(branch,many=False)
+                seri_branch = BranchAllSerializer(branch,many=False)
                 payload['role'] = "MT"
                 payload['branch_id'] = serializer.data['branch']
                 payload['salon_id'] = seri_branch.data['salon']

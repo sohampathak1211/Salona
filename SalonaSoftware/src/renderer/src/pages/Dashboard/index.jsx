@@ -20,16 +20,16 @@ const Dashboard = () => {
       {/* <ModernInvoice /> */}
       <Head />
       <SalesGraph />
-      <div className="w-full flex">
+      {/* <div className="w-full flex">
         <div className="w-3/4">
           <BranchBar />
         </div>
         <div className="w-1/4 pl-4 h-[500px]">
           <ServiceDoughnut />
         </div>
-      </div>
-      <div className="mt-10">
-        <h2>Herlgoewhgrh</h2>
+      </div> */}
+      <div className="mt-10 h-10 w-full bg-gray-50">
+        <span>.</span>
       </div>
     </div>
   )

@@ -124,9 +124,9 @@ const Product = () => {
                   <th scope="col" className="px-2 py-3">
                     Branch Address
                   </th>
-                  <th scope="col" className=" w-[20px] px-6 py-3">
+                  {/* <th scope="col" className=" w-[20px] px-6 py-3">
                     Action
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody>
@@ -149,14 +149,14 @@ const Product = () => {
                       </td>
                       <td className="px-2 py-4 max-w-xs break-words">{item.description}</td>
                       <td className="px-2 py-4">{item.branch?.address}</td>
-                      <td className="px-2 py-4 flex flex-row">
+                      {/* <td className="px-2 py-4 flex flex-row">
                         <button className="text-black bg-yellow-400 px-3 p-1  rounded-md items-center flex flex-row gap-1 ">
                           <div>
                             <FaRegEdit />
                           </div>
                           <div>Edit</div>
                         </button>
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
               </tbody>

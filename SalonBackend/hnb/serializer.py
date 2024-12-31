@@ -145,8 +145,6 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'  
 
-
-
 class BillComboSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source="combo.name")
     price = serializers.DecimalField(source="combo.price", max_digits=10, decimal_places=2)
@@ -188,6 +186,10 @@ class BranchSerializer(serializers.ModelSerializer):
         model = Branch
         fields = ["id", "address"]
 
+class BranchAllSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = '__all__'
 
 class BillServiceSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source="service.name")

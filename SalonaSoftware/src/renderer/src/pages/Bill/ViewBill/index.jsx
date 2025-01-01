@@ -1,10 +1,14 @@
-import React, { useRef } from 'react';
-import { ToWords } from 'to-words';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import EXLogo from '../../../assets/logo.png?react';
+import React, { useRef, useState } from 'react'
+import { ToWords } from 'to-words'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
+import EXLogo from '../../../assets/logo.png?react'
+import { selectSalon } from '../../../slices/salonSlice'
+import { useSelector } from 'react-redux'
 
 const ViewBill = ({ company, view, setView }) => {
+  const [loader, setLoader] = useState(false)
+  const salon = useSelector(selectSalon)
   const toWords = new ToWords({
     localeCode: 'en-IN',
     converterOptions: {
@@ -19,57 +23,58 @@ const ViewBill = ({ company, view, setView }) => {
         fractionalUnit: {
           name: 'Paisa',
           plural: 'Paise',
-          symbol: '',
-        },
-      },
-    },
-  });
+          symbol: ''
+        }
+      }
+    }
+  })
 
-  const printRef = useRef();
+  const printRef = useRef()
 
   const handleClose = () => {
-    setView(null);
-  };
+    setView(null)
+  }
 
   const handlePrint = () => {
-    const printContents = printRef.current.innerHTML;
-    const originalContents = document.body.innerHTML;
+    const printContents = printRef.current.innerHTML
+    const originalContents = document.body.innerHTML
 
-    document.body.innerHTML = printContents;
-    window.print();
+    document.body.innerHTML = printContents
+    window.print()
 
-    document.body.innerHTML = originalContents;
-    window.location.reload();
-  };
+    document.body.innerHTML = originalContents
+    window.location.reload()
+  }
 
   const handlePDFDownload = async () => {
-    const input = printRef.current;
+    const input = printRef.current
+    setLoader(true)
 
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgWidth = 210; // A4 width in mm
-    const pageHeight = 297; // A4 height in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight;
+    const canvas = await html2canvas(input, { scale: 2 })
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const imgWidth = 210 // A4 width in mm
+    const pageHeight = 297 // A4 height in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width
+    let heightLeft = imgHeight
 
-    let position = 0;
+    let position = 0
 
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+    heightLeft -= pageHeight
 
     while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      position = heightLeft - imgHeight
+      pdf.addPage()
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
     }
 
-    pdf.save(`Invoice-${view.id}.pdf`);
-  };
+    pdf.save(`Invoice-${view.id}.pdf`)
+    setLoader(false)
+  }
 
   return (
-    
     <div
       id="default-modal"
       tabIndex="-1"
@@ -97,6 +102,7 @@ const ViewBill = ({ company, view, setView }) => {
             Print
           </button>
         </div>
+        {loader && <div className="bg-gray-200 absolute top-0 right-0 w-full h-full">Loading</div>}
 
         <div ref={printRef} className="w-full overflow-y-scroll border mt-5 h-[600px] p-3">
           <div className="max-w-[1000px] mx-auto">
@@ -104,16 +110,22 @@ const ViewBill = ({ company, view, setView }) => {
             <div className="flex justify-between mb-5">
               <div className="flex flex-col max-w-[60%]">
                 <div className="flex flex-col">
-                  <h2 className="text-lg font-bold">{company?.cName}</h2>
-                  <span className="text-sm">{company?.address}</span>
-                  <span className="text-sm">Email: {company?.email}</span>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-700">{salon?.name}</h2>
+                    <p className="text-sm pl-2">{salon?.email}</p>
+                    <p className="text-sm pl-2">{salon?.phone}</p>
+                    <p className="pt-2 pl-2">{salon?.description}</p>
+                    {/* <p className="pl-2">
+                      Since {new Date(salon?.created_at).toLocaleDateString()}
+                    </p> */}
+                  </div>
                 </div>
                 <div className="flex flex-col mt-5">
                   <h2 className="text-lg font-bold">Bill To:</h2>
                   <span className="text-sm">{view?.customer?.name}</span>
-                  <span className="text-sm">{view?.branch?.address}</span>
-                  <span className="text-sm">Email: {view?.customer?.email}</span>
-                  <span className="text-sm">GST No: {view?.customer?.gst_no}</span>
+                  <span className="text-sm"> At Branch : {view?.branch?.address}</span>
+                  {/* <span className="text-sm">Email: {view?.customer?.email}</span>
+                  <span className="text-sm">GST No: {view?.customer?.gst_no}</span> */}
                 </div>
               </div>
               <div className="flex flex-col items-end">
@@ -140,8 +152,32 @@ const ViewBill = ({ company, view, setView }) => {
                 <tbody>
                   {view.services.map((item, index) => (
                     <tr key={index}>
-                      <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                      <td className="border border-gray-300 px-2 py-1">S{index + 1}</td>
                       <td className="border border-gray-300 px-2 py-1">Service</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.name}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.quantity}</td>
+                      <td className="border border-gray-300 px-2 py-1">₹{item.price}</td>
+                      <td className="border border-gray-300 px-2 py-1">
+                        ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                  {view.combos.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 px-2 py-1">C{index + 1}</td>
+                      <td className="border border-gray-300 px-2 py-1">Combo</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.name}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.quantity}</td>
+                      <td className="border border-gray-300 px-2 py-1">₹{item.price}</td>
+                      <td className="border border-gray-300 px-2 py-1">
+                        ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                  {view.product.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 px-2 py-1">P{index + 1}</td>
+                      <td className="border border-gray-300 px-2 py-1">Prodcut</td>
                       <td className="border border-gray-300 px-2 py-1">{item.name}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.quantity}</td>
                       <td className="border border-gray-300 px-2 py-1">₹{item.price}</td>
@@ -167,11 +203,15 @@ const ViewBill = ({ company, view, setView }) => {
                 </span>
               </div>
             </div>
+            <div className="border-y mt-4 text-center border-gray-300 py-2">
+              This software is build and maintained by Nexora Creations | 7887557175 |
+              pathaksoham2003@gmail.com
+            </div>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ViewBill;
+export default ViewBill

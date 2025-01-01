@@ -80,7 +80,7 @@ const SplashScreen = () => {
   }, [isLogin, hasSalon, moveAheas])
 
   return (
-    <div className="bg-background transition-colors bg-red-400 w-full h-full flex items-center justify-center">
+    <div className="bg-gray-100 transition-colors w-full h-screen flex items-center justify-center">
       <div className="overflow-hidden">
         <div className="flex justify-center items-center bg-white pr-10">
           <div className="w-[300px] h-[300px] overflow-hidden animate-customOpacity">

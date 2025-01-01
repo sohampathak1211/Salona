@@ -6,6 +6,9 @@ import useBill from '../../services/useBill'
 import FlatList from 'flatlist-react'
 import useAssets from '../../components/categories'
 import { toast } from 'react-toastify'
+import { salonFailed, salonRequest, salonSuccess } from '../../slices/salonSlice'
+import { useDispatch } from 'react-redux'
+import useSalon from '../../services/useSalon'
 
 const Bill = () => {
   const { getBill } = useBill() // Custom hook to fetch bill data
@@ -19,6 +22,8 @@ const Bill = () => {
   const [isLoading, setIsLoading] = useState(false) // To prevent multiple triggers
   const [search, setSearch] = useState('')
   const { isAdmin } = useAssets()
+  const { getSalon } = useSalon()
+  const dispatch = useDispatch()
 
   // Fetch bill data
   const getProducts = async () => {
@@ -48,11 +53,26 @@ const Bill = () => {
     const billData = await getBill({ page: 1, phone: search })
     console.log('Bill Data', billData)
     if (billData.length == 0) {
-      toast.info("No bills found for this phone number!")
+      toast.info('No bills found for this phone number!')
     }
     setBillDetails(billData) // Set the fetched data
     setIsLoading(false)
   }
+
+  const fetchSalon = async () => {
+    dispatch(salonRequest())
+    const data = await getSalon()
+    if (data.error) {
+      dispatch(salonFailed(data.error))
+      toast.info("You don't have branches. Open the settings page and add a branch to continue")
+      return
+    }
+    dispatch(salonSuccess(data))
+  }
+
+  useEffect(()=>{
+    fetchSalon()
+  },[])
 
   // Intersection Observer for infinite scrolling
   useEffect(() => {

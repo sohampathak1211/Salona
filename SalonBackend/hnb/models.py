@@ -136,7 +136,7 @@ class Bill(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_applied = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     final_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    created_at = models.DateTimeField(auto_now_add=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def calculate_totals(self):
         """

@@ -10,6 +10,7 @@ import { FaChevronDown } from 'react-icons/fa'
 import useAssets from '../../components/categories'
 import { toast } from 'react-toastify'
 import useBill from '../../services/useBill'
+import { useNavigate } from 'react-router-dom'
 
 const CreateBill = () => {
   const { getSalonProducts } = useProduct()
@@ -28,6 +29,7 @@ const CreateBill = () => {
   const [items, setItems] = useState([{ type: '', item: null, quantity: 1, price: 0, total: 0 }])
   const [query, setQuery] = useState('')
   console.log(selectedCoupon, 'selecsf')
+  const navigate = useNavigate()
   useEffect(() => {
     const getProducts = async () => {
       const proData = await getSalonProducts()
@@ -172,6 +174,7 @@ const CreateBill = () => {
       const response = await createBill(billData)
       toast.success('Bill created successfully!')
       console.log('Payload Data:', response)
+      navigate('/auth/bill')
     } catch (error) {
       toast.error('Failed to create bill. Please try again.')
       console.error('Error creating bill:', error)

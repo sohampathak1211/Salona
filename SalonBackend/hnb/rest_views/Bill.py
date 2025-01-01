@@ -18,19 +18,20 @@ from hnb.models import (
 from hnb.serializer import (BillDetailSerializer)
 from hnb.wrappers.Pagination import CustomPageNumberPagination
 class BillREST(APIView):
-    pagination_class = CustomPageNumberPagination 
+    pagination_class = CustomPageNumberPagination
+    
     def get(self, request, *args, **kwargs):
         try:
             branch_id = request.branch_id
             phone = request.query_params.get('phone')
+
             # Fetch bills based on user's role and branch_id
             paginator = CustomPageNumberPagination()
             if phone:
-            # Fetch bills for the customer with the provided phone number
+                # Fetch bills for the customer with the provided phone number
                 customer = Customer.objects.filter(phone=phone).first()
-                print("CUstomer",customer)
                 if not customer:
-                    return paginator.get_paginated_response([])
+                    return paginator.get_paginated_response([])  # No bills found for this phone
                 # Retrieve bills for the found customer
                 bills = Bill.objects.filter(customer=customer)
             else:
@@ -46,11 +47,11 @@ class BillREST(APIView):
             # Serialize the paginated results
             serializer = BillDetailSerializer(paginated_bills, many=True)
 
-            # Return only the paginated results (without pagination metadata)
+            # Return only the paginated results (with metadata)
             return paginator.get_paginated_response(serializer.data)
 
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=400)
     
     def post(self, request):
         data = request.data

@@ -190,3 +190,9 @@ JWT_ALGORITHM = 'HS256'  # Algorithm for JWT
 kolkata_tz = pytz.timezone(TIME_ZONE)
 now_kolkata = datetime.now(kolkata_tz)
 JWT_EXPIRY = (now_kolkata + timedelta(days=TOKEN_EXPIRY_DAYS)).timestamp()
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # Use DRF's default paginator
+    'PAGE_SIZE': 20,  # Optional, but you can define the default page size here if needed
+}

@@ -17,7 +17,7 @@ const Customer = () => {
   const fetchUser = async () => {
     const data = await getSalonCustomer()
     console.log('Customer data', data)
-    setVendorDetails([])
+    setVendorDetails(data)
   }
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const Customer = () => {
             <h2 className="text-sm font-bold text-subheading">Customer</h2>
             <h2 className="text-3xl font-bold">Customers</h2>
           </div>
-          {isAdmin ? (
+          {/* {isAdmin ? (
             <button
               onClick={() => setCreate(true)}
               className="m-3 mr-10 bg-accent px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500 transition-colors"
@@ -57,7 +57,7 @@ const Customer = () => {
             </button>
           ) : (
             <Fragment></Fragment>
-          )}
+          )} */}
         </div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">
@@ -68,18 +68,18 @@ const Customer = () => {
                 <th scope="col" className="px-6 py-3">
                   Name
                 </th>
-                <th scope="col" className="px-6 py-3">
+                {/* <th scope="col" className="px-6 py-3">
                   Email
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Address
-                </th>
+                </th> */}
                 <th scope="col" className="px-6 py-3">
                   Phone
                 </th>
-                <th scope="col" className="px-6 py-3">
+                {/* <th scope="col" className="px-6 py-3">
                   Actions
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody>
@@ -88,16 +88,16 @@ const Customer = () => {
                   <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {item.name}
                   </th>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                  {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {item.email}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-normal max-w-xs break-words">
                     {item.address}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     {item.phone}
                   </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                  {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     <button
                       onClick={() => handleEditVendor(item)}
                       className="text-blue-500 hover:text-blue-700 mr-4"
@@ -110,7 +110,7 @@ const Customer = () => {
                     >
                       Delete
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

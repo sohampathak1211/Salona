@@ -127,7 +127,7 @@ const CreateCoupon = ({ setCreate }) => {
   }
 
   return (
-    <div className="p-4 md:p-5 space-y-4 min-h-[480px]">
+    <div className="p-4 md:p-5 bg-white space-y-4 min-h-[480px]">
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -201,6 +201,31 @@ const CreateCoupon = ({ setCreate }) => {
             />
           </div>
         </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-900">Branch</label>
+          <Listbox value={selectedBranch} onChange={setSelectedBranch}>
+            <div className="relative mt-1">
+              <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left border border-gray-300 rounded-md">
+                <span className="block truncate">
+                  {selectedBranch?.address || 'Select a Branch'}
+                </span>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                  <FaChevronUp className="h-5 w-5 text-gray-400" />
+                </span>
+              </Listbox.Button>
+              <Transition as={Fragment}>
+                <Listbox.Options className="absolute mt-1 z-50 max-h-40 w-full overflow-auto rounded-md bg-white py-1">
+                  {selectBranch.map((branch) => (
+                    <Listbox.Option key={branch.id} value={branch}>
+                      {branch.address}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          </Listbox>
+        </div>
+
         <div className="flex w-full">
           <label className=" text-md font-medium text-gray-900">
             Is it a minimum purchase coupon?{' '}
@@ -235,32 +260,7 @@ const CreateCoupon = ({ setCreate }) => {
           </Fragment>
         ) : (
           <Fragment>
-            <div>
-              <label className="block text-sm font-medium text-gray-900">Branch</label>
-              <Listbox value={selectedBranch} onChange={setSelectedBranch}>
-                <div className="relative mt-1">
-                  <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left border border-gray-300 rounded-md">
-                    <span className="block truncate">
-                      {selectedBranch?.address || 'Select a Branch'}
-                    </span>
-                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <FaChevronUp className="h-5 w-5 text-gray-400" />
-                    </span>
-                  </Listbox.Button>
-                  <Transition as={Fragment}>
-                    <Listbox.Options className="absolute mt-1 z-50 max-h-40 w-full overflow-auto rounded-md bg-white py-1">
-                      {selectBranch.map((branch) => (
-                        <Listbox.Option key={branch.id} value={branch}>
-                          {branch.address}
-                        </Listbox.Option>
-                      ))}
-                    </Listbox.Options>
-                  </Transition>
-                </div>
-              </Listbox>
-            </div>
-
-            <div className=''>
+            <div className="">
               <div className="flex gap-4 mt-2">
                 <div className="flex-1">
                   <h4 className="font-medium text-gray-700 mb-2">Available Services</h4>
@@ -334,7 +334,7 @@ const CreateCoupon = ({ setCreate }) => {
           </Fragment>
         )}
 
-        <div className={`flex justify-end space-x-4 ${is_minimum_purchase ? 'pt-[300px]' : ''}`}>
+        <div className={`flex justify-end space-x-4 ${is_minimum_purchase ? 'pt-[220px]' : ''}`}>
           <button
             type="button"
             onClick={handleClose}

@@ -32,13 +32,13 @@ const Coupons = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [couponToEdit, setCouponToEdit] = useState(null)
-  const [searchQuery, setSearchQuery] = useState("") // New state for search query
-  
+  const [searchQuery, setSearchQuery] = useState('') // New state for search query
+
   console.log('branch ', branches)
   console.log('services ', services)
   console.log('combos ', combos)
   console.log('coupons ', coupons)
-  
+
   const getBranches = async () => {
     dispatch(branchRequest())
     const data = await getSalonBranches({}, {})
@@ -121,11 +121,11 @@ const Coupons = () => {
   const filteredCoupons = coupons.filter(
     (coupon) =>
       coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) || // Search by coupon code
-      coupon.valid_services.some(service =>
-        service.name.toLowerCase().includes(searchQuery.toLowerCase()) // Search by service name
+      coupon.valid_services.some(
+        (service) => service.name.toLowerCase().includes(searchQuery.toLowerCase()) // Search by service name
       ) ||
-      coupon.valid_combos.some(combo =>
-        combo.name.toLowerCase().includes(searchQuery.toLowerCase()) // Search by combo name
+      coupon.valid_combos.some(
+        (combo) => combo.name.toLowerCase().includes(searchQuery.toLowerCase()) // Search by combo name
       )
   )
 
@@ -149,20 +149,17 @@ const Coupons = () => {
           )}
         </div>
 
-        <div className='w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3'>
+        <div className="w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3">
+          <IoSearchSharp size={22} className="ml-4" />
 
-<IoSearchSharp size={22} className='ml-4' />
-
-<input
-   type="text"
-   value={searchQuery}
-   onChange={(e) => setSearchQuery(e.target.value)}
- className='w-full px-2 py-2 text-black mr-1 border:none outline-none' 
-
- placeholder='Search Product'
-  />
-
-</div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-2 py-2 text-black mr-1 border:none outline-none"
+            placeholder="Search Product"
+          />
+        </div>
 
         <div className="relative rounded-2xl overflow-x-auto mt-5">
           <h2 className="w-full bg-white p-5 text-xl font-bold">Coupon Details</h2>
@@ -276,7 +273,7 @@ const Coupons = () => {
       </div>
 
       <Transition appear show={create} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => setCreate(false)}>
+        <Dialog as="div" className="relative z-50" onClose={() => setCreate(false)}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"

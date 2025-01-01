@@ -126,7 +126,7 @@ class ComboNameIdSerializer(serializers.ModelSerializer):
         model = Combo
         fields = ['id','name','price']
 
-class CouponSerializer(serializers.ModelSerializer):
+class CouponAllSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = '__all__'

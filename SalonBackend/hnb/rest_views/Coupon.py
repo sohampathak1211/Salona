@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from hnb.models import Coupon
-from hnb.serializer import CouponSerializer,CouponComboServiceSerializer
+from hnb.serializer import CouponSerializer,CouponComboServiceSerializer,CouponAllSerializer
 
 class CouponREST(APIView):
     def get(self, request, *args, **kwargs):
@@ -21,14 +21,15 @@ class CouponREST(APIView):
 
     def post(self, request, *args, **kwargs):
         is_owner = request.is_owner
-        branch_id = request.branch_id
+        branch_id = request.data.get("branch")
+        if not is_owner:
+            return Response({"error": "You are not authorized to create a coupon"}, status=status.HTTP_400_BAD_REQUEST)
         if request.data.get('code'):
-            if is_owner:
-                data = Coupon.objects.filter(code=request.data.get('code'),branch_id__in=branch_id)
-                if data:
-                    return Response({"error": "Coupon with this code already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            data = Coupon.objects.filter(code=request.data.get('code'),branch=branch_id).first()
+            if data:
+                return Response({"error": "Coupon with this code already exists"}, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer = CouponSerializer(data=request.data)
+        serializer = CouponAllSerializer(data=request.data)
         if serializer.is_valid():
             coup = serializer.save()
             seri = CouponComboServiceSerializer(coup, many=False)
@@ -39,7 +40,7 @@ class CouponREST(APIView):
         try:
             coupon_id = request.data.get('coupon_id')
             coupon = Coupon.objects.get(id=coupon_id)
-            serializer = CouponSerializer(coupon, data=request.data, partial=True)
+            serializer = CouponAllSerializer(coupon, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)

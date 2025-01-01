@@ -48,7 +48,7 @@ const Sidebar = ({ sidebar, setSidebar }) => {
             <img src={Logo} />
           </div>
           <div
-            className={`transition-all duration-300 absolute h-8 w-8 -right-[20px] rounded-full z-50 top-[80px] bg-yellow-300 flex justify-center items-center ${
+            className={`transition-all duration-300 absolute h-8 w-8 -right-[20px] rounded-full z-30 top-[80px] bg-yellow-300 flex justify-center items-center ${
               sidebar ? '-rotate-45' : 'rotate-45'
             }`}
             onClick={() => setSidebar((prev) => !prev)}

@@ -189,6 +189,9 @@ const ViewBill = ({ company, view, setView }) => {
                 </tbody>
               </table>
             </div>
+            <div>
+              
+            </div>
             <div className="flex justify-between border-t border-gray-300 pt-4">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">

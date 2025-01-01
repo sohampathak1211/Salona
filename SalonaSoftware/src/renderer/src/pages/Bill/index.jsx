@@ -60,7 +60,7 @@ const Bill = () => {
     if (billData.length === 0) {
       toast.info('No bills found for this phone number!')
     }
-    setBillDetails(billData) // Set the fetched data
+    setBillDetails(billData.results) // Set the fetched data
     setIsLoading(false)
   }
 

@@ -49,7 +49,7 @@ export default function SignIn() {
         const res = await salonSignIn({ email, password, action: 'signin' })
         console.log('data from the backend for user', res)
         if (res.error) {
-          toast.info(res)
+          toast.info(res.error.error)
           return
         }
         toast.success(res.message)
@@ -65,7 +65,7 @@ export default function SignIn() {
         const res = await maintainerSignIn({ email, password, action: 'signin' })
         console.log('Responsese sefefdf', res.error)
         if (res.error) {
-          toast.info(res.error)
+          toast.info(res.error.error)
           return
         }
         toast.success(res.message)

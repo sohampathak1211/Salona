@@ -17,10 +17,11 @@ const Bill = () => {
   const [view, setView] = useState(false) // Toggle for detailed view
   const [viewBill, setBill] = useState(null) // Selected bill details
   const navigate = useNavigate() // For routing
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const sentinelRef = useRef(null) // Ref for the "Load More" sentinel
   const [isLoading, setIsLoading] = useState(false) // To prevent multiple triggers
   const [search, setSearch] = useState('')
+  const [hasNext, setNext] = useState(true)
   const { isAdmin } = useAssets()
   const { getSalon } = useSalon()
   const dispatch = useDispatch()
@@ -29,7 +30,10 @@ const Bill = () => {
   const getProducts = async () => {
     const billData = await getBill({ page: page })
     console.log('Bill Data', billData)
-    setBillDetails((prev) => [...prev, ...billData]) // Append new data to existing list
+    setBillDetails((prev) => billData.results) // Append new data to existing list
+    if (billData.next == null) {
+      setNext(false)
+    }
     setIsLoading(false)
   }
 
@@ -49,13 +53,14 @@ const Bill = () => {
       toast.info('Phone number should be exactly 10 digits!')
       return
     }
+    setPage(1)
 
     const billData = await getBill({ page: 1, phone: search })
     console.log('Bill Data', billData)
-    if (billData.length == 0) {
+    if (billData.length === 0) {
       toast.info('No bills found for this phone number!')
     }
-    setBillDetails(billData) // Set the fetched data
+    setBillDetails(billData.results) // Set the fetched data
     setIsLoading(false)
   }
 
@@ -70,31 +75,33 @@ const Bill = () => {
     dispatch(salonSuccess(data))
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchSalon()
-  },[])
+  }, [])
 
   // Intersection Observer for infinite scrolling
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries
-        if (entry.isIntersecting && !isLoading) {
-          setIsLoading(true)
-          setPage((prev) => prev + 1)
-        }
-      },
-      { threshold: 1.0 }
-    )
+    if (hasNext) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const [entry] = entries
+          if (entry.isIntersecting && !isLoading) {
+            setIsLoading(true)
+            setPage((prev) => prev + 1)
+          }
+        },
+        { threshold: 1.0 }
+      )
 
-    const currentSentinel = sentinelRef.current
-    if (currentSentinel) {
-      observer.observe(currentSentinel)
-    }
-
-    return () => {
+      const currentSentinel = sentinelRef.current
       if (currentSentinel) {
-        observer.unobserve(currentSentinel)
+        observer.observe(currentSentinel)
+      }
+
+      return () => {
+        if (currentSentinel) {
+          observer.unobserve(currentSentinel)
+        }
       }
     }
   }, [isLoading])
@@ -187,7 +194,7 @@ const Bill = () => {
       </div>
 
       {/* Add View Bill Component */}
-      {viewBill && <ViewBill company={company} view={viewBill} setView={setBill} />}
+      {viewBill && <ViewBill company={company} view={viewBill} setView={setBill}/>}
     </div>
   )
 }

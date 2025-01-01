@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas'
 import EXLogo from '../../../assets/logo.png?react'
 import { selectSalon } from '../../../slices/salonSlice'
 import { useSelector } from 'react-redux'
+import { RiLoader2Line } from 'react-icons/ri'
 
 const ViewBill = ({ company, view, setView }) => {
   const [loader, setLoader] = useState(false)
@@ -48,30 +49,35 @@ const ViewBill = ({ company, view, setView }) => {
 
   const handlePDFDownload = async () => {
     const input = printRef.current
-    setLoader(true)
+    setLoader(true) // Show loader
 
-    const canvas = await html2canvas(input, { scale: 2 })
-    const imgData = canvas.toDataURL('image/png')
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    const imgWidth = 210 // A4 width in mm
-    const pageHeight = 297 // A4 height in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width
-    let heightLeft = imgHeight
+    try {
+      const canvas = await html2canvas(input, { scale: 2 })
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const imgWidth = 210 // A4 width in mm
+      const pageHeight = 297 // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      let heightLeft = imgHeight
 
-    let position = 0
+      let position = 0
 
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-    heightLeft -= pageHeight
-
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight
-      pdf.addPage()
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
       heightLeft -= pageHeight
-    }
 
-    pdf.save(`Invoice-${view.id}.pdf`)
-    setLoader(false)
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+      }
+
+      pdf.save(`Invoice-${view.id}.pdf`)
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+    } finally {
+      setLoader(false) // Hide loader
+    }
   }
 
   return (
@@ -102,7 +108,18 @@ const ViewBill = ({ company, view, setView }) => {
             Print
           </button>
         </div>
-        {loader && <div className="bg-gray-200 absolute top-0 right-0 w-full h-full">Loading</div>}
+        {loader && (
+          <div className="bg-gray-200/50 absolute flex justify-center items-center top-0 right-0 w-full h-full">
+            <div className="w-40 h-32 bg-white flex flex-col justify-center items-center rounded-lg">
+              <div className="animate-spin mx-2">
+                <RiLoader2Line size={60} color="black" />
+              </div>
+              <div className="pt-2">
+                <h2 className="text-lg">Generating the PDF</h2>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div ref={printRef} className="w-full overflow-y-scroll border mt-5 h-[600px] p-3">
           <div className="max-w-[1000px] mx-auto">
@@ -189,9 +206,7 @@ const ViewBill = ({ company, view, setView }) => {
                 </tbody>
               </table>
             </div>
-            <div>
-              
-            </div>
+            <div></div>
             <div className="flex justify-between border-t border-gray-300 pt-4">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold">

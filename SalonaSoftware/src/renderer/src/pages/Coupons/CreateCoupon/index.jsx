@@ -32,6 +32,8 @@ const CreateCoupon = ({ setCreate }) => {
   const [enabled, setEnabled] = useState(true)
   const [is_minimum_purchase, setIsMinimumPurchase] = useState(true)
 
+  const [couponType, setType] = useState('services')
+
   console.log('dsa', selectedCombos)
   const { createCoupon } = useCoupon()
   const dispatch = useDispatch()
@@ -39,14 +41,13 @@ const CreateCoupon = ({ setCreate }) => {
   useEffect(() => {
     setCoupon((prev) => ({
       ...prev,
-      code: '',
       valid_services: [],
       valid_combos: [],
       minimum_amount: 0
     }))
     setSelectedServices([])
     setSelectedCombos([])
-  }, [is_minimum_purchase])
+  }, [couponType])
 
   useEffect(() => {
     const filteredServices = selectServices.filter(
@@ -126,13 +127,13 @@ const CreateCoupon = ({ setCreate }) => {
     )
   }
 
-  const [selected, setSelected] = useState('%'); // Default selected button
-  const [placeholder, setPlaceholder] = useState('Enter the percentage');
+  const [selected, setSelected] = useState('%') // Default selected button
+  const [placeholder, setPlaceholder] = useState('Enter the percentage')
 
   const handleButtonClick = (type) => {
-    setSelected(type);
-    setPlaceholder(type === '%' ? 'Enter the percentage' : 'Enter the amount');
-  };
+    setSelected(type)
+    setPlaceholder(type === '%' ? 'Enter the percentage' : 'Enter the amount')
+  }
 
   return (
     <div className="p-4 md:p-5 bg-white space-y-4 min-h-[480px]">
@@ -234,73 +235,94 @@ const CreateCoupon = ({ setCreate }) => {
           </Listbox>
         </div> */}
 
-<div className="flex flex-col w-full gap-4">
-  {/* Heading for Buttons and Input Field */}
-  <div className="w-full">
-    <label className="block text-sm font-medium text-gray-900 mb-1">Select One</label>
-    <div className="flex items-center gap-4">
-      {/* Buttons and Input Field */}
-      <div className="flex items-center flex-1">
-        <div className="bg-gray-200 flex rounded-md z-50 p-1 mr-3">
-          <h2
-            onClick={() => handleButtonClick('%')}
-            className={`px-4 py-2 ${
-              selected === '%'
-                ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default'
-                : 'cursor-pointer'
-            }`}
-          >
-            %
-          </h2>
-          <h2
-            onClick={() => handleButtonClick('₹')}
-            className={`px-4 py-2 ${
-              selected === '₹'
-                ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default'
-                : 'cursor-pointer'
-            }`}
-          >
-            ₹
-          </h2>
-        </div>
-        <div className="flex-grow">
-          <input
-            type="text"
-            placeholder={placeholder}
-            className="w-full h-[40px] border border-gray-400 rounded-md px-2 outline-none"
-          />
-        </div>
-      </div>
+        <div className="flex flex-col w-full gap-4">
+          {/* Heading for Buttons and Input Field */}
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray-900 mb-1">Select One</label>
+            <div className="flex items-center gap-4">
+              {/* Buttons and Input Field */}
+              <div className="flex items-center flex-1">
+                <div className="bg-gray-200 flex rounded-md z-50 p-1 mr-3">
+                  <h2
+                    onClick={() => handleButtonClick('%')}
+                    className={`px-4 py-2 ${
+                      selected === '%'
+                        ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default'
+                        : 'cursor-pointer'
+                    }`}
+                  >
+                    %
+                  </h2>
+                  <h2
+                    onClick={() => handleButtonClick('₹')}
+                    className={`px-4 py-2 ${
+                      selected === '₹'
+                        ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default'
+                        : 'cursor-pointer'
+                    }`}
+                  >
+                    ₹
+                  </h2>
+                </div>
+                <div className="flex-grow">
+                  <input
+                    type="text"
+                    placeholder={placeholder}
+                    className="w-full h-[40px] border border-gray-400 rounded-md px-2 outline-none"
+                  />
+                </div>
+              </div>
 
-      {/* Branch Selector */}
-      <div className="flex-1">
-        <label className="block text-sm font-medium text-gray-900 mb-1">Branch</label>
-        <Listbox value={selectedBranch} onChange={setSelectedBranch}>
-          <div className="relative mt-1">
-            <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left border border-gray-300 rounded-md">
-              <span className="block truncate">
-                {selectedBranch?.address || 'Select a Branch'}
-              </span>
-              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <FaChevronUp className="h-5 w-5 text-gray-400" />
-              </span>
-            </Listbox.Button>
-            <Transition as={Fragment}>
-              <Listbox.Options className="absolute mt-1 z-50 max-h-40 w-full overflow-auto rounded-md bg-white py-1">
-                {selectBranch.map((branch) => (
-                  <Listbox.Option key={branch.id} value={branch}>
-                    {branch.address}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Transition>
+              {/* Branch Selector */}
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">Branch</label>
+                <Listbox value={selectedBranch} onChange={setSelectedBranch}>
+                  <div className="relative mt-1">
+                    <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left border border-gray-300 rounded-md">
+                      <span className="block truncate">
+                        {selectedBranch?.address || 'Select a Branch'}
+                      </span>
+                      <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                        <FaChevronUp className="h-5 w-5 text-gray-400" />
+                      </span>
+                    </Listbox.Button>
+                    <Transition as={Fragment}>
+                      <Listbox.Options className="absolute mt-1 z-50 max-h-40 w-full overflow-auto rounded-md bg-white py-1">
+                        {selectBranch.map((branch) => (
+                          <Listbox.Option key={branch.id} value={branch}>
+                            {branch.address}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </Transition>
+                  </div>
+                </Listbox>
+              </div>
+            </div>
           </div>
-        </Listbox>
-      </div>
-    </div>
-  </div>
-</div>
-
+        </div>
+        <div className="relative w-full flex justify-between">
+          <div className="bg-gray-200 flex absolute rounded-md z-50 p-1 top-3 right-3">
+            <h2
+              onClick={() => setType('services')}
+              className={`px-2 py-1 ${couponType === 'services' ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default' : 'cursor-pointer'}`}
+            >
+              Services
+            </h2>
+            <h2
+              onClick={() => setType('combos')}
+              className={`px-2 py-1 ${couponType === 'combos' ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default' : 'cursor-pointer'}`}
+            >
+              Combos
+            </h2>
+            <h2
+              onClick={() => setType('minimumPurchase')}
+              className={`px-2 py-1 ${couponType === 'minimumPurchase' ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default' : 'cursor-pointer'}`}
+            >
+              Minimum Purchase
+            </h2>
+          </div>
+        </div>
 
         <div className="flex w-full">
           <label className=" text-md font-medium text-gray-900">
@@ -318,7 +340,7 @@ const CreateCoupon = ({ setCreate }) => {
             />
           </Switch>
         </div>
-        {is_minimum_purchase ? (
+        {couponType == 'minimumPurchase' ? (
           <Fragment>
             <div>
               <label className="block text-sm font-medium text-gray-900">
@@ -336,81 +358,85 @@ const CreateCoupon = ({ setCreate }) => {
           </Fragment>
         ) : (
           <Fragment>
-            <div className="">
-              <div className="flex gap-4 mt-2">
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-700 mb-2">Available Services</h4>
-                  <div className="flex h-[100px] overflow-y-scroll flex-wrap gap-2">
-                    {availableServices
-                      .filter((service) => !selectedServices.includes(service))
-                      .map((service) => (
+            {couponType == 'services' ? (
+              <div className="">
+                <div className="flex gap-4 mt-2">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-700 mb-2">Available Services</h4>
+                    <div className="flex h-[100px] overflow-y-scroll flex-wrap gap-2">
+                      {availableServices
+                        .filter((service) => !selectedServices.includes(service))
+                        .map((service) => (
+                          <div
+                            key={service.id}
+                            className="h-8 p-2 border rounded-2xl text-center text-xs font-semibold cursor-pointer bg-gray-200 hover:bg-gray-300 transition-all"
+                            onClick={() => handleServiceToggle(service)}
+                          >
+                            {service.name}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  <div className="flex-1  ">
+                    <h4 className="font-medium text-gray-700 mb-2">Selected Services</h4>
+                    <div className="flex h-[100px] overflow-y-scroll flex-wrap gap-2">
+                      {selectedServices.map((service) => (
                         <div
                           key={service.id}
-                          className="h-8 p-2 border rounded-2xl text-center text-xs font-semibold cursor-pointer bg-gray-200 hover:bg-gray-300 transition-all"
+                          className="p-2 h-8 border rounded-2xl text-center text-xs font-semibold cursor-pointer bg-gold text-black hover:bg-gold/90 transition-all flex items-center gap-1"
                           onClick={() => handleServiceToggle(service)}
                         >
-                          {service.name}
+                          <ImCheckmark className="text-green-600" /> {service.name}
                         </div>
                       ))}
-                  </div>
-                </div>
-
-                <div className="flex-1  ">
-                  <h4 className="font-medium text-gray-700 mb-2">Selected Services</h4>
-                  <div className="flex h-[100px] overflow-y-scroll flex-wrap gap-2">
-                    {selectedServices.map((service) => (
-                      <div
-                        key={service.id}
-                        className="p-2 h-8 border rounded-2xl text-center text-xs font-semibold cursor-pointer bg-gold text-black hover:bg-gold/90 transition-all flex items-center gap-1"
-                        onClick={() => handleServiceToggle(service)}
-                      >
-                        <ImCheckmark className="text-green-600" /> {service.name}
-                      </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div>
+                <div className="flex gap-4 mt-2">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-700 mb-2">Available Combos</h4>
+                    <div className="flex h-[100px] overflow-y-scroll flex-wrap gap-2">
+                      {availableCombos
+                        .filter((service) => !selectedCombos.includes(service))
+                        .map((service) => (
+                          <div
+                            key={service.id}
+                            className="p-2 h-8 border rounded-2xl text-center text-xs font-semibold cursor-pointer bg-gray-200 hover:bg-gray-300 transition-all"
+                            onClick={() => handleComboToggle(service)}
+                          >
+                            {service.name}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
 
-            <div>
-              <div className="flex gap-4 mt-2">
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-700 mb-2">Available Combos</h4>
-                  <div className="flex h-[100px] overflow-y-scroll flex-wrap gap-2">
-                    {availableCombos
-                      .filter((service) => !selectedCombos.includes(service))
-                      .map((service) => (
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-700 mb-2">Selected Combos</h4>
+                    <div className="flex h-[100px] overflow-y-scroll flex-wrap gap-2">
+                      {selectedCombos.map((service) => (
                         <div
                           key={service.id}
-                          className="p-2 h-8 border rounded-2xl text-center text-xs font-semibold cursor-pointer bg-gray-200 hover:bg-gray-300 transition-all"
+                          className="p-2 h-8 border rounded-2xl text-center text-xs font-semibold cursor-pointer bg-gold text-black hover:bg-gold/90 transition-all flex items-center gap-1"
                           onClick={() => handleComboToggle(service)}
                         >
-                          {service.name}
+                          <ImCheckmark className="text-green-600" /> {service.name}
                         </div>
                       ))}
-                  </div>
-                </div>
-
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-700 mb-2">Selected Combos</h4>
-                  <div className="flex h-[100px] overflow-y-scroll flex-wrap gap-2">
-                    {selectedCombos.map((service) => (
-                      <div
-                        key={service.id}
-                        className="p-2 h-8 border rounded-2xl text-center text-xs font-semibold cursor-pointer bg-gold text-black hover:bg-gold/90 transition-all flex items-center gap-1"
-                        onClick={() => handleComboToggle(service)}
-                      >
-                        <ImCheckmark className="text-green-600" /> {service.name}
-                      </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </Fragment>
         )}
 
-        <div className={`flex justify-end space-x-4 ${is_minimum_purchase ? 'pt-[220px]' : ''}`}>
+        <div
+          className={`flex justify-end space-x-4 ${couponType == 'minimumPurchase' ? 'pt-[220px]' : ''}`}
+        >
           <button
             type="button"
             onClick={handleClose}

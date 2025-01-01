@@ -195,7 +195,15 @@ const CreateBill = () => {
 
         {/* Table Section */}
         <div className={`relative rounded-2xl overflow-x-auto mt-5 `}>
-          <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
+          <div className='w-full flex justify-between bg-white rounded-md'>
+            <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
+            <button
+              onClick={() => navigate('/auth/bill')}
+              className="m-3 mr-10 bg-yellow-400 px-5 py-2 rounded-xl text-black font-bold hover:bg-yellow-500 transition-colors duration-300"
+            >
+              Back
+            </button>
+          </div>
           <form onSubmit={handleSubmit} className="p-5 bg-white rounded-lg shadow-md space-y-6">
             {/* Branch Dropdown */}
             <div className="h-full">

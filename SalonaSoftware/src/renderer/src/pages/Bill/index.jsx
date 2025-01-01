@@ -194,7 +194,7 @@ const Bill = () => {
       </div>
 
       {/* Add View Bill Component */}
-      {viewBill && <ViewBill company={company} view={viewBill} />}
+      {viewBill && <ViewBill company={company} view={viewBill} setView={setBill}/>}
     </div>
   )
 }

@@ -184,7 +184,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
-        fields = ["id", "address"]
+        fields = '__all__'
 
 class BranchAllSerializer(serializers.ModelSerializer):
     class Meta:

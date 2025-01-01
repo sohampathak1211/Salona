@@ -62,7 +62,7 @@ class MaintainerRest(APIView):
         maintainer = SalonMaintainer.objects.filter(email=email)
         if maintainer.exists():
             return Response({"error": "Maintainer already exists"}, status=status.HTTP_400_BAD_REQUEST)
-        request.data['password'] = make_password(request.data.get('password'))
+        # request.data['password'] = make_password(request.data.get('password'))
         serializer = SalonMaintainerSerializer(data=request.data)
         
         if serializer.is_valid():

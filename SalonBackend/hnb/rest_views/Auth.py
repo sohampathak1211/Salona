@@ -124,7 +124,7 @@ def salon_maintainer_signin(request):
                 status=status.HTTP_404_NOT_FOUND,
             )
         if user:
-            if not check_password(password,serializer.data['password']):
+            if not password == serializer.data['password']:
                 return Response({"error": "Invalid Password"}, status=status.HTTP_404_NOT_FOUND)
             else:
                 payload = serializer.data

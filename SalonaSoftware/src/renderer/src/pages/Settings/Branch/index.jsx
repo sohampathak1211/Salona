@@ -87,9 +87,6 @@ const Branch = () => {
               <BranchCard
                 key={branch.id}
                 branch={branch}
-                onClick={() => {
-                  toast.info(`Navigating to details of the branch at ${branch.address}`)
-                }}
               />
             ))}
         </div>

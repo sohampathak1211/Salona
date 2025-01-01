@@ -64,8 +64,8 @@ class SalonRest(APIView):
 
     def patch(self, request, *args, **kwargs):
         try:
-            salon_id = request.data.get('salon_id')
-            salon = Salon.objects.get(salon_id=salon_id)
+            salon_id = request.salon_id
+            salon = Salon.objects.get(id=salon_id)
             serializer = SalonSerializer(salon, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()

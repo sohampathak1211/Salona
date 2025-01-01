@@ -1,15 +1,15 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { FaInstagram, FaFacebook, FaWhatsapp } from 'react-icons/fa';
+import { FaInstagram, FaFacebook, FaWhatsapp } from 'react-icons/fa'
 
-const EditSalonModal = ({ isOpen, setIsOpen, salon, updateSalon }) => {
+const EditSalonModal = ({ isOpen, setIsOpen, salon, updateSalon, fetchSalon }) => {
   const [formData, setFormData] = useState({})
 
   useEffect(() => {
     if (salon) {
-      const { created_at, ...editableData } = salon;
-      setFormData({ ...editableData });
+      const { created_at, ...editableData } = salon
+      setFormData({ ...editableData })
     }
   }, [salon])
 
@@ -21,6 +21,7 @@ const EditSalonModal = ({ isOpen, setIsOpen, salon, updateSalon }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const response = await updateSalon(formData)
+    fetchSalon()
     if (response.error) {
       toast.error('Failed to update salon details')
     } else {

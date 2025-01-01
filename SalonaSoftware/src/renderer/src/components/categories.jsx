@@ -22,7 +22,7 @@ const useAssets = () => {
       id: 0,
       name: 'Dashboard',
       icon: <MdAutoGraph className="transition-all duration-500" size={25} />,
-      link: '/'
+      link: '/dashboard'
     },
     {
       id: 1,
@@ -92,9 +92,15 @@ const useAssets = () => {
   useEffect(() => {
     checkAdmin()
   }, [])
-  
+
+  const handleSidebar = async () => {
+    const data = await getData('cUser')
+    if (data.role == 'SO') return
+    setCategories((prev) => prev.filter((cat) => cat.name != 'Dashboard'))
+    setCategories((prev) => prev.filter((cat) => cat.name != 'Customers'))
+  }
   useEffect(() => {
-    setCategories((prev) => prev.filter((cat) => cat.name != 'Dashboard' || cat.name != 'Customer'))
+    handleSidebar()
   }, [isAdmin])
 
   const options = [

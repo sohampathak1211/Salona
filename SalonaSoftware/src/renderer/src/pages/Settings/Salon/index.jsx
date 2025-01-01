@@ -120,6 +120,7 @@ const Salon = () => {
         setIsOpen={setIsModalOpen}
         salon={salon}
         updateSalon={updateSalon}
+        fetchSalon={fetchSalon}
       />
     </div>
   )

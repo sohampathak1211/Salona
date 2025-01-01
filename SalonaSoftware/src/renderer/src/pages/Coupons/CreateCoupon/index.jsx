@@ -126,6 +126,14 @@ const CreateCoupon = ({ setCreate }) => {
     )
   }
 
+  const [selected, setSelected] = useState('%'); // Default selected button
+  const [placeholder, setPlaceholder] = useState('Enter the percentage');
+
+  const handleButtonClick = (type) => {
+    setSelected(type);
+    setPlaceholder(type === '%' ? 'Enter the percentage' : 'Enter the amount');
+  };
+
   return (
     <div className="p-4 md:p-5 bg-white space-y-4 min-h-[480px]">
       <div className="space-y-4">
@@ -154,7 +162,7 @@ const CreateCoupon = ({ setCreate }) => {
           </div>
         </div>
 
-        <div className="flex w-full h-full">
+        {/* <div className="flex w-full h-full">
           <div className="w-full">
             <label className="block text-sm font-medium text-gray-900">
               Discount By Percentage ( % )
@@ -224,7 +232,75 @@ const CreateCoupon = ({ setCreate }) => {
               </Transition>
             </div>
           </Listbox>
+        </div> */}
+
+<div className="flex flex-col w-full gap-4">
+  {/* Heading for Buttons and Input Field */}
+  <div className="w-full">
+    <label className="block text-sm font-medium text-gray-900 mb-1">Select One</label>
+    <div className="flex items-center gap-4">
+      {/* Buttons and Input Field */}
+      <div className="flex items-center flex-1">
+        <div className="bg-gray-200 flex rounded-md z-50 p-1 mr-3">
+          <h2
+            onClick={() => handleButtonClick('%')}
+            className={`px-4 py-2 ${
+              selected === '%'
+                ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default'
+                : 'cursor-pointer'
+            }`}
+          >
+            %
+          </h2>
+          <h2
+            onClick={() => handleButtonClick('₹')}
+            className={`px-4 py-2 ${
+              selected === '₹'
+                ? 'shadow-md bg-white text-gray-600 rounded-md cursor-default'
+                : 'cursor-pointer'
+            }`}
+          >
+            ₹
+          </h2>
         </div>
+        <div className="flex-grow">
+          <input
+            type="text"
+            placeholder={placeholder}
+            className="w-full h-[40px] border border-gray-400 rounded-md px-2 outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Branch Selector */}
+      <div className="flex-1">
+        <label className="block text-sm font-medium text-gray-900 mb-1">Branch</label>
+        <Listbox value={selectedBranch} onChange={setSelectedBranch}>
+          <div className="relative mt-1">
+            <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left border border-gray-300 rounded-md">
+              <span className="block truncate">
+                {selectedBranch?.address || 'Select a Branch'}
+              </span>
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <FaChevronUp className="h-5 w-5 text-gray-400" />
+              </span>
+            </Listbox.Button>
+            <Transition as={Fragment}>
+              <Listbox.Options className="absolute mt-1 z-50 max-h-40 w-full overflow-auto rounded-md bg-white py-1">
+                {selectBranch.map((branch) => (
+                  <Listbox.Option key={branch.id} value={branch}>
+                    {branch.address}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Transition>
+          </div>
+        </Listbox>
+      </div>
+    </div>
+  </div>
+</div>
+
 
         <div className="flex w-full">
           <label className=" text-md font-medium text-gray-900">

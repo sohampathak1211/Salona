@@ -19,7 +19,18 @@ const CreateBill = () => {
   const branches = useSelector(selectBranch)
   const services = useSelector(selectService)
   const combos = useSelector(selectCombo)
-  const coupons = useSelector(selectCoupon)
+  const stateCoupons = useSelector(selectCoupon)
+
+  const [coupons, setCoupons] = useState([])
+
+  useEffect(() => {
+    const validCoupons = stateCoupons.filter((coupon) => {
+      const currentDate = new Date()
+      // Check if the coupon is still valid based on the date
+      return new Date(coupon.valid_till) >= currentDate
+    })
+    setCoupons(validCoupons) // Update state with filtered coupons
+  }, [stateCoupons])
 
   const [products, setProducts] = useState([])
   const [selectedBranch, setSelectedBranch] = useState(null)
@@ -195,7 +206,7 @@ const CreateBill = () => {
 
         {/* Table Section */}
         <div className={`relative rounded-2xl overflow-x-auto mt-5 `}>
-          <div className='w-full flex justify-between bg-white rounded-md'>
+          <div className="w-full flex justify-between bg-white rounded-md">
             <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
             <button
               onClick={() => navigate('/auth/bill')}
@@ -206,45 +217,47 @@ const CreateBill = () => {
           </div>
           <form onSubmit={handleSubmit} className="p-5 bg-white rounded-lg shadow-md space-y-6">
             {/* Branch Dropdown */}
-            <div className="h-full">
-              <label className="block text-sm font-medium text-gray-900">Branch</label>
-              <Listbox value={selectedBranch} onChange={setSelectedBranch}>
-                <div className="relative mt-1">
-                  <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-                    <span className="block truncate">
-                      {selectedBranch ? selectedBranch.address : 'Select Branch'}
-                    </span>
-                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                    </span>
-                  </Listbox.Button>
-                  <Transition
-                    as={Fragment}
-                    leave="transition ease-in duration-100"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                  >
-                    <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                      {branches.map((branch) => (
-                        <Listbox.Option
-                          key={branch.id}
-                          className={({ active }) =>
-                            `relative cursor-default select-none p-2 ${
-                              active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
-                            }`
-                          }
-                          value={branch}
-                        >
-                          <span className={`block text-sm truncate font-normal`}>
-                            {branch.address}
-                          </span>
-                        </Listbox.Option>
-                      ))}
-                    </Listbox.Options>
-                  </Transition>
-                </div>
-              </Listbox>
-            </div>
+            {isAdmin && (
+              <div className="h-full">
+                <label className="block text-sm font-medium text-gray-900">Branch</label>
+                <Listbox value={selectedBranch} onChange={setSelectedBranch}>
+                  <div className="relative mt-1">
+                    <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                      <span className="block truncate">
+                        {selectedBranch ? selectedBranch.address : 'Select Branch'}
+                      </span>
+                      <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                        <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                      </span>
+                    </Listbox.Button>
+                    <Transition
+                      as={Fragment}
+                      leave="transition ease-in duration-100"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                        {branches.map((branch) => (
+                          <Listbox.Option
+                            key={branch.id}
+                            className={({ active }) =>
+                              `relative cursor-default select-none p-2 ${
+                                active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                              }`
+                            }
+                            value={branch}
+                          >
+                            <span className={`block text-sm truncate font-normal`}>
+                              {branch.address}
+                            </span>
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </Transition>
+                  </div>
+                </Listbox>
+              </div>
+            )}
 
             {/* Customer Details */}
             <div>
@@ -422,26 +435,27 @@ const CreateBill = () => {
                         leaveTo="opacity-0"
                       >
                         <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                          {coupons.map((coupon) => (
-                            <Listbox.Option
-                              key={coupon.id}
-                              className={({ active }) =>
-                                `relative cursor-default select-none p-2 ${
-                                  active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
-                                }`
-                              }
-                              value={coupon}
-                            >
-                              <span className={`block text-sm truncate font-normal`}>
-                                {coupon.code}{' '}
-                                <span className="text-gray-400">
-                                  {coupon.is_minimum_purchase
-                                    ? `Min Purchase of ${coupon.minimum_amount}`
-                                    : `${coupon.by_percent ? coupon.discount_percentage : coupon.discount_amount} ${coupon.by_percent ? '%' : 'Rs.'} off on ${coupon.valid_services.map((service) => service.name).join(',')} & ${coupon.valid_combos.map((combo) => combo.name).join(',')}`}
+                          {coupons.length > 0 &&
+                            coupons.map((coupon) => (
+                              <Listbox.Option
+                                key={coupon.id}
+                                className={({ active }) =>
+                                  `relative cursor-default select-none p-2 ${
+                                    active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                                  }`
+                                }
+                                value={coupon}
+                              >
+                                <span className={`block text-sm truncate font-normal`}>
+                                  {coupon.code}{' '}
+                                  <span className="text-gray-400">
+                                    {coupon.is_minimum_purchase
+                                      ? `Min Purchase of ${coupon.minimum_amount}`
+                                      : `${coupon.by_percent ? coupon.discount_percentage : coupon.discount_amount} ${coupon.by_percent ? '%' : 'Rs.'} off on ${coupon.valid_services.map((service) => service.name).join(',')} & ${coupon.valid_combos.map((combo) => combo.name).join(',')}`}
+                                  </span>
                                 </span>
-                              </span>
-                            </Listbox.Option>
-                          ))}
+                              </Listbox.Option>
+                            ))}
                         </Listbox.Options>
                       </Transition>
                     </div>

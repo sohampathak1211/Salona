@@ -9,22 +9,46 @@ import { FaCartPlus } from 'react-icons/fa'
 import useProduct from '../../services/useProduct'
 import useAssets from '../../components/categories'
 import { IoSearchSharp } from 'react-icons/io5'
+import { branchFailed, branchRequest, branchSuccess, selectBranch } from '../../slices/branchSlice'
+import { toast } from 'react-toastify'
+import { useDispatch, useSelector } from 'react-redux'
+import useBranch from '../../services/useBranch'
 
 const Product = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
+  const { getSalonBranches } = useBranch()
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([]) // Filtered product list
   const [query, setQuery] = useState('') // Search query
+  const branches = useSelector(selectBranch)
 
   const { getSalonProducts } = useProduct()
   const { isAdmin } = useAssets()
+  const dispatch = useDispatch()
 
   const getProducts = async () => {
     const proData = await getSalonProducts()
     setProducts(proData)
     setFilteredProducts(proData)
   }
+
+  const getBranches = async () => {
+    dispatch(branchRequest())
+    const data = await getSalonBranches({}, {})
+    if (data.error) {
+      dispatch(branchFailed(data.error))
+      toast.info("You don't have branches. Open the settings page and add a branch to continue")
+      return
+    }
+    dispatch(branchSuccess(data))
+  }
+
+  useEffect(() => {
+    if (branches.length <= 0) {
+      getBranches()
+    }
+  }, [])
 
   useEffect(() => {
     getProducts()
@@ -197,7 +221,7 @@ const Product = () => {
                     <AiFillShop size={25} color="gray" className="mr-2" />
                     New Product
                   </Dialog.Title>
-                  <CreateProduct productRefetch={getProducts} />
+                  <CreateProduct productRefetch={getProducts} setCreate={setCreate} />
                 </Dialog.Panel>
               </Transition.Child>
             </div>

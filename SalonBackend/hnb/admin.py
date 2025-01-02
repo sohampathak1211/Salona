@@ -8,6 +8,7 @@ from .models import (
 
 from django.contrib import admin
 from .models import SalonOwner, Salon
+from django.contrib.auth.hashers import make_password
 
 # SalonOwner Admin
 @admin.register(SalonOwner)
@@ -17,7 +18,6 @@ class SalonOwnerAdmin(admin.ModelAdmin):
     search_fields = ('name', 'email', 'phone')  # Search functionality for the specified fields
     ordering = ('name',)  # Default ordering by name
 
-    # Optional: If you want to toggle 'is_enabled' from the admin panel
     actions = ['enable_selected', 'disable_selected']
 
     def enable_selected(self, request, queryset):
@@ -30,6 +30,11 @@ class SalonOwnerAdmin(admin.ModelAdmin):
         self.message_user(request, "Selected owners have been disabled.")
     disable_selected.short_description = "Disable selected owners"
 
+    def save_model(self, request, obj, form, change):
+        # Check if password is being set or updated
+        if 'password' in form.changed_data:
+            obj.password = make_password(obj.password)  # Hash the password
+        super().save_model(request, obj, form, change)
 
 # Salon Admin
 @admin.register(Salon)

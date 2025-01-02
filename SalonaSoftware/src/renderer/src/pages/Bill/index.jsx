@@ -7,14 +7,24 @@ import FlatList from 'flatlist-react'
 import useAssets from '../../components/categories'
 import { toast } from 'react-toastify'
 import { salonFailed, salonRequest, salonSuccess } from '../../slices/salonSlice'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import useSalon from '../../services/useSalon'
+import { branchFailed, branchRequest, branchSuccess, selectBranch } from '../../slices/branchSlice'
+import { selectService, serviceRequest, serviceSuccess } from '../../slices/serviceSlice'
+import { comboRequest, comboSuccess, selectCombo } from '../../slices/comboSlice'
+import { couponFailed, couponRequest, couponSuccess, selectCoupon } from '../../slices/couponSlice'
+import useBranch from '../../services/useBranch'
+import useService from '../../services/useService'
+import useCombo from '../../services/useCombo'
+import useCoupon from '../../services/useCoupon'
 
 const Bill = () => {
   const { getBill } = useBill() // Custom hook to fetch bill data
+  const { getSalonBranches } = useBranch()
+  const { getSalonServices } = useService()
+  const { getSalonCombos } = useCombo()
+  const { getSalonCoupons } = useCoupon()
   const [billDetails, setBillDetails] = useState([]) // Store bill details
-  const [company, setCompany] = useState(null) // Company info (if required)
-  const [view, setView] = useState(false) // Toggle for detailed view
   const [viewBill, setBill] = useState(null) // Selected bill details
   const navigate = useNavigate() // For routing
   const [page, setPage] = useState(0)
@@ -25,6 +35,11 @@ const Bill = () => {
   const { isAdmin } = useAssets()
   const { getSalon } = useSalon()
   const dispatch = useDispatch()
+  const branches = useSelector(selectBranch)
+  const services = useSelector(selectService)
+  const combos = useSelector(selectCombo)
+  const coupons = useSelector(selectCoupon)
+  
 
   // Fetch bill data
   const getProducts = async () => {
@@ -79,6 +94,55 @@ const Bill = () => {
     fetchSalon()
   }, [])
 
+  const getBranches = async () => {
+    dispatch(branchRequest())
+    const data = await getSalonBranches({}, {})
+    if (data.error) {
+      dispatch(branchFailed(data.error))
+      toast.info("You don't have branches. Open the settings page and add a branch to continue")
+      return
+    }
+    dispatch(branchSuccess(data))
+  }
+
+  const getServices = async () => {
+    dispatch(serviceRequest())
+    const serv = await getSalonServices()
+    dispatch(serviceSuccess(serv))
+  }
+
+  const getCombos = async () => {
+    dispatch(comboRequest())
+    const comb = await getSalonCombos()
+    dispatch(comboSuccess(comb))
+  }
+
+  const getCoupons = async () => {
+    dispatch(couponRequest())
+    const coup = await getSalonCoupons()
+    if (coup.error) {
+      dispatch(couponFailed(coup.error))
+      toast.info(coup.error)
+      return
+    }
+    dispatch(couponSuccess(coup))
+  }
+
+  useEffect(() => {
+    if (services.length <= 0) {
+      getServices()
+    }
+    if (branches.length <= 0) {
+      getBranches()
+    }
+    if (combos.length <= 0) {
+      getCombos()
+    }
+    if (coupons.length <= 0) {
+      getCoupons()
+    }
+  }, [])
+
   // Intersection Observer for infinite scrolling
   useEffect(() => {
     if (hasNext) {
@@ -111,9 +175,7 @@ const Bill = () => {
       <div className="w-full p-10">
         <div className="sticky top-0 flex justify-between">
           <div>
-            <h2 className="text-sm font-bold text-subheading">
-              Billing {view ? '   >    Create Bill' : ''}
-            </h2>
+            <h2 className="text-sm font-bold text-subheading">Billing</h2>
             <h2 className="text-3xl font-bold">Billing Section</h2>
           </div>
           <button
@@ -125,7 +187,7 @@ const Bill = () => {
         </div>
 
         {/* Table Section */}
-        <div className={`relative rounded-2xl overflow-x-auto mt-5 ${view ? 'hidden' : 'block'}`}>
+        <div className={`relative rounded-2xl overflow-x-auto mt-5`}>
           <div className="flex bg-white p-2">
             <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
             {!isAdmin && (
@@ -188,13 +250,10 @@ const Bill = () => {
           {/* Sentinel for IntersectionObserver */}
           <div ref={sentinelRef} className="h-10 bg-transparent"></div>
         </div>
-
-        {/* Add Create Bill Component */}
-        <CreateBill view={view} />
       </div>
 
       {/* Add View Bill Component */}
-      {viewBill && <ViewBill company={company} view={viewBill} setView={setBill}/>}
+      {viewBill && <ViewBill view={viewBill} setView={setBill} />}
     </div>
   )
 }

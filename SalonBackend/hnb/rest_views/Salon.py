@@ -10,7 +10,7 @@ class SalonRest(APIView):
         try:
             # Fetch search query from query parameters
             search_query = request.query_params.get('search', '').strip()
-            salon_id = request.query_params.get('salon_id')
+            salon_id = request.salon_id
             owner_id = request.query_params.get('owner_id')
             only_names_and_locations = request.GET.get('names_and_locations', 'false').lower() == 'true'
             

@@ -15,7 +15,7 @@ from hnb.models import (
     BillCombo,
     BillProduct,
 )
-from hnb.serializer import (BillDetailSerializer)
+from hnb.serializer import BillDetailSerializer
 from hnb.wrappers.Pagination import CustomPageNumberPagination
 class BillREST(APIView):
     pagination_class = CustomPageNumberPagination
@@ -33,14 +33,13 @@ class BillREST(APIView):
                 if not customer:
                     return paginator.get_paginated_response([])  # No bills found for this phone
                 # Retrieve bills for the found customer
-                bills = Bill.objects.filter(customer=customer)
+                bills = Bill.objects.filter(customer=customer).order_by('-created_at')
             else:
                 # Fetch bills based on the user's role
                 if request.is_owner:
-                    bills = Bill.objects.filter(branch_id__in=branch_id)
+                    bills = Bill.objects.filter(branch_id__in=branch_id).order_by('-created_at')
                 else:
-                    bills = Bill.objects.filter(branch=branch_id)
-
+                    bills = Bill.objects.filter(branch=branch_id).order_by('-created_at')
             # Apply pagination to the queryset
             paginated_bills = paginator.paginate_queryset(bills, request)
 

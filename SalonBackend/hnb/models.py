@@ -6,7 +6,7 @@ class SalonOwner(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=13)
-    password = models.CharField(max_length=100)
+    password = models.CharField(max_length=400)
     is_enabled = models.BooleanField(default=False)
 
     def __str__(self):

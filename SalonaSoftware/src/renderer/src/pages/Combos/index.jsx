@@ -98,13 +98,12 @@ const Combos = () => {
     const query = searchQuery.toLowerCase()
     return (
       combo.branch?.address.toLowerCase().includes(query) || // Branch Name
-      combo.name.toLowerCase().includes(query) ||            // Combo Name
-      combo.description.toLowerCase().includes(query) ||     // Description
-      combo.price.toString().includes(query) ||              // Price
+      combo.name.toLowerCase().includes(query) || // Combo Name
+      combo.description.toLowerCase().includes(query) || // Description
+      combo.price.toString().includes(query) || // Price
       combo.services.some((service) => service.name.toLowerCase().includes(query)) // Services
     )
   })
-
 
   return (
     <div className="flex flex-1 justify-center relative">
@@ -114,27 +113,28 @@ const Combos = () => {
             <h2 className="text-sm font-bold text-subheading">Combos</h2>
             <h2 className="text-3xl font-bold">Combos</h2>
           </div>
-          {isAdmin ? <button
-            onClick={handleServiceOpen}
-            className="m-3 mr-10 px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
-          >
-            Add a new Combos
-          </button> : <Fragment></Fragment>}
+          {isAdmin ? (
+            <button
+              onClick={handleServiceOpen}
+              className="m-3 mr-10 px-5 py-2 rounded-xl text-black font-bold bg-yellow-500 hover:bg-yellow-500  transition-colors"
+            >
+              Add a new Combos
+            </button>
+          ) : (
+            <Fragment></Fragment>
+          )}
         </div>
-        <div className='w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3'>
+        <div className="w-[400px]  h-[50px] border border-black rounded-md items-center flex flex-row gap-3">
+          <IoSearchSharp size={22} className="ml-4" />
 
-<IoSearchSharp size={22} className='ml-4' />
-
-<input
-   type="text"
-   value={searchQuery}
-   onChange={(e) => setSearchQuery(e.target.value)}
- className='w-full px-2 py-2 text-black mr-1 border:none outline-none' 
-
- placeholder='Search Product'
-  />
-
-</div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-2 py-2 text-black mr-1 border:none outline-none"
+            placeholder="Search Product"
+          />
+        </div>
         <div className="relative rounded-2xl overflow-x-auto md:overflow-x-hidden mt-5">
           <h2 className="w-full bg-white p-5 text-xl font-bold">Combos Details</h2>
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -158,9 +158,9 @@ const Combos = () => {
                 <th scope="col" className="px-2 py-3 max-w-[500px] text-center">
                   Services
                 </th>
-                <th scope="col" className="px-2 w-20">
+                {/* <th scope="col" className="px-2 w-20">
                   Actions
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody>
@@ -193,20 +193,20 @@ const Combos = () => {
                         <h2 className="bg-gray-200 text-xs m-1 p-1 rounded-md">{temp.name}</h2>
                       ))}
                     </td>
-                    <td className="py-4 w-20 font-medium text-gray-900 whitespace-nowrap">
+                    {/* <td className="py-4 w-20 font-medium text-gray-900 whitespace-nowrap">
                       <button
                         onClick={() => handleEditVendor(item)}
                         className="text-blue-500 hover:text-blue-700 mr-4 w-full "
                       >
                         Edit
                       </button>
-                      {/* <button
+                      <button
                         onClick={() => handleDelete(item.id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         Delete
-                      </button> */}
-                    </td>
+                      </button>
+                    </td> */}
                   </tr>
                 ))}
             </tbody>

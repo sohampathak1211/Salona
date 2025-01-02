@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import useProduct from '../../../services/useProduct'
 import { toast } from 'react-toastify'
 
-const CreateProduct = ({ productRefetch }) => {
+const CreateProduct = ({ productRefetch, setCreate }) => {
   const selectBranch = useSelector((state) => state.branch.result)
   const [selectedBranch, setSelectedBranch] = useState(selectBranch[0])
   const [formData, setFormData] = useState({
@@ -42,6 +42,7 @@ const CreateProduct = ({ productRefetch }) => {
       return
     }
     productRefetch()
+    setCreate(false)
   }
 
   return (

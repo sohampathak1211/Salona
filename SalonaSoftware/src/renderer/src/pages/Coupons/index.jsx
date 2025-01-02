@@ -34,11 +34,6 @@ const Coupons = () => {
   const [couponToEdit, setCouponToEdit] = useState(null)
   const [searchQuery, setSearchQuery] = useState('') // New state for search query
 
-  console.log('branch ', branches)
-  console.log('services ', services)
-  console.log('combos ', combos)
-  console.log('coupons ', coupons)
-
   const getBranches = async () => {
     dispatch(branchRequest())
     const data = await getSalonBranches({}, {})
@@ -181,9 +176,9 @@ const Coupons = () => {
                 <th scope="col" className="px-6 py-3">
                   Valid Combos
                 </th>
-                <th scope="col" className="px-6 py-3">
+                {/* <th scope="col" className="px-6 py-3">
                   Actions
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody>
@@ -251,7 +246,7 @@ const Coupons = () => {
                         ))
                       : ''}
                   </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                  {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     <button
                       onClick={() => handleEditCoupon(coupon)}
                       className="text-blue-500 hover:text-blue-700 mr-4"
@@ -264,7 +259,7 @@ const Coupons = () => {
                     >
                       Delete
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

@@ -13,8 +13,9 @@ const CreateService = ({ setCreate }) => {
     category: '',
     description: '',
     price: 0,
-    duration: ''
+    duration: 15
   })
+  console.log(vendor)
   const [category, setCategory] = useState('MEN')
   const selectBranch = useSelector((state) => state.branch.result)
   const [selected, setSelected] = useState(selectBranch[0])
@@ -27,6 +28,14 @@ const CreateService = ({ setCreate }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
+    if (name === 'price' && value < 0) {
+      toast.error('Price must be a positive value')
+      return
+    }
+    if (name === 'price' && value === '-') {
+      toast.error('Price must be a positive value')
+      return
+    }
     setVendor({ ...vendor, [name]: value })
   }
 
@@ -45,6 +54,22 @@ const CreateService = ({ setCreate }) => {
     console.log('This is the created service ', service)
     dispatch(serviceAddService(service))
     handleClose()
+  }
+
+  const durationOptions = Array.from({ length: 34 }, (_, i) => (i + 1) * 15) // Steps of 15 minutes
+
+  const formatDuration = (minutes) => {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return `${hours}h ${mins}m`
+  }
+
+  const parseDuration = (formatted) => {
+    const [hours, mins] = formatted
+      .split(/[hm\s]/)
+      .filter(Boolean)
+      .map(Number)
+    return hours * 60 + mins
   }
 
   return (
@@ -162,7 +187,8 @@ const CreateService = ({ setCreate }) => {
             <input
               type="number"
               name="price"
-              min="1"
+              min="0" // Ensures the price cannot be negative or zero
+              step="0.01" // Allows decimal input
               value={vendor.price}
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
@@ -170,46 +196,78 @@ const CreateService = ({ setCreate }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-900">Duration {'(Hours)'}</label>
-            <input
-              type="number"
-              name="duration"
-              value={vendor.duration}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-900">Duration</label>
+              <Listbox
+                value={vendor.duration}
+                onChange={(value) => setVendor({ ...vendor, duration: value })}
+              >
+                <div className="relative mt-1">
+                  <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none">
+                    <span className="block truncate">
+                      {formatDuration(vendor.duration) || 'Select duration'}
+                    </span>
+                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </span>
+                  </Listbox.Button>
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                      {durationOptions.map((duration, idx) => (
+                        <Listbox.Option
+                          key={idx}
+                          className={({ active }) =>
+                            `relative cursor-default select-none p-2 ${
+                              active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                            }`
+                          }
+                          value={duration}
+                        >
+                          <span className="block text-sm truncate">{formatDuration(duration)}</span>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                </div>
+              </Listbox>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-900">Description</label>
-            <input
-              type="text"
-              name="description"
-              value={vendor.description}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
-              required
-            />
-          </div>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-900">Description</label>
+          <input
+            type="text"
+            name="description"
+            value={vendor.description}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"
+            required
+          />
         </div>
+      </div>
 
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={handleClose}
-            className="text-gray-700 bg-gray-200 hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="text-black font-semibold bg-gold hover:bg-gold/90 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-5 py-2.5 text-center"
-          >
-            Create
-          </button>
-        </div>
+      <div className="flex justify-end space-x-4">
+        <button
+          type="button"
+          onClick={handleClose}
+          className="text-gray-700 bg-gray-200 hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="text-black font-semibold bg-gold hover:bg-gold/90 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-5 py-2.5 text-center"
+        >
+          Create
+        </button>
       </div>
     </div>
   )

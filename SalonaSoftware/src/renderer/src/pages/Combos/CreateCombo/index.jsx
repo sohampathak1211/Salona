@@ -44,6 +44,14 @@ const CreateCombo = ({ setCreate }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
+    if (name === 'price' && value < 0) {
+      toast.error('Price must be a positive value')
+      return
+    }
+    if (name === 'price' && value === '-') {
+      toast.error('Price must be a positive value')
+      return
+    }
     setCombos({ ...combos, [name]: value })
   }
 
@@ -97,7 +105,8 @@ const CreateCombo = ({ setCreate }) => {
             <input
               type="number"
               name="price"
-              min="1"
+              min="0" // Ensures the price cannot be negative or zero
+              step="0.01" // Allows decimal input
               value={combos.price}
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gold focus:border-gold"

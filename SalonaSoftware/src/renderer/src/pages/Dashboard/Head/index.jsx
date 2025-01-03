@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaArrowTrendUp, FaArrowTrendDown } from 'react-icons/fa6';
 import { LiaRupeeSignSolid } from 'react-icons/lia';
-import { HiOutlineCalendar, HiOutlineUser, HiOutlineClock } from 'react-icons/hi'; // Thin icons
+import { HiOutlineCalendar, HiOutlineUser, HiOutlineClock } from 'react-icons/hi';
 import useDashboard from '../../../services/useDashboard';
 
 const Head = () => {
@@ -11,9 +11,10 @@ const Head = () => {
   const fetchHead = async () => {
     try {
       const response = await getHead();
-      setData(response);
+      setData(response || {}); // Ensure response is always an object
     } catch (error) {
       console.error('Error fetching data:', error);
+      setData({}); // Set to an empty object if an error occurs
     }
   };
 
@@ -25,11 +26,19 @@ const Head = () => {
     return <div>Loading...</div>; // Placeholder while fetching data
   }
 
+  // Fallback default values
   const {
-    total_sales,
-    sales_growth: { year, month, week },
-    new_users: { month: newUsers, growth },
+    total_sales = { year: 0, month: 0, week: 0 },
+    sales_growth = {
+      year: { change: 0, percentage: 0 },
+      month: { change: 0, percentage: 0 },
+      week: { change: 0, percentage: 0 },
+    },
+    new_users = { month: 0, growth: { change: 0, percentage: 0 } },
   } = data;
+
+  // Safely access nested properties and avoid null/undefined issues
+  const safeToFixed = (value) => (value !== null && value !== undefined ? value.toFixed(2) : '0.00');
 
   return (
     <div className="w-full">
@@ -45,12 +54,12 @@ const Head = () => {
           <div>
             <h2 className="text-xl font-bold">Total Sales</h2>
             <div className="flex flex-col">
-              <h2>₹{total_sales.year.toFixed(2)}</h2>
+              <h2>₹{safeToFixed(total_sales.year)}</h2>
               <div className="flex items-end">
                 <h2 className="text-xs">
-                  ({year.change.toFixed(2)} / {year.percentage.toFixed(2)}%)
+                  ({safeToFixed(sales_growth.year.change)} / {safeToFixed(sales_growth.year.percentage)}%)
                 </h2>
-                {year.change >= 0 ? (
+                {sales_growth.year.change >= 0 ? (
                   <FaArrowTrendUp color="green" className="mx-2" />
                 ) : (
                   <FaArrowTrendDown color="red" className="mx-2" />
@@ -66,12 +75,12 @@ const Head = () => {
           <div>
             <h2 className="text-xl font-bold">Current Month</h2>
             <div className="flex flex-col">
-              <h2>₹{total_sales.month.toFixed(2)}</h2>
+              <h2>₹{safeToFixed(total_sales.month)}</h2>
               <div className="flex items-end">
                 <h2 className="text-xs">
-                  ({month.change.toFixed(2)} / {month.percentage.toFixed(2)}%)
+                  ({safeToFixed(sales_growth.month.change)} / {safeToFixed(sales_growth.month.percentage)}%)
                 </h2>
-                {month.change >= 0 ? (
+                {sales_growth.month.change >= 0 ? (
                   <FaArrowTrendUp color="green" className="mx-2" />
                 ) : (
                   <FaArrowTrendDown color="red" className="mx-2" />
@@ -87,12 +96,12 @@ const Head = () => {
           <div>
             <h2 className="text-xl font-bold">Current Week</h2>
             <div className="flex flex-col">
-              <h2>₹{total_sales.week.toFixed(2)}</h2>
+              <h2>₹{safeToFixed(total_sales.week)}</h2>
               <div className="flex items-end">
                 <h2 className="text-xs">
-                  ({week.change.toFixed(2)} / {week.percentage.toFixed(2)}%)
+                  ({safeToFixed(sales_growth.week.change)} / {safeToFixed(sales_growth.week.percentage)}%)
                 </h2>
-                {week.change >= 0 ? (
+                {sales_growth.week.change >= 0 ? (
                   <FaArrowTrendUp color="green" className="mx-2" />
                 ) : (
                   <FaArrowTrendDown color="red" className="mx-2" />
@@ -108,12 +117,12 @@ const Head = () => {
           <div>
             <h2 className="text-xl font-bold">New Users</h2>
             <div className="flex flex-col">
-              <h2>{newUsers}</h2>
+              <h2>{new_users.month}</h2>
               <div className="flex items-end">
                 <h2 className="text-xs">
-                  ({growth.change} / {growth.percentage.toFixed(2)}%)
+                  ({safeToFixed(new_users.growth.change)} / {safeToFixed(new_users.growth.percentage)}%)
                 </h2>
-                {growth.change >= 0 ? (
+                {new_users.growth.change >= 0 ? (
                   <FaArrowTrendUp color="green" className="mx-2" />
                 ) : (
                   <FaArrowTrendDown color="red" className="mx-2" />

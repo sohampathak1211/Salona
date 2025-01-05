@@ -39,7 +39,8 @@ const CreateBill = () => {
   const [selectedCoupon, setSelectedCoupon] = useState(null)
   const [items, setItems] = useState([{ type: '', item: null, quantity: 1, price: 0, total: 0 }])
   const [query, setQuery] = useState('')
-  console.log(selectedCoupon, 'selecsf')
+  console.log('COupons',coupons)
+  console.log("Items",items)
   const navigate = useNavigate()
   useEffect(() => {
     const getProducts = async () => {

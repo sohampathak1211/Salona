@@ -19,22 +19,6 @@ class ServicesRest(APIView):
             service = Service.objects.filter(branch=branch_id)
             serializer = ServiceBranchIdSerilaizer(service,many=True)
             return Response(serializer.data,status=status.HTTP_200_OK)
-            
-            print("service_id",service_id)
-            print("branch_id",branch_id)
-            if service_id:
-                service = Service.objects.filter(id=service_id,branch=branch_id)
-                serializer = ServiceSerializer(service,many=False)
-                return Response(serializer.data,status=status.HTTP_200_OK)
-            if branch_id:
-                service = Service.objects.filter(branch=branch_id)
-                serializer = ServiceSerializer(service,many=True)
-                return Response(serializer.data,status=status.HTTP_200_OK)
-            logger.info('Getting all services')
-            data = Service.objects.filter(branch=branch_id)
-            serializer = ServiceSerializer(data, many=True)
-            logger.info('Services retrieved successfully')
-            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f'Error getting services: {str(e)}')
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)

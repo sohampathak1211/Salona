@@ -65,7 +65,7 @@ const CreateCombo = ({ setCreate }) => {
   }
 
   const handleSubmit = async () => {
-    if (!combos.name || !combos.description || !combos.price) {
+    if (!combos.name || !combos.description || !combos.price || selectedServices.length === 0) {
       toast.warn('Please fill out all required fields')
       return
     }

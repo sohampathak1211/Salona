@@ -26,6 +26,12 @@ const maintainerSlice = createSlice({
     maintainerAddMaintainer: (state, action) => {
       state.result = [...state.result, action.payload]
     },
+    maintianerEditMaintainer: (state, action) => {
+      const updatedMaintainer = action.payload 
+      state.result = state.result.map((maintainer) =>
+        maintainer.id === updatedMaintainer.id ? updatedMaintainer : maintainer
+      )
+    },
     maintainerReset: (state, action) => {
       state.loading = false
       state.error = null
@@ -40,6 +46,7 @@ export const {
   maintainerFailed,
   maintainerSuccess,
   maintainerRequest,
+  maintianerEditMaintainer,
   maintainerAddMaintainer,
   maintainerReset
 } = maintainerSlice.actions

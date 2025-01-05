@@ -68,6 +68,10 @@ export default function SignIn() {
           toast.info(res.error.error)
           return
         }
+        // if(!res.so_enable) {
+        //   toast.info('Your account is disabled. Please contact the Salon Owner.')
+        //   return
+        // }
         toast.success(res.message)
         setData('cUser', res.cUser)
         setData('token', res.token)

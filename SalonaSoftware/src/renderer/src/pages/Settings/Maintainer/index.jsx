@@ -122,7 +122,7 @@ const Maintainer = () => {
                     className="flex text-xl pb-4 font-semibold leading-6 text-gray-900"
                   >
                     <GrUserWorker size={25} color="gray" className="mr-2" />
-                    Add Maintainer
+                    {currentMaintainer.id != null ? 'Edit Maintainer' : 'Add Maintainer'}
                   </Dialog.Title>
                   <AddMaintainer
                     currentMaintainer={currentMaintainer}

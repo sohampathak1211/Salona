@@ -10,6 +10,14 @@ export const MaintainerApi = (ipcMain) => {
       return e
     }
   })
+  ipcMain.handle('editMaintainer', async (event, data) => {
+    try {
+      const response = await Request.patch(maintainer, data)
+      return response
+    } catch (e) {
+      return e
+    }
+  })
 
   ipcMain.handle('createMaintainer', async (e, data) => {
     try {

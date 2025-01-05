@@ -5,7 +5,7 @@ const useCustomer = () => {
     const res = await window.electron.ipcRenderer.invoke('getBranchCustomer')
     return res
   }
-  const getSalonCustomer = async (data) => {
+  const getSalonCustomer = async () => {
     const res = await window.electron.ipcRenderer.invoke('getSalonCustomer')
     return res
   }

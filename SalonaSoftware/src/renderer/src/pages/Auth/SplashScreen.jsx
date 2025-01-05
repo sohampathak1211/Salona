@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Logo from '../../assets/logo.png?react'
 import useAuth from '../../services/useAuth'
@@ -18,6 +18,7 @@ const SplashScreen = () => {
 
   const [hasSalon, setHasSalon] = useState(null) // Use `null` for unknown state
   const [isLogin, setIsLogin] = useState(null) // Use `null` for unknown state
+  const [error, setError] = useState(false)
 
   const [moveAheas, setMoveAhead] = useState(false)
 
@@ -42,6 +43,7 @@ const SplashScreen = () => {
         setHasSalon(!!salon) // Explicitly convert to boolean
         if (salon.error) {
           setHasSalon(false)
+          setError(true)
         }
       } catch (e) {
         console.error('Error fetching salon:', e)
@@ -63,16 +65,19 @@ const SplashScreen = () => {
   // Separate useEffect to handle redirection after state updates
   useEffect(() => {
     if (moveAheas) {
+      if (error) {
+        return
+      }
       if (!isLogin) {
         navigate('signin')
       } else if (!hasSalon) {
         navigate('/salonCreate')
       } else {
         if (temp.role == 'MT') {
-          console.log("MAINTAINER")
+          console.log('MAINTAINER')
           navigate('/auth/bill')
         } else {
-          console.log("sALON OWNERR")
+          console.log('sALON OWNERR')
           navigate('/auth/dashboard')
         }
       }
@@ -83,12 +88,23 @@ const SplashScreen = () => {
     <div className="bg-gray-100 transition-colors w-full h-screen flex items-center justify-center">
       <div className="overflow-hidden">
         <div className="flex justify-center items-center bg-white pr-10">
-          <div className="w-[300px] h-[300px] overflow-hidden animate-customOpacity">
-            <img className="flex-1" src={Logo} alt="App Logo" />
-          </div>
-          <div className="text-8xl animate-leftRightOpacity">
-            Hair<span className="font-bold">& Beauty</span>
-          </div>
+          {error ? (
+            <Fragment>
+              <div className='flex items-center justify-center flex-col w-[800px] h-[300px]'>
+                <h2 className='text-xl font-bold'>Once Restart the application. If the problem still occurs.</h2>
+                <h2 className='text-lg font-semibold'>Contact 7887557175 or email pathaksoham2003@gmail.com</h2>
+              </div>
+            </Fragment>
+          ) : (
+            <Fragment>
+              <div className="w-[300px] h-[300px] overflow-hidden animate-customOpacity">
+                <img className="flex-1" src={Logo} alt="App Logo" />
+              </div>
+              <div className="text-8xl animate-leftRightOpacity">
+                Hair<span className="font-bold">& Beauty</span>
+              </div>
+            </Fragment>
+          )}
         </div>
         <div className="h-5 bg-black"></div>
       </div>

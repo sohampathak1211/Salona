@@ -14,6 +14,7 @@ export const salon = `${API_URL}salon/`
 export const services = `${API_URL}service/`
 export const combo = `${API_URL}combo/`
 export const coupon = `${API_URL}coupon/`
+export const customer = `${API_URL}customer/`
 export const branch = `${API_URL}branch/`
 export const product = `${API_URL}product/`
 export const bill = `${API_URL}bill/`

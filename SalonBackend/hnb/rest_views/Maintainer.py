@@ -19,46 +19,10 @@ class MaintainerRest(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
-        
-    def signin(self,request,*args,**kwargs):
-        try:
-            email = request.data.get('email')
-            password = request.data.get('password')
-            try:
-                user = SalonMaintainer.objects.get(email=email)
-                serializer = SalonMaintainerSerializer(user,many=False)
-            except SalonMaintainer.DoesNotExist:
-                return Response(
-                    {"error": "Maintainer with this email does not exist"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-            if user:
-                if not check_password(password,serializer.data['password']):
-                    return Response({"error": "Invalid Password"}, status=status.HTTP_404_NOT_FOUND)
-                else:
-                    payload = serializer.data
-                    payload['role'] = 'MT'
-                    branch = Branch.objects.get(id=serializer.data['branch'])
-                    seri_branch = BranchSerializer(branch,many=False)
-                    payload['role'] = "MT"
-                    payload['branch_id'] = serializer.data['branch']
-                    payload['salon_id'] = seri_branch.data['salon']
-                    payload['password'] = ''
-                    payload['exp'] = int(JWT_EXPIRY)
-                    access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-                    return Response(
-                    {"message": "Maintainer Sign-in successful", "token": access_token, "cUser": payload},
-                    status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "Maintainer does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        except Exception:
-            return Response({"error":"Error in the maintainer api"},status=status.HTTP_400_BAD_REQUEST)
-            
+             
     def post(self, request, *args, **kwargs):
-        action = request.data.get('action')
         email = request.data.get('email')
-        if action == 'signin':
-            return self.signin(request,*args,**kwargs)
+        
         maintainer = SalonMaintainer.objects.filter(email=email)
         if maintainer.exists():
             return Response({"error": "Maintainer already exists"}, status=status.HTTP_400_BAD_REQUEST)
@@ -84,9 +48,9 @@ class MaintainerRest(APIView):
 
     def patch(self, request, *args, **kwargs):
         try:
-            service_id = request.data.get('service_id')
-            service = SalonMaintainer.objects.get(service_id=service_id)
-            serializer = SalonMaintainerSerializer(service, data=request.data, partial=True)
+            maintainer_id = request.data.get('id')
+            maintainer = SalonMaintainer.objects.get(id=maintainer_id)
+            serializer = SalonMaintainerSerializer(maintainer, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)

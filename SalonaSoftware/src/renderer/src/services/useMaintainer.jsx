@@ -21,7 +21,18 @@ const useMaintainer = () => {
         return err
       })
   }
-  return { getSalonMaintainers, createMaintainer }
+
+  const editMaintainer = (data) => {
+    return window.electron.ipcRenderer
+      .invoke('editMaintainer', data)
+      .then((data) => {
+        return data
+      })
+      .catch((err) => {
+        return err
+      })
+  }
+  return { getSalonMaintainers, createMaintainer, editMaintainer }
 }
 
 export default useMaintainer

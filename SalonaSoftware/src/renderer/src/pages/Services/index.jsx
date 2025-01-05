@@ -93,6 +93,12 @@ const Services = () => {
     }
   }
 
+  const formatDuration = (minutes) => {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return `${hours}h ${mins}m`
+  }
+
   // Filtered services based on search query
   const filteredServices = services.filter((service) => {
     const query = searchQuery.toLowerCase()
@@ -186,7 +192,7 @@ const Services = () => {
                     {item.price}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.duration}
+                    {formatDuration(item.duration)}
                   </td>
                   {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                     <button

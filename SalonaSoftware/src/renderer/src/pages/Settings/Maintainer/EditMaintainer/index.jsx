@@ -17,10 +17,10 @@ const AddMaintainer = ({ currentMaintainer, setCurrentMaintainer, setIsModalOpen
     }
   }, [selectBranch])
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Save logic here
     // Reset the modal after saving
-    const data = await createMaintainer(
+    const data = await createMaintainer();
     resetModal()
   }
 

@@ -13,7 +13,7 @@ class CouponREST(APIView):
                 coupons = Coupon.objects.filter(branch__in=branch_id)
                 seri = CouponComboServiceSerializer(coupons, many=True)
                 return Response(seri.data, status=status.HTTP_200_OK)
-            data = Coupon.objects.all()
+            data = Coupon.objects.filter(branch=branch_id)
             serializer = CouponComboServiceSerializer(data, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:

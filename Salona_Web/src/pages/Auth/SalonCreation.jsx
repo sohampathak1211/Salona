@@ -1,10 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import useSalon from '../../services/useSalon'
+import { Link, useNavigate } from 'react-router-dom'
+import useLocalStorage from '../../services/useLocalStorage'
 
 const SalonCreation = () => {
   const { createSalon } = useSalon()
+  const { getData } = useLocalStorage()
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     name: '',
@@ -15,7 +19,8 @@ const SalonCreation = () => {
     share_location: '',
     instagram_acc: '',
     facebook_acc: '',
-    whatsapp_link: ''
+    whatsapp_link: '',
+    owner: -1
   })
   const validateFields = () => {
     if (currentStep === 1) {
@@ -102,13 +107,26 @@ const SalonCreation = () => {
     setFormData({ ...formData, [name]: value })
   }
 
+  useEffect(() => {
+    const getOwner = async () => {
+      const cUser = await getData('cUser')
+      setFormData((prev) => {
+        return { ...prev, owner: cUser.id }
+      })
+    }
+    getOwner()
+  }, [])
+
   const handleSend = async () => {
-    try{
-      const response = await createSalon(formData);
-      console.log(response)
-      // toast.success(response)
-    }catch(e){
+    try {
+      console.log(formData)
+      const response = await createSalon(formData)
+      console.log('Salon creation', response)
+      toast.success('Salon Successfully created')
+      navigate('/auth')
+    } catch (e) {
       console.log(e)
+      toast.error('Error creating the salon')
     }
   }
 
@@ -128,8 +146,10 @@ const SalonCreation = () => {
       //   backgroundRepeat: 'no-repeat',
       // }}
     >
-      <ToastContainer />
-      <h1 className="text-4xl font-extrabold mb-8 text-center text-gold/90">Create a Salon</h1>
+      {/* <ToastContainer /> */}
+      <Link to="/auth">
+        <h1 className="text-4xl font-extrabold mb-8 text-center text-gold/90">Create a Salon</h1>
+      </Link>
 
       {/* Step Indicators */}
       <div className="flex items-center space-x-4 mb-8">

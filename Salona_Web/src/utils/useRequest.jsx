@@ -1,71 +1,50 @@
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
-import useLocalStorage from '../services/useLocalStorage'
-import { toast } from 'react-toastify'
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
+import useLocalStorage from "../services/useLocalStorage";
+import {toast} from "react-toastify";
 
 const useRequest = () => {
-  const navigation = useNavigate()
-  const { getData, setData } = useLocalStorage()
+  const navigation = useNavigate();
+  const {getData, setData} = useLocalStorage();
   const Request = axios.create({
-    // baseURL: 'http://10.0.2.2:7000',
-    baseURL: 'http://192.168.1.2:7001'
-    // baseURL: 'https://quiz.digiappstore.com'
-  })
+    baseURL: import.meta.env.VITE_SALONA_BACKEND_URL || 'http://127.0.0.1:8000/'
+  });
 
   Request.interceptors.request.use(
     async (config) => {
-      const token = getData("data");
-      console.log("I AM SPEAKING FROM REQUEST HOOK ", token)
-      // const token =
-      //   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTE1NzE1MTMsImV4cCI6MTY5MTU3NTExMywiYXVkIjoiMTAwMDAwMDAwOSIsImlzcyI6ImRhcy5jb20ifQ.0OHjnm3-dV0ezi-C290LDvatYfBRHT8frhKc0hyBV9I';
-      // if (token) {
-      // }
-      config.headers.Authorization = `Bearer ${token}`
+      const token = getData("token");
+      console.log("TOKENENNE",token)
+      config.headers.Authorization = `Bearer ${token}`;
+
       if (config.data instanceof FormData) {
-        config.headers['Content-Type'] = 'multipart/form-data'
+        config.headers["Content-Type"] = "multipart/form-data";
       } else {
-        config.headers['Content-Type'] = 'application/json'
+        config.headers["Content-Type"] = "application/json";
       }
-      // console.log("config : ", config)
-      return config
+      return config;
     },
-    (error) => {
-      return Promise.reject(error)
-    }
-  )
+    (error) => Promise.reject(error)
+  );
 
   Request.interceptors.response.use(
-    (res) => res,
-    async (err) => {
-      if (err.response) {
-        if (err.response.status === 401) {
-          // useAuthLogin.logout();
-          console.log("Logout here")
-          // originalConfig._retry = true;
-          // try {
-          //   const rs = await refreshToken();
-          //   const { accessToken } = rs.data;
-          //   var ls = JSON.parse(window.localStorage['persist:quiz']);
-          //   ls.accessToken = accessToken;
-          //   window.localStorage.setItem('persist:quiz', JSON.stringify(ls));
-          //   Request.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-          //   return Request(originalConfig);
-          // } catch (_error) {
-          //   window.location.href = '/';
-          // }
-        }
-        console.log('Error in Request Hook ', err)
-        if (err.response.status === 403 && err.response.data) {
-          return Promise.reject({ data: err.response.data, status: err.response.status })
+    (response) => response.data,
+    async (error) => {
+      if (error.response) {
+        if (error.response.status === 401) {
+          setData("token", "");
+          console.log("Unauthorized: Handle Logout or Refresh Token");
+          navigation("/signin");
+        } else if (error.response.status === 403) {
+          return Promise.reject({data: error.response.data, status: 403});
         }
       }
-      toast.error(`Error occured`)
-      return Promise.reject({ data: err.response.data, status: err.response.status })
+      console.error("Request Error:", error.response?.data || error.message);
+      return Promise.reject({error: error.response?.data || error.message});
     }
-  )
+  );
   return {
-    Request
-  }
-}
+    Request,
+  };
+};
 
-export default useRequest
+export default useRequest;

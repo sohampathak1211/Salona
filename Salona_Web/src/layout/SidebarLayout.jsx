@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
-import { ToastContainer } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import WebView from '../pages/Music/WebView'
+import useLocalStorage from '../services/useLocalStorage'
+import { useDispatch } from 'react-redux'
+import { clearAuth } from '../slices/authSlice'
+import { branchReset } from '../slices/branchSlice'
+import { couponReset } from '../slices/couponSlice'
+import { serviceReset } from '../slices/serviceSlice'
+import { comboReset } from '../slices/comboSlice'
+import { maintainerReset } from '../slices/maintainerSlice'
 const SidebarLayout = () => {
   const [sidebar, setSidebar] = useState(true)
   const [active, setActive] = useState(0)
   const [visible, setVisible] = useState(false)
-  const location  = useLocation();
+  const location = useLocation()
+  const dispatch = useDispatch()
+  const { setData } = useLocalStorage()
   console.log(location)
-console.log(visible)
+  console.log(visible)
   useEffect(() => {
     const parts = location.pathname.split('/')
     const lastPart = parts[parts.length - 1]
@@ -19,6 +29,25 @@ console.log(visible)
       setVisible(false)
     }
   }, [location.pathname])
+
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      dispatch(clearAuth())
+      dispatch(branchReset())
+      dispatch(couponReset())
+      dispatch(serviceReset())
+      dispatch(comboReset())
+      dispatch(maintainerReset())
+      await setData('cUser', {})
+      await setData('token', {})
+      toast.success('Successfully logged out')
+      navigate('/signin')
+    } catch (e) {
+      toast.error('Error loggin out')
+    }
+  }
 
   return (
     <div className="w-full h-screen flex flex-1 justify-center">
@@ -36,9 +65,10 @@ console.log(visible)
           <div className="w-full relative h-screen flex-1 custom-scrollbar overflow-y-scroll">
             <Outlet />
             <div
-              className={`w-full h-[calc(100vh - 20%)] bg-cyan-500 absolute top-0 left-0 ${visible ? 'visible h-full' : 'hidden opacity-0'}`}
+              className={`w-full h-screen bg-gray-700 absolute top-0 left-0 ${visible ? 'visible h-full' : 'hidden opacity-0'}`}
             >
-              <WebView visible={visible} setVisible={setVisible} />
+              {/* THis music player is not available in the website version  */}
+              {/* <WebView visible={visible} setVisible={setVisible} /> */}
             </div>
           </div>
         </div>

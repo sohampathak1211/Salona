@@ -1,26 +1,32 @@
-import React from 'react'
-import useRequest from '../utils/useRequest'
-import { toast } from 'react-toastify'
+import React from "react";
+import useRequest from "../utils/useRequest";
+import {toast} from "react-toastify";
+import {deserialize} from "../utils/utils";
+import {salonMaintainerSignIn, salonOwnerSignIn} from "../utils/api";
 
 const useAuth = () => {
+  const {Request} = useRequest();
   const salonSignIn = async (data) => {
-    return await window.electron.ipcRenderer
-      .invoke('signinOwner', data)
-      .then((data) => data)
-      .catch((e) => e)
-  }
+    try {
+      const response = await Request.post(salonOwnerSignIn, data);
+      return response;
+    } catch (e) {
+      console.error("Error during salon sign-in:", e);
+      return null; // Handle errors gracefully
+    }
+  };
 
   const maintainerSignIn = async (data) => {
-    const res = await window.electron.ipcRenderer.invoke('signinMaintainer', data)
-    return res
-  }
+    try {
+      const response = await Request.post(salonMaintainerSignIn, data);
+      return response;
+    } catch (e) {
+      console.error("Error during salon sign-in:", e);
+      return null;
+    }
+  };
 
-  const getUsers = async (data) => {
-    const res = await window.electron.ipcRenderer.invoke('getUsers')
-    return res
-  }
+  return {salonSignIn, maintainerSignIn};
+};
 
-  return { salonSignIn, maintainerSignIn, getUsers }
-}
-
-export default useAuth
+export default useAuth;

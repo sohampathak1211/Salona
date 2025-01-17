@@ -3,18 +3,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import Both from '../../assets/hairfemale3.jpg?react'
 import { toast } from 'react-toastify'
 import useAuth from '../../services/useAuth'
-import useSalon from '../../services/useSalon'
-import { FaChevronDown } from 'react-icons/fa'
-import { FaChevronUp } from 'react-icons/fa'
 import useLocalStorage from '../../services/useLocalStorage'
 import Logo from '../../assets/logo.png?react'
+import { useDispatch, useSelector } from 'react-redux'
+import { setAuth } from '../../slices/authSlice'
 
 export default function SignIn() {
   const navigate = useNavigate()
-  const { salonSignIn } = useAuth()
+  const dispatch = useDispatch();
+  const { salonSignIn, maintainerSignIn } = useAuth()
   const { setData } = useLocalStorage()
-  const { getNamesAndLocation } = useSalon()
-
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -39,10 +37,6 @@ export default function SignIn() {
     return true
   }
 
-  useEffect(()=>{
-    localStorage.setItem("key","Values")
-  },[])
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -52,19 +46,36 @@ export default function SignIn() {
 
     try {
       if (admin) {
-      }
-      const res = await salonSignIn({ email, password, action: 'signin' })
-      console.log('data from the backend for user', res)
-      if (res.error) {
-        toast.info(res)
-        return
-      }
-      toast.success(res.message)
-      setData('owner', res.owner_data)
-      setData('salon_data', res.salon_data)
-      setData('token', res.token)
-      if (res.salon_data.length <= 0) {
-        navigate('/createSalon')
+        const res = await salonSignIn({ email, password, action: 'signin' })
+        console.log('data from the backend for user', res)
+        if (res.error) {
+          toast.info(res.error.error)
+          return
+        }
+        toast.success(res.message)
+        setData('cUser', res.cUser)
+        setData('token', res.token)
+        dispatch(setAuth(res))
+        if (res.cUser.salon_id == -1) {
+          navigate('/salonCreate')
+        } else {
+          navigate('/auth/dashboard')
+        }
+      } else {
+        const res = await maintainerSignIn({ email, password, action: 'signin' })
+        console.log('Responsese sefefdf', res.error)
+        if (res.error) {
+          toast.info(res.error.error)
+          return
+        }
+        // if(!res.so_enable) {
+        //   toast.info('Your account is disabled. Please contact the Salon Owner.')
+        //   return
+        // }
+        toast.success(res.message)
+        setData('cUser', res.cUser)
+        setData('token', res.token)
+        navigate('/auth/bill')
       }
     } catch (err) {
       toast.error(err)

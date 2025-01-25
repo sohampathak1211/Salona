@@ -21,7 +21,15 @@ const useCustomer = () => {
       return error;
     }
   };
-  return {getBranchCustomer, getSalonCustomer};
+  const searchByPhone = async (params) => {
+    try {
+      const response = await Request.get(customer, {params});
+      return response;
+    } catch (error) {
+      return error;
+    }
+  };
+  return {getBranchCustomer, getSalonCustomer, searchByPhone};
 };
 
 export default useCustomer;

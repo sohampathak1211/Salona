@@ -1,177 +1,215 @@
-import React, { useEffect, useState, useRef } from 'react'
-import ViewBill from './ViewBill'
-import CreateBill from './CreateBill'
-import { useNavigate } from 'react-router-dom'
-import useBill from '../../services/useBill'
-import FlatList from 'flatlist-react'
-import useAssets from '../../components/categories'
-import { toast } from 'react-toastify'
-import { salonFailed, salonRequest, salonSuccess } from '../../slices/salonSlice'
-import { useDispatch, useSelector } from 'react-redux'
-import useSalon from '../../services/useSalon'
-import { branchFailed, branchRequest, branchSuccess, selectBranch } from '../../slices/branchSlice'
-import { selectService, serviceRequest, serviceSuccess } from '../../slices/serviceSlice'
-import { comboRequest, comboSuccess, selectCombo } from '../../slices/comboSlice'
-import { couponFailed, couponRequest, couponSuccess, selectCoupon } from '../../slices/couponSlice'
-import useBranch from '../../services/useBranch'
-import useService from '../../services/useService'
-import useCombo from '../../services/useCombo'
-import useCoupon from '../../services/useCoupon'
+import React, {useEffect, useState, useRef} from "react";
+import ViewBill from "./ViewBill";
+import CreateBill from "./CreateBill";
+import {useNavigate} from "react-router-dom";
+import useBill from "../../services/useBill";
+import FlatList from "flatlist-react";
+import useAssets from "../../components/categories";
+import {toast} from "react-toastify";
+import {salonFailed, salonRequest, salonSuccess} from "../../slices/salonSlice";
+import {useDispatch, useSelector} from "react-redux";
+import useSalon from "../../services/useSalon";
+import {
+  branchFailed,
+  branchRequest,
+  branchSuccess,
+  selectBranch,
+} from "../../slices/branchSlice";
+import {
+  selectService,
+  serviceRequest,
+  serviceSuccess,
+} from "../../slices/serviceSlice";
+import {comboRequest, comboSuccess, selectCombo} from "../../slices/comboSlice";
+import {
+  couponFailed,
+  couponRequest,
+  couponSuccess,
+  selectCoupon,
+} from "../../slices/couponSlice";
+import useBranch from "../../services/useBranch";
+import useService from "../../services/useService";
+import useCombo from "../../services/useCombo";
+import useCoupon from "../../services/useCoupon";
 
 const Bill = () => {
-  const { getBill } = useBill() // Custom hook to fetch bill data
-  const { getSalonBranches } = useBranch()
-  const { getSalonServices } = useService()
-  const { getSalonCombos } = useCombo()
-  const { getSalonCoupons } = useCoupon()
-  const [billDetails, setBillDetails] = useState([]) // Store bill details
-  const [viewBill, setBill] = useState(null) // Selected bill details
-  const navigate = useNavigate() // For routing
-  const [page, setPage] = useState(0)
-  const sentinelRef = useRef(null) // Ref for the "Load More" sentinel
-  const [isLoading, setIsLoading] = useState(false) // To prevent multiple triggers
-  const [search, setSearch] = useState('')
-  const [hasNext, setNext] = useState(true)
-  const { isAdmin } = useAssets()
-  const { getSalon } = useSalon()
-  const dispatch = useDispatch()
-  const branches = useSelector(selectBranch)
-  const services = useSelector(selectService)
-  const combos = useSelector(selectCombo)
-  const coupons = useSelector(selectCoupon)
-  
-
+  const {getBill} = useBill(); // Custom hook to fetch bill data
+  const {getSalonBranches} = useBranch();
+  const {getSalonServices} = useService();
+  const {getSalonCombos} = useCombo();
+  const {getSalonCoupons} = useCoupon();
+  const [billDetails, setBillDetails] = useState([]); // Store bill details
+  const [viewBill, setBill] = useState(null); // Selected bill details
+  const navigate = useNavigate(); // For routing
+  const [page, setPage] = useState(0);
+  const sentinelRef = useRef(null); // Ref for the "Load More" sentinel
+  const [isLoading, setIsLoading] = useState(false); // To prevent multiple triggers
+  const [search, setSearch] = useState("");
+  const [hasNext, setNext] = useState(true);
+  const {isAdmin} = useAssets();
+  const {getSalon} = useSalon();
+  const dispatch = useDispatch();
+  const branches = useSelector(selectBranch);
+  const services = useSelector(selectService);
+  const combos = useSelector(selectCombo);
+  const coupons = useSelector(selectCoupon);
+  console.log("Page", page);
   // Fetch bill data
   const getProducts = async () => {
-    const billData = await getBill({ page: page })
-    console.log('Bill Data', billData)
-    setBillDetails((prev) => billData.results) // Append new data to existing list
-    if (billData.next == null) {
-      setNext(false)
+    if (isLoading) return; // Prevent duplicate requests
+    setIsLoading(true); // Set loading before making the request
+
+    try {
+      const billData = await getBill({page: page});
+      console.log("Fetched Bill Data:", billData);
+
+      setBillDetails((prev) => [...prev, ...billData.results]); // Append new data
+
+      if (!billData.next) {
+        setNext(false); // Disable further fetching if there's no next page
+      }
+    } catch (error) {
+      console.error("Error fetching bills:", error);
     }
-    setIsLoading(false)
-  }
+
+    setIsLoading(false); // Reset loading flag
+  };
 
   useEffect(() => {
-    if (isAdmin) {
-      getProducts()
+    if (isAdmin && hasNext) {
+      getProducts();
     }
-  }, [page])
+  }, [page]); // `page` as a dependency ensures fetching data when it changes
 
   // Handle viewing a specific bill
   const handleBillView = (item) => {
-    setBill(item)
-  }
+    setBill(item);
+  };
 
   const handleSearch = async () => {
     if (search.length !== 10) {
-      toast.info('Phone number should be exactly 10 digits!')
-      return
+      toast.info("Phone number should be exactly 10 digits!");
+      return;
     }
-    setPage(1)
+    setPage(1);
 
-    const billData = await getBill({ page: 1, phone: search })
-    console.log('Bill Data', billData)
+    const billData = await getBill({page: 1, phone: search});
+    console.log("Bill Data", billData);
     if (billData.length === 0) {
-      toast.info('No bills found for this phone number!')
+      toast.info("No bills found for this phone number!");
     }
-    setBillDetails(billData.results) // Set the fetched data
-    setIsLoading(false)
-  }
+    setBillDetails(billData.results); // Set the fetched data
+    setIsLoading(false);
+  };
 
   const fetchSalon = async () => {
-    dispatch(salonRequest())
-    const data = await getSalon()
+    dispatch(salonRequest());
+    const data = await getSalon();
     if (data.error) {
-      dispatch(salonFailed(data.error))
-      toast.info("You don't have branches. Open the settings page and add a branch to continue")
-      return
+      dispatch(salonFailed(data.error));
+      toast.info(
+        "You don't have branches. Open the settings page and add a branch to continue"
+      );
+      return;
     }
-    dispatch(salonSuccess(data))
-  }
+    dispatch(salonSuccess(data));
+  };
 
   useEffect(() => {
-    fetchSalon()
-  }, [])
+    fetchSalon();
+  }, []);
 
   const getBranches = async () => {
-    dispatch(branchRequest())
-    const data = await getSalonBranches({}, {})
+    dispatch(branchRequest());
+    const data = await getSalonBranches({}, {});
     if (data.error) {
-      dispatch(branchFailed(data.error))
-      toast.info("You don't have branches. Open the settings page and add a branch to continue")
-      return
+      dispatch(branchFailed(data.error));
+      toast.info(
+        "You don't have branches. Open the settings page and add a branch to continue"
+      );
+      return;
     }
-    dispatch(branchSuccess(data))
-  }
+    dispatch(branchSuccess(data));
+  };
 
   const getServices = async () => {
-    dispatch(serviceRequest())
-    const serv = await getSalonServices()
-    dispatch(serviceSuccess(serv))
-  }
+    dispatch(serviceRequest());
+    const serv = await getSalonServices();
+    dispatch(serviceSuccess(serv));
+  };
 
   const getCombos = async () => {
-    dispatch(comboRequest())
-    const comb = await getSalonCombos()
-    dispatch(comboSuccess(comb))
-  }
+    dispatch(comboRequest());
+    const comb = await getSalonCombos();
+    dispatch(comboSuccess(comb));
+  };
 
   const getCoupons = async () => {
-    dispatch(couponRequest())
-    const coup = await getSalonCoupons()
+    dispatch(couponRequest());
+    const coup = await getSalonCoupons();
     if (coup.error) {
-      dispatch(couponFailed(coup.error))
-      toast.info(coup.error)
-      return
+      dispatch(couponFailed(coup.error));
+      toast.info(coup.error);
+      return;
     }
-    dispatch(couponSuccess(coup))
-  }
+    dispatch(couponSuccess(coup));
+  };
 
   useEffect(() => {
     if (services.length <= 0) {
-      getServices()
+      getServices();
     }
     if (branches.length <= 0) {
-      getBranches()
+      getBranches();
     }
     if (combos.length <= 0) {
-      getCombos()
+      getCombos();
     }
     if (coupons.length <= 0) {
-      getCoupons()
+      getCoupons();
     }
-  }, [])
+  }, []);
 
   // Intersection Observer for infinite scrolling
   useEffect(() => {
-    if (hasNext) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          const [entry] = entries
-          if (entry.isIntersecting && !isLoading) {
-            setIsLoading(true)
-            setPage((prev) => prev + 1)
-          }
-        },
-        { threshold: 1.0 }
-      )
+    if (!hasNext || isLoading) return; // Stop observing if there's no next page or loading
 
-      const currentSentinel = sentinelRef.current
-      if (currentSentinel) {
-        observer.observe(currentSentinel)
-      }
-
-      return () => {
-        if (currentSentinel) {
-          observer.unobserve(currentSentinel)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoading) {
+          console.log("Sentinel reached. Fetching next page...");
+          setPage((prev) => prev + 1); // Increase page to trigger new API call
         }
-      }
-    }
-  }, [isLoading])
+      },
+      {threshold: 0.1}
+    );
 
+    const sentinel = sentinelRef.current;
+    console.log("Sentinel:", sentinel); // Debugging line
+
+    if (sentinel) observer.observe(sentinel);
+
+    return () => {
+      if (sentinel) observer.unobserve(sentinel);
+    };
+  }, [hasNext, isLoading]);
+
+  const handleScroll = () => {
+    console.log("Heihgt : ", document.documentElement.scrollHeight);
+    console.log("Top : ", document.documentElement.scrollTop);
+    const bottom =
+      Math.ceil(window.innerHeight + window.scrollY) >=
+      document.documentElement.scrollHeight;
+    if (bottom) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+  });
   return (
-    <div className="flex flex-1 justify-center relative">
+    <div onScroll={handleScroll} className="flex flex-1 justify-center relative">
       <div className="w-full p-10">
         <div className="sticky top-0 flex justify-between">
           <div>
@@ -179,7 +217,7 @@ const Bill = () => {
             <h2 className="text-3xl font-bold">Billing Section</h2>
           </div>
           <button
-            onClick={() => navigate('/auth/createBill')}
+            onClick={() => navigate("/auth/createBill")}
             className="m-3 mr-10 bg-yellow-400 px-5 py-2 rounded-xl text-black font-bold hover:bg-yellow-500 transition-colors duration-300"
           >
             Add a Bill
@@ -189,7 +227,9 @@ const Bill = () => {
         {/* Table Section */}
         <div className={`relative rounded-2xl overflow-x-auto mt-5`}>
           <div className="flex bg-white p-2">
-            <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
+            <h2 className="w-full bg-white p-5 text-xl font-bold">
+              Bill Details
+            </h2>
             {!isAdmin && (
               <div className="flex items-center mb-5">
                 <input
@@ -235,10 +275,15 @@ const Bill = () => {
                   onClick={() => handleBillView(item)}
                   className="bg-white hover:bg-slate-50 text-large cursor-pointer"
                 >
-                  <th scope="row" className="pl-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                  <th
+                    scope="row"
+                    className="pl-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                  >
                     {item.branch.address}
                   </th>
-                  <td className="px-6 py-4">{new Date(item.created_at).toLocaleDateString()}</td>
+                  <td className="px-6 py-4">
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </td>
                   <td className="px-6 py-4">{item?.customer?.name}</td>
                   <td className="px-6 py-4">{item?.customer?.phone}</td>
                   <td className="px-6 py-4">₹{item.final_amount}</td>
@@ -246,16 +291,16 @@ const Bill = () => {
               ))}
             </tbody>
           </table>
+            <div ref={sentinelRef} className="h-20 bg-red-500"></div>
 
           {/* Sentinel for IntersectionObserver */}
-          <div ref={sentinelRef} className="h-10 bg-transparent"></div>
         </div>
       </div>
 
       {/* Add View Bill Component */}
       {viewBill && <ViewBill view={viewBill} setView={setBill} />}
     </div>
-  )
-}
+  );
+};
 
-export default Bill
+export default Bill;

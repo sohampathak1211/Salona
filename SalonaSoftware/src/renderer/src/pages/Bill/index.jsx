@@ -3,7 +3,6 @@ import ViewBill from './ViewBill'
 import CreateBill from './CreateBill'
 import { useNavigate } from 'react-router-dom'
 import useBill from '../../services/useBill'
-import FlatList from 'flatlist-react'
 import useAssets from '../../components/categories'
 import { toast } from 'react-toastify'
 import { salonFailed, salonRequest, salonSuccess } from '../../slices/salonSlice'
@@ -39,14 +38,15 @@ const Bill = () => {
   const services = useSelector(selectService)
   const combos = useSelector(selectCombo)
   const coupons = useSelector(selectCoupon)
-  
 
   // Fetch bill data
   const getProducts = async () => {
+    if (!hasNext) return
     const billData = await getBill({ page: page })
     console.log('Bill Data', billData)
-    setBillDetails((prev) => billData.results) // Append new data to existing list
-    if (billData.next == null) {
+    setBillDetails((prev) => [...prev, ...billData.results])
+    if (billData.next_page == null) {
+      console.log('No more data')
       setNext(false)
     }
     setIsLoading(false)
@@ -63,6 +63,7 @@ const Bill = () => {
     setBill(item)
   }
 
+  console.log('Page : ', page)
   const handleSearch = async () => {
     if (search.length !== 10) {
       toast.info('Phone number should be exactly 10 digits!')
@@ -142,6 +143,27 @@ const Bill = () => {
       getCoupons()
     }
   }, [])
+
+  const observerTarget = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoading) {
+          console.log('Triggered a function')
+          setIsLoading(true)
+          setPage((prev) => prev + 1)
+        }
+      },
+      { threshold: 1.0 }
+    )
+
+    if (observerTarget.current) observer.observe(observerTarget.current)
+
+    return () => {
+      if (observerTarget.current) observer.unobserve(observerTarget.current)
+    }
+  }, [billDetails])
 
   // Intersection Observer for infinite scrolling
   useEffect(() => {
@@ -248,7 +270,8 @@ const Bill = () => {
           </table>
 
           {/* Sentinel for IntersectionObserver */}
-          <div ref={sentinelRef} className="h-10 bg-transparent"></div>
+          <div ref={sentinelRef} className="h-10 bg-red-500"></div>
+          <div ref={observerTarget} style={{ height: '20px', background: 'red' }} />
         </div>
       </div>
 

@@ -1,175 +1,211 @@
-import React, { useEffect, useState, Fragment } from 'react'
-import { Listbox, Combobox, Transition } from '@headlessui/react'
-import { useSelector } from 'react-redux'
-import { selectService } from '../../slices/serviceSlice'
-import { selectCombo } from '../../slices/comboSlice'
-import { selectBranch } from '../../slices/branchSlice'
-import { selectCoupon } from '../../slices/couponSlice'
-import useProduct from '../../services/useProduct'
-import { FaChevronDown } from 'react-icons/fa'
-import useAssets from '../../components/categories'
-import { toast } from 'react-toastify'
-import useBill from '../../services/useBill'
-import { useNavigate } from 'react-router-dom'
+import React, {useEffect, useState, Fragment} from "react";
+import {Listbox, Combobox, Transition} from "@headlessui/react";
+import {useSelector} from "react-redux";
+import {selectService} from "../../slices/serviceSlice";
+import {selectCombo} from "../../slices/comboSlice";
+import {selectBranch} from "../../slices/branchSlice";
+import {selectCoupon} from "../../slices/couponSlice";
+import useProduct from "../../services/useProduct";
+import {FaChevronDown} from "react-icons/fa";
+import useAssets from "../../components/categories";
+import {toast} from "react-toastify";
+import useBill from "../../services/useBill";
+import {useNavigate} from "react-router-dom";
+import useDebounce from "../../utils/useDebounce";
+import useCustomer from "../../services/useCustomer";
 
 const CreateBill = () => {
-  const { getSalonProducts } = useProduct()
-  const { createBill } = useBill()
-  const { isAdmin } = useAssets()
-  const branches = useSelector(selectBranch)
-  const services = useSelector(selectService)
-  const combos = useSelector(selectCombo)
-  const stateCoupons = useSelector(selectCoupon)
+  const {getSalonProducts} = useProduct();
+  const {createBill} = useBill();
+  const {isAdmin} = useAssets();
+  const branches = useSelector(selectBranch);
+  const services = useSelector(selectService);
+  const combos = useSelector(selectCombo);
+  const {searchByPhone} = useCustomer();
+  const stateCoupons = useSelector(selectCoupon);
 
-  const [coupons, setCoupons] = useState([])
+  const [coupons, setCoupons] = useState([]);
 
   useEffect(() => {
     const validCoupons = stateCoupons.filter((coupon) => {
-      const currentDate = new Date()
+      const currentDate = new Date();
       // Check if the coupon is still valid based on the date
-      return new Date(coupon.valid_till) >= currentDate
-    })
-    setCoupons(validCoupons) // Update state with filtered coupons
-  }, [stateCoupons])
+      return new Date(coupon.valid_till) >= currentDate;
+    });
+    setCoupons(validCoupons); // Update state with filtered coupons
+  }, [stateCoupons]);
 
-  const [products, setProducts] = useState([])
-  const [selectedBranch, setSelectedBranch] = useState(null)
-  const [customerName, setCustomerName] = useState('')
-  const [contactNumber, setContactNumber] = useState('')
-  const [selectedCoupon, setSelectedCoupon] = useState(null)
-  const [items, setItems] = useState([{ type: '', item: null, quantity: 1, price: 0, total: 0 }])
-  const [query, setQuery] = useState('')
-  console.log('COupons',coupons)
-  console.log("Items",items)
-  const navigate = useNavigate()
+  const [products, setProducts] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [customerName, setCustomerName] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [relatedContacts, setRelatedContacts] = useState([]);
+  const debouncedSearchTerm = useDebounce(contactNumber, 500); // Debounce input by 500ms
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [items, setItems] = useState([
+    {type: "", item: null, quantity: 1, price: 0, total: 0},
+  ]);
+  const [query, setQuery] = useState("");
+  console.log("COupons", coupons);
+  console.log("Items", items);
+  const navigate = useNavigate();
   useEffect(() => {
     const getProducts = async () => {
-      const proData = await getSalonProducts()
-      setProducts(proData)
+      const proData = await getSalonProducts();
+      setProducts(proData);
+    };
+    getProducts();
+  }, []);
+
+  useEffect(() => {
+    if (!debouncedSearchTerm) {
+      setRelatedContacts([]);
+      return;
     }
-    getProducts()
-  }, [])
+    console.log("THIS IS TRIGGERED");
+    const fetchPhoneNumbers = async () => {
+      try {
+        const data = await searchByPhone({phone: debouncedSearchTerm});
+        console.log("DATA", data);
+        setRelatedContacts(data);
+      } catch (error) {
+        console.error("Error fetching phone numbers:", error);
+      }
+    };
+
+    fetchPhoneNumbers();
+  }, [debouncedSearchTerm]);
 
   const addItem = () => {
-    setItems([...items, { type: '', item: null, quantity: 1, price: 0, total: 0 }])
-  }
+    setItems([
+      ...items,
+      {type: "", item: null, quantity: 1, price: 0, total: 0},
+    ]);
+  };
 
   const removeItem = (index) => {
-    setItems(items.filter((_, i) => i !== index))
-  }
+    setItems(items.filter((_, i) => i !== index));
+  };
 
   const handleItemChange = (index, field, value) => {
-    const updatedItems = [...items]
-    updatedItems[index][field] = value
+    const updatedItems = [...items];
+    updatedItems[index][field] = value;
 
-    if (field === 'item' && value) {
-      updatedItems[index].price = parseFloat(value.price) || 0
+    if (field === "item" && value) {
+      updatedItems[index].price = parseFloat(value.price) || 0;
     }
 
-    updatedItems[index].total = updatedItems[index].price * updatedItems[index].quantity || 0
-    setItems(updatedItems)
-  }
+    updatedItems[index].total =
+      updatedItems[index].price * updatedItems[index].quantity || 0;
+    setItems(updatedItems);
+  };
 
   const calculateGrandTotal = () => {
-    const totalBeforeCoupon = items.reduce((sum, item) => sum + item.total, 0)
+    const totalBeforeCoupon = items.reduce((sum, item) => sum + item.total, 0);
 
-    let discount = 0
+    let discount = 0;
     if (selectedCoupon) {
       const {
         by_percent,
         discount_amount,
         discount_percentage,
         minimum_amount,
-        is_minimum_purchase
-      } = selectedCoupon
+        is_minimum_purchase,
+      } = selectedCoupon;
 
-      if (!is_minimum_purchase || totalBeforeCoupon >= parseFloat(minimum_amount)) {
+      if (
+        !is_minimum_purchase ||
+        totalBeforeCoupon >= parseFloat(minimum_amount)
+      ) {
         if (by_percent) {
-          discount = (totalBeforeCoupon * parseFloat(discount_percentage)) / 100
+          discount =
+            (totalBeforeCoupon * parseFloat(discount_percentage)) / 100;
         } else {
-          discount = parseFloat(discount_amount)
+          discount = parseFloat(discount_amount);
         }
       }
     }
 
     return {
       beforeCoupon: totalBeforeCoupon.toFixed(2),
-      afterCoupon: Math.max(totalBeforeCoupon - discount, 0).toFixed(2)
-    }
-  }
+      afterCoupon: Math.max(totalBeforeCoupon - discount, 0).toFixed(2),
+    };
+  };
 
   const filteredOptions = (index) => {
-    if (items[index].type === 'Service') return services
-    if (items[index].type === 'Combo') return combos
-    if (items[index].type === 'Product') return products
-    return []
-  }
+    if (items[index].type === "Service") return services;
+    if (items[index].type === "Combo") return combos;
+    if (items[index].type === "Product") return products;
+    return [];
+  };
 
   const displayedOptions = (index) => {
-    const options = filteredOptions(index)
-    return query === ''
+    const options = filteredOptions(index);
+    return query === ""
       ? options
-      : options.filter((opt) => opt.name.toLowerCase().includes(query.toLowerCase()))
-  }
+      : options.filter((opt) =>
+          opt.name.toLowerCase().includes(query.toLowerCase())
+        );
+  };
 
   const validateBill = () => {
     if (!customerName.trim()) {
-      toast.info('Customer name is required.')
-      return false
+      toast.info("Customer name is required.");
+      return false;
     }
     if (!contactNumber.trim()) {
-      toast.info('Contact number is required.')
-      return false
+      toast.info("Contact number is required.");
+      return false;
     }
     if (isAdmin && !selectedBranch) {
-      toast.info('Branch is required for admin users.')
-      return false
+      toast.info("Branch is required for admin users.");
+      return false;
     }
     if (items.length === 0) {
-      toast.info('At least one item must be added to the bill.')
-      return false
+      toast.info("At least one item must be added to the bill.");
+      return false;
     }
     for (let item of items) {
       if (!item.type) {
-        toast.info('Each item must have a type selected.')
-        return false
+        toast.info("Each item must have a type selected.");
+        return false;
       }
       if (!item.item) {
-        toast.info('Each item must have an item selected.')
-        return false
+        toast.info("Each item must have an item selected.");
+        return false;
       }
       if (!item.quantity || item.quantity <= 0) {
-        toast.info('Each item must have a valid quantity.')
-        return false
+        toast.info("Each item must have a valid quantity.");
+        return false;
       }
     }
-    return true
-  }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!validateBill()) return
+    e.preventDefault();
+    if (!validateBill()) return;
 
     const services_data = items
-      .filter((item) => item.type === 'Service')
+      .filter((item) => item.type === "Service")
       .map((service) => ({
         id: service.item.id,
-        quantity: service.quantity
-      }))
+        quantity: service.quantity,
+      }));
 
     const combos_data = items
-      .filter((item) => item.type === 'Combo')
+      .filter((item) => item.type === "Combo")
       .map((combo) => ({
         id: combo.item.id,
-        quantity: combo.quantity
-      }))
+        quantity: combo.quantity,
+      }));
 
     const products_data = items
-      .filter((item) => item.type === 'Product')
+      .filter((item) => item.type === "Product")
       .map((product) => ({
         id: product.item.id,
-        quantity: product.quantity
-      }))
+        quantity: product.quantity,
+      }));
 
     const billData = {
       c_name: customerName,
@@ -178,20 +214,20 @@ const CreateBill = () => {
       services: services_data,
       combos: combos_data,
       products: products_data,
-      coupon: selectedCoupon ? selectedCoupon.id : null
-    }
-    console.log(billData)
+      coupon: selectedCoupon ? selectedCoupon.id : null,
+    };
+    console.log(billData);
 
     try {
-      const response = await createBill(billData)
-      toast.success('Bill created successfully!')
-      console.log('Payload Data:', response)
-      navigate('/auth/bill')
+      const response = await createBill(billData);
+      toast.success("Bill created successfully!");
+      console.log("Payload Data:", response);
+      navigate("/auth/bill");
     } catch (error) {
-      toast.error('Failed to create bill. Please try again.')
-      console.error('Error creating bill:', error)
+      toast.error("Failed to create bill. Please try again.");
+      console.error("Error creating bill:", error);
     }
-  }
+  };
 
   return (
     <div className="flex flex-1 justify-center relative">
@@ -208,27 +244,39 @@ const CreateBill = () => {
         {/* Table Section */}
         <div className={`relative rounded-2xl overflow-x-auto mt-5 `}>
           <div className="w-full flex justify-between bg-white rounded-md">
-            <h2 className="w-full bg-white p-5 text-xl font-bold">Bill Details</h2>
+            <h2 className="w-full bg-white p-5 text-xl font-bold">
+              Bill Details
+            </h2>
             <button
-              onClick={() => navigate('/auth/bill')}
+              onClick={() => navigate("/auth/bill")}
               className="m-3 mr-10 bg-yellow-400 px-5 py-2 rounded-xl text-black font-bold hover:bg-yellow-500 transition-colors duration-300"
             >
               Back
             </button>
           </div>
-          <form onSubmit={handleSubmit} className="p-5 bg-white rounded-lg shadow-md space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="p-5 bg-white rounded-lg shadow-md space-y-6"
+          >
             {/* Branch Dropdown */}
             {isAdmin && (
               <div className="h-full">
-                <label className="block text-sm font-medium text-gray-900">Branch</label>
+                <label className="block text-sm font-medium text-gray-900">
+                  Branch
+                </label>
                 <Listbox value={selectedBranch} onChange={setSelectedBranch}>
-                  <div className="relative mt-1">
+                  <div className="relative mt-1 z-30">
                     <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                       <span className="block truncate">
-                        {selectedBranch ? selectedBranch.address : 'Select Branch'}
+                        {selectedBranch
+                          ? selectedBranch.address
+                          : "Select Branch"}
                       </span>
                       <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <FaChevronDown
+                          className="h-5 w-5 text-gray-400"
+                          aria-hidden="true"
+                        />
                       </span>
                     </Listbox.Button>
                     <Transition
@@ -241,14 +289,18 @@ const CreateBill = () => {
                         {branches.map((branch) => (
                           <Listbox.Option
                             key={branch.id}
-                            className={({ active }) =>
+                            className={({active}) =>
                               `relative cursor-default select-none p-2 ${
-                                active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                                active
+                                  ? "bg-amber-100 text-amber-900"
+                                  : "text-gray-900"
                               }`
                             }
                             value={branch}
                           >
-                            <span className={`block text-sm truncate font-normal`}>
+                            <span
+                              className={`block text-sm truncate font-normal`}
+                            >
                               {branch.address}
                             </span>
                           </Listbox.Option>
@@ -262,7 +314,64 @@ const CreateBill = () => {
 
             {/* Customer Details */}
             <div>
-              <label className="block text-sm font-medium mb-1">Customer Name</label>
+              {/* <label className="block text-sm font-medium mb-1">
+                Contact Contact Number
+              </label>
+              <input
+                type="tel"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
+                className="w-full p-2 border rounded-md"
+                placeholder="Enter contact number"
+                required
+              /> */}
+              <Combobox
+                value={contactNumber}
+                onChange={(val) => setContactNumber(val)}
+                as="div"
+                className="relative w-full z-10"
+              >
+                <div>
+                  <Combobox.Input
+                    className="p-2 border rounded-md w-full"
+                    placeholder="Enter Phone Number"
+                    onChange={(val) => setContactNumber(val)}
+                    displayValue={(selected) => (selected ? selected.name : "")}
+                  />
+                  <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                    <FaChevronDown
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </Combobox.Button>
+                </div>
+                <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto bg-white border rounded-md shadow-lg z-10">
+                  {relatedContacts.length > 0 ? (
+                    relatedContacts.map((opt) => (
+                      <Combobox.Option
+                        key={opt.id}
+                        value={opt}
+                        className={({active}) =>
+                          `cursor-pointer select-none px-4 py-2 ${
+                            active ? "bg-blue-500 text-white" : "text-gray-900"
+                          }`
+                        }
+                      >
+                        {opt.name}
+                      </Combobox.Option>
+                    ))
+                  ) : (
+                    <div className="cursor-default select-none px-4 py-2 text-gray-500">
+                      No results found
+                    </div>
+                  )}
+                </Combobox.Options>
+              </Combobox>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Customer Name
+              </label>
               <input
                 type="text"
                 value={customerName}
@@ -272,18 +381,6 @@ const CreateBill = () => {
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Contact Number</label>
-              <input
-                type="tel"
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-                className="w-full p-2 border rounded-md"
-                placeholder="Enter contact number"
-                required
-              />
-            </div>
-
             {/* Items Section */}
             <div>
               <h3 className="text-lg font-semibold mb-3">Items</h3>
@@ -299,13 +396,18 @@ const CreateBill = () => {
                   {/* Type Dropdown */}
                   <Listbox
                     value={item.type}
-                    onChange={(value) => handleItemChange(index, 'type', value)}
+                    onChange={(value) => handleItemChange(index, "type", value)}
                   >
                     <div className="relative mt-1">
                       <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-                        <span className="block truncate">{item.type || 'Select Type'}</span>
+                        <span className="block truncate">
+                          {item.type || "Select Type"}
+                        </span>
                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                          <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                          <FaChevronDown
+                            className="h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                          />
                         </span>
                       </Listbox.Button>
                       <Transition
@@ -315,17 +417,21 @@ const CreateBill = () => {
                         leaveTo="opacity-0"
                       >
                         <Listbox.Options className="absolute mt-1 max-h-40 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                          {['Service', 'Combo', 'Product'].map((type) => (
+                          {["Service", "Combo", "Product"].map((type) => (
                             <Listbox.Option
                               key={type}
-                              className={({ active }) =>
+                              className={({active}) =>
                                 `relative cursor-default select-none p-2 ${
-                                  active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                                  active
+                                    ? "bg-amber-100 text-amber-900"
+                                    : "text-gray-900"
                                 }`
                               }
                               value={type}
                             >
-                              <span className="block text-sm truncate font-normal">{type}</span>
+                              <span className="block text-sm truncate font-normal">
+                                {type}
+                              </span>
                             </Listbox.Option>
                           ))}
                         </Listbox.Options>
@@ -336,7 +442,7 @@ const CreateBill = () => {
                   {/* Item Dropdown */}
                   <Combobox
                     value={item.item}
-                    onChange={(value) => handleItemChange(index, 'item', value)}
+                    onChange={(value) => handleItemChange(index, "item", value)}
                     as="div"
                     className="relative w-full"
                   >
@@ -345,10 +451,15 @@ const CreateBill = () => {
                         className="p-2 border rounded-md w-full"
                         placeholder="Search or Select Item"
                         onChange={(e) => setQuery(e.target.value)}
-                        displayValue={(selected) => (selected ? selected.name : '')}
+                        displayValue={(selected) =>
+                          selected ? selected.name : ""
+                        }
                       />
                       <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                        <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <FaChevronDown
+                          className="h-5 w-5 text-gray-400"
+                          aria-hidden="true"
+                        />
                       </Combobox.Button>
                     </div>
                     <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto bg-white border rounded-md shadow-lg z-10">
@@ -357,9 +468,11 @@ const CreateBill = () => {
                           <Combobox.Option
                             key={opt.id}
                             value={opt}
-                            className={({ active }) =>
+                            className={({active}) =>
                               `cursor-pointer select-none px-4 py-2 ${
-                                active ? 'bg-blue-500 text-white' : 'text-gray-900'
+                                active
+                                  ? "bg-blue-500 text-white"
+                                  : "text-gray-900"
                               }`
                             }
                           >
@@ -379,7 +492,13 @@ const CreateBill = () => {
                     type="number"
                     min="1"
                     value={item.quantity}
-                    onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handleItemChange(
+                        index,
+                        "quantity",
+                        parseInt(e.target.value)
+                      )
+                    }
                     className="w-20 p-2 border rounded-md"
                   />
 
@@ -418,15 +537,22 @@ const CreateBill = () => {
                   Add Item
                 </button>
                 <div className="h-full flex items-center">
-                  <label className="block text-md font-medium mr-4 text-gray-900">Coupon</label>
+                  <label className="block text-md font-medium mr-4 text-gray-900">
+                    Coupon
+                  </label>
                   <Listbox value={selectedCoupon} onChange={setSelectedCoupon}>
                     <div className="relative mt-1 w-[400px]">
                       <Listbox.Button className="relative w-full cursor-default bg-white py-[10px] pl-3 pr-10 text-left  border border-gray-300 rounded-md shadow-sm focus:ring-gold focus:border-gold focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                         <span className="block truncate">
-                          {selectedCoupon ? selectedCoupon.code : 'Select Coupon'}
+                          {selectedCoupon
+                            ? selectedCoupon.code
+                            : "Select Coupon"}
                         </span>
                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                          <FaChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                          <FaChevronDown
+                            className="h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                          />
                         </span>
                       </Listbox.Button>
                       <Transition
@@ -440,19 +566,33 @@ const CreateBill = () => {
                             coupons.map((coupon) => (
                               <Listbox.Option
                                 key={coupon.id}
-                                className={({ active }) =>
+                                className={({active}) =>
                                   `relative cursor-default select-none p-2 ${
-                                    active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                                    active
+                                      ? "bg-amber-100 text-amber-900"
+                                      : "text-gray-900"
                                   }`
                                 }
                                 value={coupon}
                               >
-                                <span className={`block text-sm truncate font-normal`}>
-                                  {coupon.code}{' '}
+                                <span
+                                  className={`block text-sm truncate font-normal`}
+                                >
+                                  {coupon.code}{" "}
                                   <span className="text-gray-400">
                                     {coupon.is_minimum_purchase
                                       ? `Min Purchase of ${coupon.minimum_amount}`
-                                      : `${coupon.by_percent ? coupon.discount_percentage : coupon.discount_amount} ${coupon.by_percent ? '%' : 'Rs.'} off on ${coupon.valid_services.map((service) => service.name).join(',')} & ${coupon.valid_combos.map((combo) => combo.name).join(',')}`}
+                                      : `${
+                                          coupon.by_percent
+                                            ? coupon.discount_percentage
+                                            : coupon.discount_amount
+                                        } ${
+                                          coupon.by_percent ? "%" : "Rs."
+                                        } off on ${coupon.valid_services
+                                          .map((service) => service.name)
+                                          .join(",")} & ${coupon.valid_combos
+                                          .map((combo) => combo.name)
+                                          .join(",")}`}
                                   </span>
                                 </span>
                               </Listbox.Option>
@@ -468,11 +608,15 @@ const CreateBill = () => {
             {/* Total Section */}
             <div className="mt-4 w-[300px]">
               <div className="flex justify-between">
-                <span className="font-medium text-gray-700">Total Before Coupon:</span>
+                <span className="font-medium text-gray-700">
+                  Total Before Coupon:
+                </span>
                 <span>{calculateGrandTotal().beforeCoupon}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-medium text-gray-700">Total After Coupon:</span>
+                <span className="font-medium text-gray-700">
+                  Total After Coupon:
+                </span>
                 <span>{calculateGrandTotal().afterCoupon}</span>
               </div>
             </div>
@@ -490,7 +634,7 @@ const CreateBill = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreateBill
+export default CreateBill;

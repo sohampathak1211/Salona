@@ -7,7 +7,12 @@ from hnb.serializer import CustomerSerializer
 class CustomerREST(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            print("I AM GETTING HIT")
+            phone = request.query_params.get('phone')
+            print("I AM GETTING HIT",phone)
+            if phone:
+                customer = Customer.objects.filter(salon_id=request.salon_id,phone__startswith=phone)
+                serializer = CustomerSerializer(customer,many=True)
+                return Response(serializer.data)
             salon_id = request.salon_id
             data = Customer.objects.filter(salon_id=request.salon_id)
             serializer = CustomerSerializer(data, many=True)

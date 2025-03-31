@@ -28,6 +28,9 @@ class ChatUserEnabledMiddleware:
         if request.path.startswith('/admin'):
             logger.info("Request is for salon owner")
             return self.get_response(request)
+        if request.path.startswith('/hnb/superuser/'):
+            logger.info("Request is for salon owner")
+            return self.get_response(request)
         
         # request.cUser = 3
         # request.salon_id = 4

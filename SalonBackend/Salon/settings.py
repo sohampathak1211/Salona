@@ -9,11 +9,15 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 import os
 import pytz
 from datetime import datetime,timedelta
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -175,19 +179,18 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST="smtp.gmail.com"
-EMAIL_USE_TLS=True
-EMAIL_PORT=587
-EMAIL_HOST_USER="pathaksoham2003@gmail.com"
-EMAIL_HOST_PASSWORD="mlsn.520f24ab18eeca13c6d9c985be2347e1a1a3fd1814401868238590862bade9bb"
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 
 # settings.py
-TOKEN_EXPIRY_DAYS = 30  # Token validity in days
-JWT_SECRET_KEY = 'your_secret_key_here'  # Define your secret key here
-JWT_ALGORITHM = 'HS256'  # Algorithm for JWT
+TOKEN_EXPIRY_DAYS = int(os.getenv("TOKEN_EXPIRY_DAYS", 30))
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your_default_secret_key")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 
 kolkata_tz = pytz.timezone(TIME_ZONE)
 now_kolkata = datetime.now(kolkata_tz)

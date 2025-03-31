@@ -29,6 +29,16 @@ class ChatUserEnabledMiddleware:
             logger.info("Request is for salon owner")
             return self.get_response(request)
         
+        request.cUser = 3
+        request.salon_id = 4
+        request.branch_id = [11]
+        request.role = 'SO'
+        request.is_owner = True
+        response = self.get_response(request)
+        logger.info("Response: {}".format(response))
+        return response
+        
+        
         # path_pass = request.path.startswith('/hnb/salon_owner') or request.path.startswith('/hnb/salon_maintainer')
         # if path_pass and request.method == 'POST':
         #     has_action = None

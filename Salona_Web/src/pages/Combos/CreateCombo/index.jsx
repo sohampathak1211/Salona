@@ -6,7 +6,7 @@ import { ImCheckmark } from 'react-icons/im'
 import { useDispatch, useSelector } from 'react-redux'
 import useService from '../../../services/useService'
 import useCombo from '../../../services/useCombo'
-import { comboAddCombo } from '../../../slices/comboSLice'
+import { comboAddCombo } from '../../../slices/comboSlice'
 
 const CreateCombo = ({ setCreate }) => {
   const [combos, setCombos] = useState({

@@ -2,7 +2,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils.crypto import get_random_string
-from .models import User
+from .models import User,SalonOwner
 import random
 import json
 from mailersend import emails
@@ -78,11 +78,11 @@ class OtpVerificationView(View):
 
 class OtpResendView(View):
     def post(self, request):
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode("utf-8"))
         email = data.get('email')
         
         try:
-            user = User.objects.get(email=email)
+            user = SalonOwner.objects.get(email=email)
             user.otp = random.randint(1000, 9999)  # Regenerate 4-digit OTP
             user.save()
             
@@ -101,7 +101,7 @@ class OtpResendView(View):
 #sms otp things
 
 @api_view(['POST'])
-def send_otp(request):
+def send_otp_phone(request):
     data = request.data
     
     if data.get('phone') is None:

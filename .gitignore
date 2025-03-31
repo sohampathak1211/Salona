@@ -55,3 +55,6 @@ SalonBackend/migrations/
 SalonBackend/hnb/migrations/
 SalonBackend/rest_views/__pycache__/
 SalonBackend/static/
+
+docker
+WtsApi

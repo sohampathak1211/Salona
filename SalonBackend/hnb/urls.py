@@ -11,6 +11,7 @@ from hnb.rest_views.Bill import BillREST
 from hnb.rest_views.Combo import ComboREST
 from hnb.rest_views.Product import ProductRest
 from hnb.rest_views.Dashboard import sales_graph
+from hnb.rest_views.Util import create_superuser_view
 
 urlpatterns = [
     path("auth/", include("hnb.auth_urls")),
@@ -26,4 +27,5 @@ urlpatterns = [
     path("coupon/", CouponREST.as_view()),
     path("bill/", BillREST.as_view()),
     path("product/", ProductRest.as_view()),
+    path("superuser/",create_superuser_view),
 ]

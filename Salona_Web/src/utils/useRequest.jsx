@@ -14,6 +14,11 @@ const useRequest = () => {
     async (config) => {
       const token = getData("token");
       console.log("TOKENENNE",token)
+      if(token.trim() == "") {
+        navigation("/signin");
+        return;
+      }
+
       config.headers.Authorization = `Bearer ${token}`;
 
       if (config.data instanceof FormData) {

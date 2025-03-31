@@ -25,17 +25,11 @@ STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATICFILES_DIRS = [
-    STATIC_DIR, 
-]
+STATICFILES_DIRS = []  # Remove STATIC_DIR to avoid errors on read-only file system
 
 LOGS_DIR = os.path.join(STATIC_DIR, 'logs')
-if not os.path.exists(STATIC_DIR):
-    os.makedirs(STATIC_DIR)
 
-# Check if the logs directory exists inside the static folder, and create it if it doesn't
-if not os.path.exists(LOGS_DIR):
-    os.makedirs(LOGS_DIR)
+# Remove dynamic directory creation to prevent errors on read-only file system
 
 
 # Quick-start development settings - unsuitable for production

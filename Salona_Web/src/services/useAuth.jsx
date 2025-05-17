@@ -18,7 +18,7 @@ const useAuth = () => {
   const maintainerSignIn = async (data) => {
     try {
       const response = await axios.post(salonMaintainerSignIn, data);
-      return response;
+      return response.data;
     } catch (e) {
       console.error("Error during salon sign-in:", e);
       return null;

@@ -44,9 +44,9 @@ const Salon = () => {
       </div>
       <div className="bg-white flex p-6 rounded-lg shadow">
         <div className="w-2/3 flex pr-6">
-          <div className="w-36 h-36 mr-10 rounded-md bg-black">
+          {/* <div className="w-36 h-36 mr-10 rounded-md bg-black">
             <img src={Image} alt="Salon Logo" />
-          </div>
+          </div> */}
           <div>
             <h2 className="text-3xl font-bold text-gray-700">{salon?.name}</h2>
             <p className="text-gray-600 text-sm pl-2">{salon?.email}</p>

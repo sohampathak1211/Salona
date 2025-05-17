@@ -1,96 +1,121 @@
-import React, { Fragment, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Both from '../../assets/hairfemale3.jpg?react'
-import { toast } from 'react-toastify'
-import useAuth from '../../services/useAuth'
-import useLocalStorage from '../../services/useLocalStorage'
-import Logo from '../../assets/logo.png?react'
-import { useDispatch, useSelector } from 'react-redux'
-import { setAuth } from '../../slices/authSlice'
+import React, {Fragment, useEffect, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import Both from "../../assets/hairfemale3.jpg?react";
+import {toast} from "react-toastify";
+import useAuth from "../../services/useAuth";
+import useLocalStorage from "../../services/useLocalStorage";
+import Logo from "../../assets/logo.png?react";
+import {useDispatch, useSelector} from "react-redux";
+import {setAuth} from "../../slices/authSlice";
 
 export default function SignIn() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { salonSignIn, maintainerSignIn } = useAuth()
-  const { setData } = useLocalStorage()
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const {salonSignIn, maintainerSignIn} = useAuth();
+  const {setData} = useLocalStorage();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [admin, setAdmin] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [admin, setAdmin] = useState(false);
 
   const validateForm = () => {
     if (!email) {
-      setError('Email is required.')
-      return false
+      setError("Email is required.");
+      return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address.')
-      return false
+      setError("Please enter a valid email address.");
+      return false;
     }
     if (!password) {
-      setError('Password is required.')
-      return false
+      setError("Password is required.");
+      return false;
     }
-    setError('')
-    return true
-  }
+    setError("");
+    return true;
+  };
+
+  const handleTestSignIn = async (type) => {
+    if (type === "owner") {
+      const res = await salonSignIn({
+        email: import.meta.env.VITE_TEST_OWNER_EMAIL,
+        password: import.meta.env.VITE_TEST_OWNER_PASSWORD,
+        action: "signin",
+      });
+      setData("cUser", res.cUser);
+      setData("token", res.token);
+      dispatch(setAuth(res));
+      navigate("/auth/dashboard");
+    } else {
+      const res = await maintainerSignIn({
+        email: import.meta.env.VITE_TEST_MAINTAINER_EMAIL,
+        password: import.meta.env.VITE_TEST_MAINTAINER_PASSWORD,
+        action: "signin",
+      });
+      console.log("res from the backend for maintainer", res);
+      setData("cUser", res.cUser);
+      setData("token", res.token);
+      dispatch(setAuth(res));
+      navigate("/auth/bill");
+    }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setLoading(true)
+    setLoading(true);
 
     try {
       if (admin) {
-        const res = await salonSignIn({ email, password, action: 'signin' })
-        console.log('data from the backend for user', res)
+        const res = await salonSignIn({email, password, action: "signin"});
+        console.log("data from the backend for user", res);
         if (res.error) {
-          toast.info(res.error.error)
-          return
+          toast.info(res.error.error);
+          return;
         }
-        toast.success(res.message)
-        setData('cUser', res.cUser)
-        setData('token', res.token)
-        dispatch(setAuth(res))
+        toast.success(res.message);
+        setData("cUser", res.cUser);
+        setData("token", res.token);
+        dispatch(setAuth(res));
         if (res.cUser.salon_id == -1) {
-          navigate('/salonCreate')
+          navigate("/salonCreate");
         } else {
-          navigate('/auth/dashboard')
+          navigate("/auth/dashboard");
         }
       } else {
-        const res = await maintainerSignIn({ email, password, action: 'signin' })
-        console.log('Responsese sefefdf', res.error)
+        const res = await maintainerSignIn({email, password, action: "signin"});
+        console.log("Responsese sefefdf", res.error);
         if (res.error) {
-          toast.info(res.error.error)
-          return
+          toast.info(res.error.error);
+          return;
         }
         // if(!res.so_enable) {
         //   toast.info('Your account is disabled. Please contact the Salon Owner.')
         //   return
         // }
-        toast.success(res.message)
-        setData('cUser', res.cUser)
-        setData('token', res.token)
-        navigate('/auth/bill')
+        toast.success(res.message);
+        setData("cUser", res.cUser);
+        setData("token", res.token);
+        navigate("/auth/bill");
       }
     } catch (err) {
-      toast.error(err)
-      setError('An error occurred. Please try again later.')
+      toast.error(err);
+      setError("An error occurred. Please try again later.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen">
       {/* Left side - Image */}
       <div
         className="hidden lg:flex w-1/2 bg-cover bg-center"
-        style={{ backgroundImage: `url(${Both})` }}
+        style={{backgroundImage: `url(${Both})`}}
       >
         <div className="bg-black bg-opacity-30 w-full h-full"></div>
       </div>
@@ -104,7 +129,7 @@ export default function SignIn() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className=" mb-4 flex items-center">
+          {/* <div className=" mb-4 flex items-center">
             <div className="w-24 h-24">
               <img src={Logo} />
             </div>
@@ -114,8 +139,8 @@ export default function SignIn() {
                 CIDCO BRANCH , PLot 21 , Aurangabad,CIDCO BRANCH , PLot 21 , Aurangabad
               </p>
             </div>
-          </div>
-          <div className="mb-4">
+          </div> */}
+          <div className="">
             <label className="block text-gray-700">Email or phone number</label>
             <input
               type="email"
@@ -148,7 +173,10 @@ export default function SignIn() {
               )}
             </p> */}
             <div className="w-[calc(100%-60px)] flex items-center mt-2">
-              <Link to="/salonCreate" className="text-sm text-blue-500 hover:underline">
+              <Link
+                to="/salonCreate"
+                className="text-sm text-blue-500 hover:underline"
+              >
                 Forgot password?
               </Link>
               <div className="w-[64px] ml-auto">
@@ -168,14 +196,28 @@ export default function SignIn() {
           <button
             type="submit"
             className={`w-full py-3 text-white rounded-lg ${
-              loading ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
+              loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
             }`}
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
+        <div className="flex justify-between gap-2 items-center my-2">
+          <button
+            onClick={() => handleTestSignIn("owner")}
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 w-full text-white px-4 py-2 rounded-md"
+          >
+            Sign In as test salon owner 👤
+          </button>
+          <button
+            onClick={() => handleTestSignIn("maintainer")}
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 w-full text-white px-4 py-2 rounded-md"
+          >
+            Sign In as test salon maintainer 👨‍💼
+          </button>
+        </div>
       </div>
     </div>
-  )
+  );
 }

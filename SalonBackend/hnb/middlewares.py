@@ -94,12 +94,12 @@ class ChatUserEnabledMiddleware:
                     try:
                         cUser = SalonMaintainer.objects.get(id=user['id'])
                         # The below line is a temporary fix later we have to create proper fallback for this
-                        cUser.is_enable = True
-                        logger.info(f"User {user['id']} is enabled: {cUser.is_enabled}")
-                        if not cUser.is_enabled:
-                            logger.warning("User is not enabled")
-                            return JsonResponse({"error": "You are not enabled. Contact admin of the software at 7887557175 or pathaksoham2003@gmail.com | Thanks for connecting with NEXORA CREATIONS |"}, 
-                                                status=status.HTTP_401_UNAUTHORIZED)
+                        # cUser.is_enable = True
+                        # logger.info(f"User {user['id']} is enabled: {cUser.is_enabled}")
+                        # if not cUser.is_enabled:
+                        #     logger.warning("User is not enabled")
+                        #     return JsonResponse({"error": "You are not enabled. Contact admin of the software at 7887557175 or pathaksoham2003@gmail.com | Thanks for connecting with NEXORA CREATIONS |"}, 
+                        #                         status=status.HTTP_401_UNAUTHORIZED)
                         request.cUser = cUser
                         request.salon_id = salon_id
                         request.branch_id = branch_id

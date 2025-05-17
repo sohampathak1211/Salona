@@ -21,7 +21,7 @@ const CreateBill = () => {
   const branches = useSelector(selectBranch);
   const services = useSelector(selectService);
   const combos = useSelector(selectCombo);
-  const {searchByPhone} = useCustomer();
+  const {searchByPhone, createCustomer} = useCustomer();
   const stateCoupons = useSelector(selectCoupon);
 
   const [coupons, setCoupons] = useState([]);
@@ -49,6 +49,9 @@ const CreateBill = () => {
   console.log("COupons", coupons);
   console.log("Items", items);
   const navigate = useNavigate();
+  const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
+  const [newCustomerName, setNewCustomerName] = useState("");
+
   useEffect(() => {
     const getProducts = async () => {
       const proData = await getSalonProducts();
@@ -60,16 +63,19 @@ const CreateBill = () => {
   useEffect(() => {
     if (!debouncedSearchTerm) {
       setRelatedContacts([]);
+      setShowNewCustomerForm(false);
       return;
     }
-    console.log("THIS IS TRIGGERED");
+
     const fetchPhoneNumbers = async () => {
       try {
         const data = await searchByPhone({phone: debouncedSearchTerm});
-        console.log("DATA", data);
         setRelatedContacts(data);
+        // Show new customer form if no results found
+        setShowNewCustomerForm(data.length === 0);
       } catch (error) {
         console.error("Error fetching phone numbers:", error);
+        setShowNewCustomerForm(true);
       }
     };
 
@@ -229,6 +235,27 @@ const CreateBill = () => {
     }
   };
 
+  const handleNewCustomerSubmit = async () => {
+    if (!newCustomerName.trim() || !contactNumber.trim()) {
+      toast.error("Please enter both customer name and phone number");
+      return;
+    }
+
+    try {
+      const newCustomer = await createCustomer({
+        name: newCustomerName,
+        phone: contactNumber
+      });
+      
+      setCustomerName(newCustomer.name);
+      setShowNewCustomerForm(false);
+      toast.success("New customer created successfully");
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      toast.error("Failed to create new customer");
+    }
+  };
+
   return (
     <div className="flex flex-1 justify-center relative">
       <div className="w-full p-10">
@@ -314,20 +341,16 @@ const CreateBill = () => {
 
             {/* Customer Details */}
             <div>
-              {/* <label className="block text-sm font-medium mb-1">
-                Contact Contact Number
-              </label>
-              <input
-                type="tel"
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-                className="w-full p-2 border rounded-md"
-                placeholder="Enter contact number"
-                required
-              /> */}
               <Combobox
                 value={contactNumber}
-                onChange={(val) => setContactNumber(val)}
+                onChange={(val) => {
+                  if (typeof val === 'string') {
+                    setContactNumber(val);
+                  } else {
+                    setContactNumber(val.phone);
+                    setCustomerName(val.name);
+                  }
+                }}
                 as="div"
                 className="relative w-full z-10"
               >
@@ -335,8 +358,8 @@ const CreateBill = () => {
                   <Combobox.Input
                     className="p-2 border rounded-md w-full"
                     placeholder="Enter Phone Number"
-                    onChange={(val) => setContactNumber(val)}
-                    displayValue={(selected) => (selected ? selected.name : "")}
+                    onChange={(e) => setContactNumber(e.target.value)}
+                    displayValue={(selected) => selected?.phone || selected}
                   />
                   <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
                     <FaChevronDown
@@ -357,9 +380,27 @@ const CreateBill = () => {
                           }`
                         }
                       >
-                        {opt.name}
+                        {opt.name} - {opt.phone}
                       </Combobox.Option>
                     ))
+                  ) : showNewCustomerForm ? (
+                    <div className="p-4 border-t">
+                      <div className="text-sm text-gray-600 mb-2">Customer not found. Add new customer:</div>
+                      <input
+                        type="text"
+                        value={newCustomerName}
+                        onChange={(e) => setNewCustomerName(e.target.value)}
+                        className="w-full p-2 border rounded-md mb-2"
+                        placeholder="Enter customer name"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleNewCustomerSubmit}
+                        className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                      >
+                        Add New Customer
+                      </button>
+                    </div>
                   ) : (
                     <div className="cursor-default select-none px-4 py-2 text-gray-500">
                       No results found

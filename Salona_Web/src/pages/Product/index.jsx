@@ -13,6 +13,7 @@ import { branchFailed, branchRequest, branchSuccess, selectBranch } from '../../
 import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux'
 import useBranch from '../../services/useBranch'
+import ViewProduct from './ViewProduct'
 
 const Product = () => {
   const [create, setCreate] = useState(false)
@@ -26,6 +27,9 @@ const Product = () => {
   const { getSalonProducts } = useProduct()
   const { isAdmin } = useAssets()
   const dispatch = useDispatch()
+
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [viewModal, setViewModal] = useState(false)
 
   const getProducts = async () => {
     const proData = await getSalonProducts()
@@ -77,8 +81,13 @@ const Product = () => {
     }
   }, [query, products])
 
+  const handleViewProduct = (product) => {
+    setSelectedProduct(product)
+    setViewModal(true)
+  }
+
   return (
-    <div className="flex flex-1 justify-center relative ">
+    <div className="flex flex-1 justify-center relative">
       <div className="w-full p-10">
         <div className="flex justify-between">
           <div>
@@ -107,82 +116,53 @@ const Product = () => {
           />
         </div>
 
-        <div className="relative rounded-2xl overflow-x-auto mt-5">
-          <h2 className="w-full bg-white p-5 text-xl font-bold items-center flex flex-row gap-2">
-            <div>
-              <FaCartPlus size={18} fontWeight={20} />
-            </div>
-            <div> Product Details</div>
-          </h2>
-
-          <div className="max-h-[620px] overflow-y-scroll">
-            {' '}
-            {/* Add this wrapper */}
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 overflow-x-hidden ">
-              <thead className="text-subheading bg-white border-b">
+        <div className="relative rounded-2xl overflow-hidden mt-5">
+          <h2 className="w-full bg-white p-5 text-xl font-bold">Product Details</h2>
+          <div className="max-h-[600px] overflow-y-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-subheading bg-white border-b sticky top-0 z-10">
                 <tr>
-                  <th scope="col" className="px-2 py-3">
-                    Name
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Product Name
                   </th>
-                  <th scope="col" className="px-2 py-3">
-                    Brand
-                  </th>
-                  <th scope="col" className="px-2 py-3">
+                  <th scope="col" className="px-6 py-3 bg-white">
                     Category
                   </th>
-                  <th scope="col" className="px-2 py-3">
-                    Price
-                  </th>
-                  <th scope="col" className="px-2 py-3">
-                    Qty.
-                  </th>
-                  <th scope="col" className="px-2 py-3">
-                    M/F
-                  </th>
-                  <th scope="col" className="px-2 py-3">
-                    Expiry Date
-                  </th>
-                  <th scope="col" className="px-2 py-3">
+                  <th scope="col" className="px-6 py-3 bg-white">
                     Description
                   </th>
-                  <th scope="col" className="px-2 py-3">
-                    Branch Address
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Price
                   </th>
-                  {/* <th scope="col" className=" w-[20px] px-6 py-3">
-                    Action
-                  </th> */}
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Stock
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.length > 0 &&
-                  filteredProducts?.map((item) => (
-                    <tr key={item.id} className="bg-white text-large">
-                      <th
-                        scope="row"
-                        className="px-2 py-4 font-medium text-gray-900 break-words max-w-xs"
-                      >
-                        {item.name}
-                      </th>
-                      <td className="px-2 py-4 text-wrap break-words">{item.brand}</td>
-                      <td className="px-2 py-4">{item.category}</td>
-                      <td className="px-2 py-4">₹{item.price}</td>
-                      <td className="px-2 py-4">{item.quantity}</td>
-                      <td className="px-2 py-4">{item.gender}</td>
-                      <td className="px-2 py-4">
-                        {new Date(item.expiry_date).toLocaleDateString()}
-                      </td>
-                      <td className="px-2 py-4 max-w-xs break-words">{item.description}</td>
-                      <td className="px-2 py-4">{item.branch?.address}</td>
-                      {/* <td className="px-2 py-4 flex flex-row">
-                        <button className="text-black bg-yellow-400 px-3 p-1  rounded-md items-center flex flex-row gap-1 ">
-                          <div>
-                            <FaRegEdit />
-                          </div>
-                          <div>Edit</div>
-                        </button>
-                      </td> */}
-                    </tr>
-                  ))}
+                {filteredProducts.map((item) => (
+                  <tr 
+                    key={item.product_id} 
+                    className="bg-white text-large cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => handleViewProduct(item)}
+                  >
+                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap max-w-[200px] truncate">
+                      {item.name}
+                    </th>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap max-w-[150px] truncate">
+                      {item.category}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap max-w-[250px] truncate">
+                      {item.description}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      ₹{item.price}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {item.stock}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -268,6 +248,11 @@ const Product = () => {
           </div>
         </Dialog>
       </Transition>
+      <ViewProduct 
+        isOpen={viewModal}
+        onClose={() => setViewModal(false)}
+        product={selectedProduct}
+      />
     </div>
   )
 }

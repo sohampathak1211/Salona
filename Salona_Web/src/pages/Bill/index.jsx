@@ -291,13 +291,10 @@ const Bill = () => {
               ))}
             </tbody>
           </table>
-            <div ref={sentinelRef} className="h-20 bg-red-500"></div>
-
-          {/* Sentinel for IntersectionObserver */}
+            <div ref={sentinelRef} className="h-20 "></div>
         </div>
       </div>
 
-      {/* Add View Bill Component */}
       {viewBill && <ViewBill view={viewBill} setView={setBill} />}
     </div>
   );

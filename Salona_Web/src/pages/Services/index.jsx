@@ -1,6 +1,7 @@
 import React, { useEffect, useState, Fragment } from 'react'
 import CreateService from './CreateService'
 import EditService from './EditService'
+import ViewService from './ViewService'
 import useService from '../../services/useService'
 import useBranch from '../../services/useBranch'
 import { Dialog, Transition } from '@headlessui/react'
@@ -29,6 +30,8 @@ const Services = () => {
   const [create, setCreate] = useState(false)
   const [edit, setEdit] = useState(false)
   const [vendorToEdit, setVendorToEdit] = useState(null)
+  const [selectedService, setSelectedService] = useState(null)
+  const [viewModal, setViewModal] = useState(false)
 
   const [searchQuery, setSearchQuery] = useState('') // Search query state
 
@@ -113,6 +116,11 @@ const Services = () => {
     )
   })
 
+  const handleViewService = (service) => {
+    setSelectedService(service)
+    setViewModal(true)
+  }
+
   return (
     <div className="flex flex-1 justify-center relative ">
       <div className="w-full p-10">
@@ -145,73 +153,62 @@ const Services = () => {
           />
         </div>
 
-        <div className="relative rounded-2xl overflow-x-auto mt-5">
+        <div className="relative rounded-2xl overflow-hidden mt-5">
           <h2 className="w-full bg-white p-5 text-xl font-bold">Services Details</h2>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead className="text-subheading bg-white border-b">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Branch Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Service Name
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Category
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Description
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Price
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Duration
-                </th>
-                {/* <th scope="col" className="px-6 py-3">
-                  Actions
-                </th> */}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredServices.map((item) => (
-                <tr key={item.service_id} className="bg-white text-large">
-                  <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.branch.address}
+          <div className="max-h-[600px] overflow-y-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead className="text-subheading bg-white border-b sticky top-0 z-10">
+                <tr>
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Branch Name
                   </th>
-                  <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.name}
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Service Name
                   </th>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.category}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {item.description}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-normal max-w-xs break-words">
-                    {item.price}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {formatDuration(item.duration)}
-                  </td>
-                  {/* <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    <button
-                      onClick={() => handleEditVendor(item)}
-                      className="text-blue-500 hover:text-blue-700 mr-4"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
-                  </td> */}
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Category
+                  </th>
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Price
+                  </th>
+                  <th scope="col" className="px-6 py-3 bg-white">
+                    Duration
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredServices.map((item) => (
+                  <tr 
+                    key={item.service_id} 
+                    className="bg-white text-large cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => handleViewService(item)}
+                  >
+                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap max-w-[200px] truncate">
+                      {item.branch.address}
+                    </th>
+                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap max-w-[200px] truncate">
+                      {item.name}
+                    </th>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap max-w-[150px] truncate">
+                      {item.category}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap max-w-[250px] truncate">
+                      {item.description}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {item.price}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {formatDuration(item.duration)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <Transition appear show={create} as={Fragment}>
@@ -294,6 +291,11 @@ const Services = () => {
           </div>
         </Dialog>
       </Transition>
+      <ViewService 
+        isOpen={viewModal}
+        onClose={() => setViewModal(false)}
+        service={selectedService}
+      />
     </div>
   )
 }

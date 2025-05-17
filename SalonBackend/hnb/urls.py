@@ -27,5 +27,5 @@ urlpatterns = [
     path("coupon/", CouponREST.as_view()),
     path("bill/", BillREST.as_view()),
     path("product/", ProductRest.as_view()),
-    path("superuser/",create_superuser_view),
+    # path("superuser/",create_superuser_view),
 ]
